@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 05</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+
+  <!-- Markdown renderer (optional but recommended) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* ── Cinematic intro ─────────────────────────────────────────── */
+    #cinematic-intro {
+      position: fixed; inset: 0; z-index: 99999;
+      background: radial-gradient(circle at center, #05060a 0%, #000 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 40px;
+    }
+
+    #intro-text {
+      font-family: monospace;
+      color: rgba(200,220,255,.9);
+      max-width: 72ch; text-align: center;
+      line-height: 1.9; letter-spacing: 0.06em;
+      font-size: 0.95rem; transition: opacity .4s ease;
+    }
+
+    #skip-btn {
+      background: transparent;
+      border: 1px solid rgba(120,160,255,.25);
+      color: rgba(120,160,255,.75);
+      padding: 8px 14px; cursor: pointer;
+      letter-spacing: .12em; font-family: monospace;
+      transition: .25s;
+      position: absolute; bottom: 28px; right: 32px;
+      z-index: 3;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95,240,255,.6);
+      color: rgba(95,240,255,.95);
+      box-shadow: 0 0 18px rgba(95,240,255,.12);
+    }
+
+    .fade-out { animation: fadeOut 1.2s forwards; }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    /* ── Lore box ────────────────────────────────────────────────── */
+    #lore-box {
+      display: none;
+      margin-top: 22px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(120,160,255,.14);
+      background: linear-gradient(180deg, rgba(10,14,24,.78), rgba(8,10,18,.88));
+      font-family: monospace;
+      font-size: 0.86rem;
+      color: #d7e2f2;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .lore-line {
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(2px);
+      transition: .35s ease;
+      margin-bottom: 6px;
+    }
+
+    .lore-line.show {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* ── Input area ──────────────────────────────────────────────── */
+    .l3-input-group {
+      display: flex; gap: 10px;
+      margin-top: 18px; flex-wrap: wrap;
+    }
+
+    .l3-input {
+      flex: 1;
+      background: rgba(6,9,16,.96);
+      border: 1px solid rgba(95,240,255,.18);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .l3-input:focus {
+      border-color: rgba(95,240,255,.45);
+      box-shadow: 0 0 14px rgba(95,240,255,.1);
+    }
+
+    .l3-btn {
+      padding: 12px 22px;
+      border-radius: 10px;
+      border: 1px solid rgba(95,240,255,.28);
+      background: linear-gradient(180deg, rgba(95,240,255,.1), rgba(152,184,255,.08));
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: .2s;
+      white-space: nowrap;
+    }
+
+    .l3-btn:hover {
+      border-color: rgba(95,240,255,.5);
+      box-shadow: 0 0 16px rgba(95,240,255,.14);
+    }
+
+    .l3-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .l3-status {
+      margin-top: 12px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      min-height: 1.5em;
+    }
+
+    .l3-status.ok { color: var(--good); }
+    .l3-status.err { color: var(--danger); }
+
+    .l3-pg-link {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      opacity: .8;
+    }
+  </style>
+</head>
+
+<body class="level3">
+
+<!-- CINEMATIC INTRO -->
+<div id="cinematic-intro">
+  <div id="intro-text"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+
+<div class="noise-overlay"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<main class="l3-wrapper">
+
+  <div class="l3-header">
+    <div class="l3-tag">NODE 05 // Informatics Layer</div>
+    <h1>NULL KNOWLEDGE LAYER</h1>
+    <p class="l3-sub">
+      a signal fragment survived the collapse. decode it using the corpus.
+    </p>
+  </div>
+
+  <!-- LORE BOX -->
+  <div id="lore-box"></div>
+
+  <section class="l3-clue">
+
+
+    <a class="l3-pg-link" href="/pg.txt" target="_blank">↓ access corpus (pg.txt)</a>
+
+    <div class="l3-input-group">
+      <input id="answer-input" class="l3-input"
+        type="text"
+        placeholder="decoded message..."
+        autocomplete="off"
+        spellcheck="false" />
+      <button id="submit-btn" class="l3-btn">TRANSMIT</button>
+    </div>
+
+    <div id="status" class="l3-status"></div>
+
+  </section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const intro   = document.getElementById("cinematic-intro");
+  const text    = document.getElementById("intro-text");
+  const skip    = document.getElementById("skip-btn");
+  const loreBox = document.getElementById("lore-box");
+
+  const LINES = [
+    "This was Artical's Informatics layer.",
+    "All knowledge once lived here.",
+    "A distributed mind across fractured nodes.",
+    "Now only echoes remain...",
+    "You must decode the NULL layer.",
+    "Good luck, operator."
+  ];
+
+  let skipped = false;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function runIntro() {
+    for (const line of LINES) {
+      if (skipped) return;
+      text.textContent = "";
+
+      for (const ch of line) {
+        if (skipped) return;
+        text.textContent += ch;
+        await sleep(25);
+      }
+
+      await sleep(1200);
+      text.style.opacity = 0.4;
+      await sleep(200);
+      text.style.opacity = 1;
+    }
+    endIntro();
+  }
+
+  function endIntro() {
+    if (intro.classList.contains("fade-out")) return;
+    intro.classList.add("fade-out");
+    setTimeout(() => {
+      intro.remove();
+      showLore();
+    }, 1100);
+  }
+
+  skip.onclick = () => { skipped = true; endIntro(); };
+  runIntro();
+
+  /* ── LOAD pg.txt INTO LORE BOX ─────────────────────────────── */
+  async function showLore() {
+    loreBox.style.display = "block";
+
+    try {
+      const res = await fetch("/pg.txt", { cache: "no-store" });
+      const md = await res.text();
+
+      const html = window.marked ? marked.parse(md) : md;
+      loreBox.innerHTML = html;
+
+      const children = loreBox.querySelectorAll("*");
+      children.forEach((el, i) => {
+        el.classList.add("lore-line");
+        setTimeout(() => el.classList.add("show"), i * 25);
+      });
+
+    } catch (err) {
+      loreBox.innerHTML = "<div class='lore-line show'>Failed to load corpus.</div>";
+    }
+  }
+
+  /* ── SUBMIT LOGIC ───────────────────────────────────────────── */
+  const btn = document.getElementById("submit-btn");
+  const input = document.getElementById("answer-input");
+  const status = document.getElementById("status");
+
+  btn.addEventListener("click", async () => {
+    const answer = input.value.trim();
+    if (!answer) return;
+
+    btn.disabled = true;
+    status.textContent = "transmitting...";
+
+    try {
+      const res = await fetch("/api/verify-layer1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer }),
+        credentials: "same-origin"
+      });
+
+      if (res.ok) {
+        status.className = "l3-status ok";
+        status.textContent = "✓ signal accepted — routing...";
+        setTimeout(() => window.location.href = "/math.html", 1800);
+      } else {
+        status.className = "l3-status err";
+        status.textContent = "✗ signal rejected.";
+        btn.disabled = false;
+      }
+
+    } catch {
+      status.className = "l3-status err";
+      status.textContent = "✗ connection failure.";
+      btn.disabled = false;
+    }
+  });
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") btn.click();
+  });
+
+});
+</script>
+
+</body>
+</html>

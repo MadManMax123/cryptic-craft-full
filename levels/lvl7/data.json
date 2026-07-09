@@ -1,0 +1,16 @@
+{
+  "loreSentences": [
+    "NULL has routed you into the audio layer.",
+    "Text was sufficient for the outer nodes.",
+    "Deeper systems archived their remains as waveform.",
+    "Most of what passes for static is structured loss.",
+    "Bursts, gaps, and distortions are not incidental here.",
+    "This interface will release the trace once the relay is stabilized."
+  ],
+  "expectedAnswer": "2564",
+  "audioSrc": "/2564.wav",
+  "audioType": "audio/wav",
+  "downloadLink": "/2564.wav",
+  "downloadText": "audionodal.vercel.app/2564.wav",
+  "flagText": "FLAG{AUDIO_SIGNAL_CRACK}"
+}

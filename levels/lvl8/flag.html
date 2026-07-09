@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LEVEL 11 – FLAG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+</head>
+<body class="level8-flag">
+  <main class="flag-wrapper">
+    <div class="flag-header">
+      <div class="flag-tag">Node ascension // node 11</div>
+      <h1>LEVEL 11 COMPLETE</h1>
+      <p class="flag-sub">
+        the core vocabulary has been accepted by the interface.
+      </p>
+    </div>
+
+    <p class="flag-label">Level 11 Flag</p>
+
+    <div id="flag-box" class="flag-box">
+      retrieving flag...
+    </div>
+
+    <p class="flag-note">
+      the outer shell has opened. what remains is no longer a boundary.
+    </p>
+
+    <a href="https://nodecore.vercel.app" class="next-node-btn">
+      Decrypt NULL and see what lies beyond, if anything at all...
+    </a>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const flagBox = document.getElementById("flag-box");
+
+      try {
+        const res = await fetch("/api/get-level8-flag", {
+          method: "GET",
+          credentials: "same-origin"
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.flag) {
+          flagBox.textContent = data.flag;
+        } else {
+          flagBox.textContent = "access denied";
+        }
+      } catch (err) {
+        console.error("Failed to fetch level 10 flag:", err);
+        flagBox.textContent = "failed to retrieve flag";
+      }
+    });
+  </script>
+</body>
+</html>

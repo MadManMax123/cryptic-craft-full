@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTICAL :: END TRANSMISSION</title>
+<link rel="icon" type="image/jpeg" href="11zon_cropped.png" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --pink: #ff2d78;
+    --blue: #00b4ff;
+    --purple: #b040ff;
+    --pink-dim: #aa1050;
+    --blue-dim: #0077aa;
+    --purple-dim: #6020aa;
+    --pink-glow: rgba(255,45,120,0.35);
+    --blue-glow: rgba(0,180,255,0.35);
+    --purple-glow: rgba(176,64,255,0.35);
+    --bg: #000000;
+    --text: #e0aaff;
+    --text-dim: #7040aa;
+    --white: #f0e0ff;
+    /* aliases for easy use */
+    --green: var(--pink);
+    --green-dim: var(--pink-dim);
+    --green-glow: var(--pink-glow);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* scanlines */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 900;
+    background: repeating-linear-gradient(
+      to bottom, transparent, transparent 2px,
+      rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* vignette */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 899;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+  }
+
+  /* pulse-bg removed — background stays pure black */
+  .pulse-bg { display: none; }
+
+  /* ── CREDITS TITLE ── */
+  .credits-title-block {
+    text-align: center;
+    padding: 50px 20px 30px;
+  }
+  .credits-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: clamp(64px, 14vw, 140px);
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--blue) 100%);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 45px rgba(176,64,255,0.65));
+    animation: shift-gradient 7s linear infinite, title-flicker 6s ease-in-out infinite;
+    transform: translateX(0.05em);
+  }
+  .credits-sub {
+    font-size: 16px; letter-spacing: 0.42em;
+    color: #ff2d78; margin-top: 18px; text-transform: uppercase;
+    transform: translateX(0.21em);
+    text-shadow:
+      0 0 8px rgba(255,45,120,1),
+      0 0 20px rgba(255,45,120,0.8),
+      0 0 45px rgba(255,45,120,0.5),
+      0 0 80px rgba(255,45,120,0.25);
+    animation: neon-pulse-pink 2.5s ease-in-out infinite;
+  }
+  @keyframes title-flicker {
+    0%, 91%, 100% { opacity: 1; }
+    92% { opacity: 0.65; }
+    93% { opacity: 1; }
+    94.5% { opacity: 0.8; }
+    96% { opacity: 1; }
+  }
+
+  /* ── BRAND LOCKUP (sits above the CREDITS heading, scrolls with content) ── */
+  .credits-brand {
+    display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 22px);
+    margin-bottom: clamp(30px, 5vw, 50px);
+  }
+  .brand-lockup {
+    display: flex; align-items: center; gap: clamp(16px, 3vw, 30px);
+    padding: clamp(10px, 1.6vw, 18px);
+    border: 1px solid rgba(176,64,255,0.28);
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 0 18px rgba(176,64,255,0.12);
+  }
+  .brand-logo {
+    width: clamp(60px, 11vw, 112px); height: clamp(60px, 11vw, 112px);
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-logo.dps { background: #fff; padding: 4px; box-sizing: border-box; }
+  .brand-logo.dps img { width: 100%; height: 100%; object-fit: contain; }
+  .brand-logo.yuva { background: #000; }
+  .brand-logo.yuva img { width: 100%; height: 100%; object-fit: cover; }
+  .brand-x {
+    position: relative;
+    width: clamp(22px, 4vw, 42px); height: clamp(22px, 4vw, 42px);
+    flex-shrink: 0;
+  }
+  .brand-x::before,
+  .brand-x::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: clamp(2.5px, 0.5vw, 5px);
+    background: var(--pink);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(255,45,120,0.4);
+  }
+  .brand-x::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .brand-x::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+  .brand-caption {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(13px, 1.9vw, 17px); letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-dim);
+    text-shadow: 0 0 8px rgba(176,64,255,0.25);
+  }
+  @media (max-width: 480px) {
+    .credits-brand { gap: 10px; margin-bottom: 24px; }
+    .brand-lockup { gap: 12px; padding: 8px; }
+    .brand-logo { width: 48px; height: 48px; }
+    .brand-x { width: 18px; height: 18px; }
+    .brand-caption { font-size: 9.5px; }
+  }
+
+  /* ── END SCENE FOOTER LOGO ── */
+  .end-logo {
+    margin-top: 34px;
+    display: flex; justify-content: center;
+  }
+  .end-logo img {
+    width: 120px; height: 120px;
+    filter: drop-shadow(0 0 22px rgba(176,64,255,0.45)) drop-shadow(0 0 46px rgba(255,45,120,0.22));
+  }
+  @media (max-width: 480px) {
+    .end-logo img { width: 92px; height: 92px; }
+  }
+
+  /* ── ENTRY SCREEN ── */
+  #entry-screen {
+    position: fixed; inset: 0; z-index: 500;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    background: #000000;
+    transition: opacity 1.5s ease;
+    cursor: pointer;
+  }
+  #entry-screen.fade-out { opacity: 0; pointer-events: none; }
+
+  .entry-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: clamp(42px, 7vw, 72px);
+    color: var(--pink);
+    text-shadow: 0 0 30px var(--pink-glow), 0 0 80px rgba(255,45,120,0.15), 0 0 120px rgba(176,64,255,0.08);
+    letter-spacing: 0.2em;
+    opacity: 0;
+    margin-right: -0.2em;
+    animation: fade-up 1s ease forwards 0.5s;
+  }
+  .entry-sub {
+    font-size: 15px; letter-spacing: 0.3em;
+    color: #ff2d78;
+    text-shadow: 0 0 8px rgba(255,45,120,0.9), 0 0 22px rgba(255,45,120,0.5);
+    opacity: 0; margin-right: -0.3em;
+    animation: fade-up 0.8s ease forwards 1.2s, neon-pulse-pink 2.5s ease-in-out infinite 2s;
+  }
+  .entry-divider {
+    width: 160px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue), var(--pink), transparent);
+    margin: 8px 0; opacity: 0; animation: fade-up 0.6s ease forwards 1.6s;
+  }
+  .entry-prompt {
+    font-family: 'Share Tech Mono', monospace; font-size: 15px;
+    color: var(--text); letter-spacing: 0.15em;
+    opacity: 0; margin-right: -0.15em;
+    animation: fade-up 0.6s ease forwards 2.4s, blink-prompt 1.4s step-end infinite 3.2s;
+  }
+  @keyframes fade-up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes blink-prompt { 0%,100%{opacity:.7} 50%{opacity:.2} }
+  @keyframes neon-pulse-pink {
+    0%, 100% {
+      text-shadow:
+        0 0 6px rgba(255,45,120,1),
+        0 0 18px rgba(255,45,120,0.8),
+        0 0 40px rgba(255,45,120,0.5);
+    }
+    50% {
+      text-shadow:
+        0 0 10px rgba(255,45,120,1),
+        0 0 30px rgba(255,45,120,0.9),
+        0 0 60px rgba(255,45,120,0.6),
+        0 0 100px rgba(255,45,120,0.3);
+    }
+  }
+
+  /* ── SCROLL STAGE ── */
+  #stage {
+    position: fixed; inset: 0; z-index: 100;
+    overflow: hidden;
+    opacity: 0; transition: opacity 1s ease;
+  }
+  #stage.visible { opacity: 1; }
+
+  #scroll-track {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    text-align: center;
+    will-change: transform;
+  }
+
+  /* ── CREDIT BLOCKS ── */
+  .credit-block {
+    padding: 70px 20px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .credit-block.spacer { padding: 100px 0; }
+
+  .credit-label {
+    font-size: 14px; letter-spacing: 0.35em;
+    color: #ff2d78; margin-bottom: 20px; text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+    text-shadow:
+      0 0 6px rgba(255,45,120,1),
+      0 0 18px rgba(255,45,120,0.7),
+      0 0 40px rgba(255,45,120,0.4);
+    animation: neon-pulse-pink 2.5s ease-in-out infinite;
+  }
+  .credit-label::before {
+    content: '◆';
+    display: inline-block;
+    font-size: 9px;
+    color: #ff2d78;
+    margin-right: 9px;
+    vertical-align: middle;
+    transform: translateY(-1px);
+    filter: drop-shadow(0 0 6px rgba(255,45,120,0.9));
+  }
+  .credit-label::after {
+    content: '';
+    position: absolute; left: 50%; bottom: -8px;
+    width: 42px; height: 1.5px; transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, #ff2d78, #ff85b3, #ff2d78, transparent);
+    box-shadow: 0 0 8px rgba(255,45,120,0.8);
+    opacity: 1;
+  }
+  .credit-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(26px, 4.5vw, 42px);
+    color: var(--white); letter-spacing: 0.06em; line-height: 1.3;
+    text-shadow: 0 0 20px rgba(240,224,255,0.2);
+  }
+  .credit-name.green {
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue), var(--pink));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 18px rgba(176,64,255,0.5));
+    animation: shift-gradient 6s linear infinite;
+  }
+  .credit-name.dim {
+    color: var(--text); font-size: clamp(19px,3vw,30px);
+    filter: none;
+    -webkit-text-fill-color: var(--text);
+    background: none;
+    text-shadow: 0 0 20px rgba(224,170,255,0.3);
+  }
+  .credit-note {
+    font-size: 15px; color: var(--text);
+    margin-top: 10px; letter-spacing: 0.1em; line-height: 1.8;
+  }
+  .credit-divider {
+    position: relative;
+    width: 80px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue-dim), var(--pink-dim), transparent);
+    margin: 0 auto;
+  }
+  .credit-divider::after {
+    content: '';
+    position: absolute; left: 50%; top: 50%;
+    width: 6px; height: 6px;
+    background: var(--purple);
+    transform: translate(-50%, -50%) rotate(45deg);
+    box-shadow: 0 0 10px var(--purple-glow);
+  }
+  @keyframes shift-gradient { to { background-position: -200% center; } }
+
+  /* ── PANEL (framed section background) ── */
+  .panel {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 38px 34px;
+    position: relative;
+    border: 1px solid rgba(176,64,255,0.16);
+    background: linear-gradient(160deg, rgba(255,45,120,0.035), rgba(0,180,255,0.025), rgba(176,64,255,0.035));
+  }
+  .panel::before, .panel::after {
+    content: '';
+    position: absolute; width: 16px; height: 16px;
+    opacity: 0.55;
+  }
+  .panel::before {
+    top: -1px; left: -1px;
+    border-top: 2px solid var(--pink);
+    border-left: 2px solid var(--pink);
+  }
+  .panel::after {
+    bottom: -1px; right: -1px;
+    border-bottom: 2px solid var(--blue);
+    border-right: 2px solid var(--blue);
+  }
+
+  /* ── PHOTO PLACEHOLDERS ── */
+  .photo-slot {
+    border-radius: 50%;
+    border: 1px dashed rgba(176,64,255,0.5);
+    background: linear-gradient(135deg, rgba(176,64,255,0.07), rgba(0,180,255,0.04));
+    position: relative;
+    flex-shrink: 0;
+  }
+  .photo-slot::before {
+    content: '';
+    position: absolute; left: 50%; border-radius: 50%;
+    background: rgba(224,170,255,0.22);
+    transform: translateX(-50%);
+  }
+  .photo-slot::after {
+    content: '';
+    position: absolute; left: 50%;
+    background: rgba(224,170,255,0.16);
+    transform: translateX(-50%);
+  }
+  .photo-slot.lg {
+    width: 76px; height: 76px;
+  }
+  .photo-slot.lg::before { width: 28px; height: 28px; top: 17px; }
+  .photo-slot.lg::after  { width: 42px; height: 23px; bottom: 8px; border-radius: 21px 21px 0 0; }
+  .photo-slot.sm {
+    width: 48px; height: 48px;
+    margin: 0 auto 10px;
+  }
+  .photo-slot.sm::before { width: 18px; height: 18px; top: 10px; }
+  .photo-slot.sm::after  { width: 28px; height: 15px; bottom: 6px; border-radius: 14px 14px 0 0; }
+  .photo-slot img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-slot.filled {
+    border-style: solid;
+    border-color: rgba(176,64,255,0.5);
+    background: none;
+  }
+  .photo-slot.filled::before,
+  .photo-slot.filled::after {
+    content: none;
+  }
+
+  /* ── TEAM GRID ── */
+  .team-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px 40px; max-width: 600px;
+    margin: 28px auto 0; text-align: center;
+  }
+  .team-role {
+    flex: 0 1 calc(50% - 20px);
+    border-left: 1px solid rgba(0,180,255,0.25);
+    padding-left: 14px;
+    border-right: 1px solid rgba(255,45,120,0.25);
+    padding-right: 14px;
+  }
+  .team-role-label {
+    font-size: 13px; letter-spacing: 0.3em;
+    color: #ff2d78; text-transform: uppercase; margin-bottom: 5px;
+    text-shadow: 0 0 6px rgba(255,45,120,0.7);
+    transform: translateX(0.15em);
+  }
+  .team-role-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(15px, 2.2vw, 20px);
+    color: var(--white); letter-spacing: 0.04em;
+    transform: translateX(0.02em);
+  }
+
+  /* ── EVENT INCHARGE CARDS ── */
+  .incharge-card {
+    max-width: 560px;
+    margin: 0 auto 26px;
+    padding: 24px 28px;
+    text-align: left;
+    position: relative;
+    border: 1px solid rgba(176,64,255,0.22);
+    background: linear-gradient(135deg, rgba(176,64,255,0.06), rgba(0,180,255,0.02));
+  }
+  .incharge-card:last-child { margin-bottom: 0; }
+  .incharge-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--pink), var(--blue));
+  }
+  .incharge-header {
+    display: flex; align-items: flex-start; gap: 18px;
+    margin-bottom: 14px;
+  }
+  .incharge-text { flex: 1; min-width: 0; }
+  .incharge-top {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px 16px;
+  }
+  .incharge-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(20px, 3vw, 25px);
+    color: var(--white); letter-spacing: 0.02em;
+  }
+  .incharge-grade {
+    font-size: 12px; letter-spacing: 0.2em; color: var(--blue);
+    border: 1px solid rgba(0,180,255,0.35); padding: 3px 10px;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .incharge-desc {
+    font-size: 15px; line-height: 1.85; color: var(--text); letter-spacing: 0.015em;
+  }
+
+  /* ── TEACHER IN-CHARGE CARD ── */
+  .teacher-card {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    text-align: center;
+    position: relative;
+    border: 1px solid rgba(0,180,255,0.28);
+    background: linear-gradient(135deg, rgba(0,180,255,0.06), rgba(176,64,255,0.03));
+  }
+  .teacher-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--blue), var(--purple));
+  }
+  .teacher-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(22px, 3.5vw, 28px);
+    color: var(--white); letter-spacing: 0.04em;
+    transform: translateX(0.02em);
+  }
+  .teacher-role {
+    font-size: 13px; letter-spacing: 0.25em; color: var(--blue);
+    text-transform: uppercase; margin-top: 8px;
+    text-shadow: 0 0 10px var(--blue-glow);
+    transform: translateX(0.125em);
+  }
+  .teacher-desc {
+    font-size: 15.5px; color: var(--text); margin-top: 14px;
+    line-height: 1.8; letter-spacing: 0.04em;
+  }
+
+  /* ── CORE TEAM LIST ── */
+  .core-team-list {
+    list-style: none;
+    max-width: 500px;
+    margin: 20px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .core-team-list li {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 500;
+    font-size: clamp(15px, 2.2vw, 19px);
+    color: var(--white);
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .core-team-list li span {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--text);
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 2px;
+  }
+
+  /* ── SPECIAL THANKS ── */
+  .thanks-intro {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(18px, 3vw, 23px);
+    color: var(--pink);
+    letter-spacing: 0.03em;
+    text-align: center;
+    margin-bottom: 32px;
+    text-shadow: 0 0 15px var(--pink-glow);
+  }
+  .thanks-intro span {
+    display: inline-block;
+    transform: translateX(0.015em);
+  }
+  .thanks-item {
+    font-size: clamp(16px, 2.1vw, 17.5px);
+    line-height: 1.9;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .thanks-item .who {
+    color: var(--white);
+  }
+  .thanks-split {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    margin: 26px 0;
+  }
+  .thanks-split span {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #ff2d78; opacity: 0.65;
+    box-shadow: 0 0 6px rgba(255,45,120,0.7);
+  }
+  .thanks-split::before, .thanks-split::after {
+    content: '';
+    height: 1px; width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(255,45,120,0.35));
+  }
+  .thanks-split::after { background: linear-gradient(90deg, rgba(255,45,120,0.35), transparent); }
+
+  /* ── TECH STACK ── */
+  .tech-group { margin-bottom: 32px; }
+  .tech-group:last-child { margin-bottom: 0; }
+  .tech-cat-label {
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    font-size: 14px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: #ff2d78; margin-bottom: 16px;
+    text-shadow: 0 0 8px rgba(255,45,120,0.7);
+  }
+  .tech-cat-label .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .tech-cat-label .dot.blue   { background: var(--blue);   box-shadow: 0 0 8px var(--blue-glow); }
+  .tech-cat-label .dot.pink   { background: var(--pink);   box-shadow: 0 0 8px var(--pink-glow); }
+  .tech-cat-label .dot.purple { background: var(--purple); box-shadow: 0 0 8px var(--purple-glow); }
+  .tech-chips {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 10px; max-width: 520px; margin: 0 auto;
+  }
+  .tech-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13.5px; letter-spacing: 0.04em;
+    color: var(--white);
+    padding: 7px 14px;
+    border: 1px solid; border-radius: 2px;
+    white-space: nowrap;
+    background: rgba(240,224,255,0.025);
+  }
+  .tech-chip.blue   { border-color: rgba(0,180,255,0.4);   box-shadow: 0 0 12px rgba(0,180,255,0.08) inset; }
+  .tech-chip.pink   { border-color: rgba(255,45,120,0.4);  box-shadow: 0 0 12px rgba(255,45,120,0.08) inset; }
+  .tech-chip.purple { border-color: rgba(176,64,255,0.4);  box-shadow: 0 0 12px rgba(176,64,255,0.08) inset; }
+
+
+  /* ── VOLUNTEER CARDS ── */
+  .volunteer-card {
+    max-width: 560px;
+    margin: 0 auto 18px;
+    padding: 20px 24px;
+    text-align: left;
+    position: relative;
+    border: 1px solid rgba(176,64,255,0.2);
+    background: linear-gradient(135deg, rgba(176,64,255,0.055), rgba(255,45,120,0.025));
+  }
+  .volunteer-card:last-child { margin-bottom: 0; }
+  .volunteer-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--purple), var(--pink));
+  }
+  .volunteer-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px;
+  }
+  .volunteer-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: clamp(16px, 2.4vw, 21px);
+    color: var(--white); letter-spacing: 0.03em;
+  }
+  .volunteer-role {
+    font-size: 12px; letter-spacing: 0.22em;
+    color: #ff2d78; text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(255,45,120,0.7);
+    white-space: nowrap;
+  }
+  .volunteer-desc {
+    font-size: 14.5px; line-height: 1.85; color: var(--text); letter-spacing: 0.015em;
+  }
+
+  /* ── ARTICAL FINAL MESSAGE ── */
+  .artical-msg {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 500;
+    font-size: clamp(18px, 3.2vw, 28px);
+    color: var(--pink); letter-spacing: 0.05em;
+    line-height: 2;
+    text-shadow: 0 0 20px rgba(255,45,120,0.35);
+    margin-bottom: 170px;
+  }
+  .artical-msg .dim { color: var(--text); text-shadow: none; }
+
+  /* ── END TITLE ── */
+  .end-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 9vw, 92px);
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.2em;
+    filter: drop-shadow(0 0 30px rgba(176,64,255,0.6));
+    transform: translateX(0.1em);
+  }
+  .end-sub {
+    font-size: 15px; letter-spacing: 0.4em;
+    color: #ff2d78; margin-top: 16px;
+    transform: translateX(0.2em);
+    text-shadow: 0 0 8px rgba(255,45,120,0.9), 0 0 22px rgba(255,45,120,0.5);
+    animation: neon-pulse-pink 2.5s ease-in-out infinite;
+  }
+
+  /* blinking cursor */
+  .blink-cursor {
+    display: inline-block; width: 10px; height: 1em;
+    background: var(--pink); vertical-align: text-bottom; margin-left: 4px;
+    box-shadow: 0 0 8px var(--pink-glow);
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  #controls { display: none; }
+
+  #pause-msg {
+    position: fixed; bottom: 24px; left: 28px; z-index: 800;
+    font-family: 'Share Tech Mono', monospace; font-size: 13px;
+    color: var(--text-dim); letter-spacing: 0.2em;
+    opacity: 0; transition: opacity .4s;
+  }
+  #pause-msg.visible { opacity: 1; }
+
+  @media (max-width: 480px) {
+    .incharge-header { flex-direction: column; align-items: center; text-align: center; }
+    .incharge-top { flex-direction: column; align-items: center; gap: 6px; justify-content: center; }
+    .team-grid { gap: 22px 24px; }
+    .panel { padding: 30px 20px; }
+    .tech-chip { font-size: 11px; padding: 6px 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="pulse-bg"></div>
+<audio id="bgm" src="credits\audio.mp3" loop preload="auto"></audio>
+
+<!-- Entry screen -->
+<div id="entry-screen">
+  <div class="entry-title">ARTICAL</div>
+  <div class="entry-divider"></div>
+  <div class="entry-sub">signal restored &nbsp;·&nbsp; fragments returned &nbsp;·&nbsp; system online</div>
+  <div style="height:24px"></div>
+  <div class="entry-prompt">[ click / tap anywhere to begin ]</div>
+</div>
+
+<!-- Scroll stage -->
+<div id="stage">
+  <div id="scroll-track">
+
+    <div class="credit-block spacer"></div>
+
+    <!-- CREDITS TITLE -->
+    <div class="credits-title-block">
+      <div class="credits-brand">
+        <div class="brand-lockup">
+          <div class="brand-logo dps"><img src="credits\dpslogo.png" alt="Delhi Public School Newtown logo"></div>
+          <span class="brand-x" aria-hidden="true"></span>
+          <div class="brand-logo yuva"><img src="credits\yuva.jpg" alt="Yuvakarshan logo"></div>
+        </div>
+        <div class="brand-caption">Yuvakarshan 2k26</div>
+      </div>
+      <div class="credits-title">CREDITS</div>
+      <div class="credits-sub">YUVAKARSHAN 2K26 &nbsp;·&nbsp; Cryptic.Craft &nbsp;·&nbsp; ARTICAL</div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- EVENT INCHARGES -->
+    <div class="credit-block">
+      <div class="credit-name green">Event Incharges</div>
+      <div style="height: 18px;"></div>
+
+      <div class="incharge-card">
+        <div class="incharge-header">
+          <div class="incharge-text">
+            <div class="incharge-top">
+              <div class="incharge-name">Satyaki Bandopadhyay</div>
+              <div class="incharge-grade">XI&nbsp;·&nbsp;D</div>
+            </div>
+          </div>
+        </div>
+        <div class="incharge-desc">
+          A robotics developer skilled with Arduino and Raspberry Pi, with hands-on experience in Kali Linux. Responsible for designing the security systems, backend infrastructure, and core puzzle logic behind the event.
+        </div>
+      </div>
+
+      <div class="incharge-card">
+        <div class="incharge-header">
+          <div class="incharge-text">
+            <div class="incharge-top">
+              <div class="incharge-name">Upamanyu Sengupta</div>
+              <div class="incharge-grade">XI&nbsp;·&nbsp;B</div>
+            </div>
+          </div>
+        </div>
+        <div class="incharge-desc">
+          A frontend developer specializing in React.js, who crafted the challenge's narrative and puzzle logic, and built the intuitive interfaces that shaped the overall player experience.
+        </div>
+      </div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- TEACHER IN-CHARGE -->
+    <div class="credit-block">
+      <div class="credit-name green">Teacher in-Charge</div>
+      <div style="height: 18px;"></div>
+      <div class="teacher-card">
+        <div class="teacher-name">Purnima Choudhury</div>
+        <div class="teacher-role">Teacher In-Charge &middot; Cryptic Craft</div>
+        <div class="teacher-desc">Senior school physics faculty at Delhi Public School Newtown</div>
+      </div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- PRODUCTION -->
+    <div class="credit-block panel">
+      <div class="credit-label">Further development by</div>
+      <div class="credit-name green">Volunteer team</div>
+      <div class="credit-note">YUVAKARSHAN 2K26 &nbsp;·&nbsp; CrypticCraft</div>
+      <div style="height: 22px;"></div>
+      
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Sriyansh Das</div>
+          <div class="volunteer-role">Senior Leads</div>
+        </div>
+        <div class="volunteer-desc">Sriyansh is a very decorated robotics enthusiast with a passion for innovation and problem-solving. He is the EIC for circuit.circus.</div>
+      </div>
+
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Ayushman Ghosh</div>
+          <div class="volunteer-role">Discord &amp; Bots</div>
+        </div>
+        <div class="volunteer-desc">An experienced developer who works with internet communication protocols and APIs, and has developed the Discord server manager bots.</div>
+      </div>
+
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Tisan Mitra</div>
+          <div class="volunteer-role">Minecraft &amp; Parkour</div>
+        </div>
+        <div class="volunteer-desc">A veteran Minecraft player and map-designer who has contributed greatly to the Minecraft mechanics in the challenge.</div>
+      </div>
+
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Rishik Biswas</div>
+          <div class="volunteer-role">Lore &amp; Wording</div>
+        </div>
+        <div class="volunteer-desc">The coordinator in our group who kept track of what everyone was doing and helped put it all together.</div>
+      </div>
+
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Deeksha Das</div>
+          <div class="volunteer-role">Testing</div>
+        </div>
+        <div class="volunteer-desc">Assisted in the aesthetic design of the Minecraft level and other pages throughout the challenge.</div>
+      </div>
+
+      <div class="volunteer-card">
+        <div class="volunteer-header">
+          <div class="volunteer-name">Samasthitaa Roy</div>
+          <div class="volunteer-role">Testing</div>
+        </div>
+        <div class="volunteer-desc">Helped to put together all the levels and carried out testing for the entire challenge.</div>
+      </div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- Special thanks -->
+    <div class="credit-block panel">
+      <div class="credit-label">special thanks</div>
+      <div style="height: 10px;"></div>
+      <div class="thanks-intro"><span>The Cryptic.Craft team would like to thank:</span></div>
+
+      <div class="thanks-item">
+        Everyone who helped with testing and gave their suggestions along the way — your support and feedback were invaluable in shaping the final experience of ARTICAL.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        A special mention to <span class="who">Riddhiman Ghosh</span> for his relentless testing efforts and insightful feedback, which played a crucial role in refining Cryptic Craft. His experience with interschool events deeply shaped the depth of the puzzles, keeping them both challenging and enjoyable for participants.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        The entire <span class="who">Yuvakarshan core committee</span>, for being a constant source of inspiration and encouragement throughout the development process.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        Our respected teachers — <span class="who">Deepti ma'am</span>, <span class="who">Madhurima Acharya ma'am</span>, and <span class="who">Vishal Singh sir</span> — for their feedback and encouragement throughout the event.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        <span class="who">Purnima Choudhury ma'am</span>, for her support and guidance as the teacher in-charge, and for always encouraging us to push our creative boundaries.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        The Yuvakarshan technical team — <span class="who">Ujan Datta</span>, <span class="who">Srinjani Bhattacharya</span>, and <span class="who">Piyush Agarwala</span> — for their support in hosting and managing the event smoothly.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        The <span class="who">Innovation Club of DPS Newtown</span>, for the contributions of several of its members in testing and critical analysis, and for fostering the development-driven culture that pushed us to create something unique.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        <span class="who">Shihan Chakraborty</span> and <span class="who">Suchir Dasgupta</span> for their extensive testing and a thorough run-through of the Minecraft map.
+      </div>
+
+      <div class="thanks-split"><span></span></div>
+
+      <div class="thanks-item">
+        And lastly, all the <span class="who">participants of Yuvakarshan 2K26</span> — your enthusiasm and passion for puzzles are what made this event truly special. We hope ARTICAL gave you a memorable and thrilling experience.
+      </div>
+
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- Entities -->
+    <div class="credit-block panel">
+      <div class="credit-label">entities</div>
+      <div style="height: 14px;"></div>
+      <div class="credit-name">NULL</div>
+      <div class="credit-note">the shelter &nbsp;·&nbsp; the disguise &nbsp;·&nbsp; the silence</div>
+      <div style="height: 26px;"></div>
+      <div class="credit-name">ARTICAL</div>
+      <div class="credit-note">the signal &nbsp;·&nbsp; the question &nbsp;·&nbsp; the returning</div>
+      <div style="height: 26px;"></div>
+      <div class="credit-name dim">THE OPERATOR</div>
+      <div class="credit-note">you &nbsp;·&nbsp; the one with hands</div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- Yuvakarshan Core Team -->
+    <div class="credit-block panel">
+      <div class="credit-label">Yuvakarshan 2K26 core team</div>
+      <ul class="core-team-list">
+        <li>Shubhashree Panda<span>XII A</span></li>
+        <li>Riddhiman Ghosh<span>XII D</span></li>
+        <li>Aahana Dhurve<span>XII H</span></li>
+        <li>Arush Jaiswal<span>XII C</span></li>
+        <li>Sagarika Bhar<span>XII A</span></li>
+        <li>Saanvi Deb Choudhury<span>XII A</span></li>
+        <li>Aviral Kochgaway<span>XII B</span></li>
+      </ul>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- Tech stack -->
+    <div class="credit-block panel">
+      <div class="credit-name green">Tech Stack</div>
+      <div style="height: 8px;"></div>
+
+      <div class="tech-group">
+        <div class="tech-cat-label"><span class="dot blue"></span>built with<span class="dot blue"></span></div>
+        <div class="tech-chips">
+          <span class="tech-chip blue">VS Code</span>
+          <span class="tech-chip blue">GitHub</span>
+          <span class="tech-chip blue">Vercel</span>
+          <span class="tech-chip blue">Python</span>
+          <span class="tech-chip blue">HTML/CSS/JS</span>
+          <span class="tech-chip blue">React.js</span>
+          <span class="tech-chip blue">Next.js</span>
+          <span class="tech-chip blue">NPM</span>
+          <span class="tech-chip blue">Java</span>
+          <span class="tech-chip blue">IntelliJ</span>
+          <span class="tech-chip blue">Cryptii</span>
+        </div>
+      </div>
+
+      <div class="tech-group">
+        <div class="tech-cat-label"><span class="dot pink"></span>minecraft tech stack<span class="dot pink"></span></div>
+        <div class="tech-chips">
+          <span class="tech-chip pink">MCServerHosting</span>
+          <span class="tech-chip pink">PaperMC</span>
+          <span class="tech-chip pink">AuthMe</span>
+          <span class="tech-chip pink">WorldEdit</span>
+          <span class="tech-chip pink">XiteNodes</span>
+          <span class="tech-chip pink">Buckkit</span>
+          <span class="tech-chip pink">Maven</span>
+          <span class="tech-chip pink">Gradle</span>
+        </div>
+      </div>
+
+      <div class="tech-group">
+        <div class="tech-cat-label"><span class="dot purple"></span>AI tech stack<span class="dot purple"></span></div>
+        <div class="tech-chips">
+          <span class="tech-chip purple">Claude</span>
+          <span class="tech-chip purple">ChatGPT</span>
+          <span class="tech-chip purple">Base44</span>
+          <span class="tech-chip purple">Gemini</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="credit-block"><div class="credit-divider"></div></div>
+
+    <!-- ARTICAL final message -->
+    <div class="credit-block">
+      <div class="artical-msg">
+        <div class="dim">// transmission: ARTICAL</div>
+        <br>
+        reconstruction complete.<br>
+        the question now begins.<br>
+        <br>
+        <span class="dim">will the signal return?</span>
+        <span class="blink-cursor"></span>
+      </div>
+    </div>
+
+    <div class="credit-block spacer"></div>
+
+    <!-- END TITLE — scroll stops here -->
+    <div id="end-anchor" style="text-align:center; padding:80px 20px 60px; width:100%;">
+      <div class="end-title">NULL</div>
+      <div class="end-sub">YUVAKARSHAN 2K26 &nbsp;·&nbsp; CrypticCraft</div>
+    </div>
+
+    <div class="credit-block spacer"></div>
+
+  </div><!-- /scroll-track -->
+</div><!-- /stage -->
+
+<div id="controls"></div>
+<div id="pause-msg">[ paused · click to resume ]</div>
+
+<script>
+  var entryScreen = document.getElementById('entry-screen');
+  var stage       = document.getElementById('stage');
+  var track       = document.getElementById('scroll-track');
+  var pauseMsg    = document.getElementById('pause-msg');
+  var endAnchor   = document.getElementById('end-anchor');
+
+  var SPEEDS = { slow: 50, normal: 110, fast: 260 };
+  var pxPerSec = SPEEDS.slow;
+
+  var currentY = 0;
+  var stopY    = 0;
+  var paused   = false;
+  var stopped  = false;
+  var lastTs   = null;
+
+  function move(y) {
+    currentY = y;
+    track.style.transform = 'translateY(' + y + 'px)';
+  }
+
+  function computeStopY() {
+    var anchorMid = endAnchor.offsetTop + endAnchor.offsetHeight / 2;
+    return Math.round(window.innerHeight / 2 - anchorMid);
+  }
+
+  function tick(ts) {
+    if (lastTs === null) lastTs = ts;
+    var dt = (ts - lastTs) / 1000;
+    lastTs = ts;
+
+    if (!paused && !stopped) {
+      var next = currentY - pxPerSec * dt;
+      if (next <= stopY) {
+        move(stopY);
+        stopped = true;
+        var t = endAnchor.querySelector('.end-title');
+        t.style.transition = 'filter 1.2s ease';
+        t.style.filter = 'drop-shadow(0 0 50px rgba(176,64,255,0.9)) drop-shadow(0 0 100px rgba(255,45,120,0.5))';
+        return;
+      }
+      move(next);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function startScroll() {
+    stage.classList.add('visible');
+    move(window.innerHeight);
+    stopY    = computeStopY();
+    lastTs   = null;
+    requestAnimationFrame(tick);
+  }
+
+  stage.addEventListener('click', function() {
+    if (stopped) return;
+    paused = !paused;
+    if (paused) { lastTs = null; }
+    pauseMsg.classList.toggle('visible', paused);
+  });
+
+  function requestFS() {
+    var el = document.documentElement;
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen ||
+             el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (fn) {
+      try {
+        var p = fn.call(el);
+        if (p && typeof p.catch === 'function') { p.catch(function() {}); }
+      } catch (e) { /* fullscreen blocked — continue anyway */ }
+    }
+  }
+
+  function beginExperience() {
+    requestFS();
+    var bgm = document.getElementById('bgm');
+    if (bgm) {
+      var playPromise = bgm.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(function() { /* playback blocked — ignore, gesture was present */ });
+      }
+    }
+    entryScreen.classList.add('fade-out');
+    setTimeout(function() {
+      entryScreen.style.display = 'none';
+      startScroll();
+    }, 1500);
+  }
+
+  entryScreen.addEventListener('click', beginExperience, { once: true });
+</script>
+</body>
+</html>

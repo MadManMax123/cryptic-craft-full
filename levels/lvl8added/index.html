@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 13</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+  <link rel="stylesheet" href="/style.css" />
+
+  <style>
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes introFadeOut {
+      to { opacity: 0; }
+    }
+
+    #lore-display {
+      position: relative;
+      z-index: 2;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(180, 210, 255, 0.82);
+      text-align: center;
+      max-width: 64ch;
+      line-height: 1.8;
+      letter-spacing: .045em;
+      min-height: 1.8em;
+      opacity: 1;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display.fade-line-out {
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95, 240, 255, .75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.18) 2px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%),
+        linear-gradient(
+          135deg,
+          transparent 0%,
+          transparent 45%,
+          rgba(95, 240, 255, 0.06) 50%,
+          transparent 55%,
+          transparent 100%
+        );
+      background-size: 100% 100%, 200% 200%;
+      animation: diagonalShimmer 6s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes diagonalShimmer {
+      0% { background-position: center, 100% 100%; }
+      100% { background-position: center, 0% 0%; }
+    }
+
+    #skip-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 32px;
+      z-index: 3;
+      background: transparent;
+      border: 1px solid rgba(120, 160, 255, .2);
+      border-radius: 8px;
+      color: rgba(120, 160, 255, .45);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .66rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95, 240, 255, .5);
+      color: rgba(95, 240, 255, .8);
+      box-shadow: 0 0 10px rgba(95, 240, 255, .12);
+    }
+  </style>
+</head>
+<body class="level8">
+
+  <div id="cinematic-intro">
+    <div id="lore-display"></div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <main class="l8-wrapper" id="main-site" style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+    <div class="l8-header">
+      <div class="l8-tag">NODE 13 // Signal Fragment</div>
+      <h1>NODE INTERFACE</h1>
+      <p class="l8-sub">
+        a single transmission is embedded below. the rest is up to you.
+      </p>
+    </div>
+
+    <div class="l8-lore" id="embed-wrapper">
+      <iframe id="embed-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <section class="l8-core visible" id="answer-section">
+      <p class="core-intro">
+        enter the answer below.
+      </p>
+
+      <div class="answer-row">
+        <input
+          id="answer-input"
+          class="answer-field"
+          type="text"
+          placeholder="station"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <button id="answer-submit" class="core-submit" type="button">
+        submit
+      </button>
+      <div id="answer-feedback" class="core-feedback"></div>
+
+      <div id="flag-reveal" class="hidden" style="margin-top:18px;">
+        <div class="flag-label">node unlocked</div>
+        <div class="flag-box" id="flag-text"></div>
+        <p class="flag-note">check the console for additional data.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (async () => {
+      const introEl   = document.getElementById('cinematic-intro');
+      const displayEl = document.getElementById('lore-display');
+      const skipBtn   = document.getElementById('skip-btn');
+      const mainSite  = document.getElementById('main-site');
+
+      const lines = [
+        "IDK.. the investigators were a bit confused about this one.",
+        "Good luck..."
+      ];
+
+      const CHAR_DELAY = 38;
+      const HOLD_MS    = 2200;
+      const FADE_MS    = 800;
+      const INTER_MS   = 80;
+
+      let skipTriggered = false;
+
+      function revealSite() {
+        skipTriggered = true;
+        introEl.classList.add('fade-out');
+        setTimeout(() => {
+          introEl.style.display = 'none';
+          mainSite.style.visibility = 'visible';
+          mainSite.style.opacity    = '1';
+        }, 1200);
+      }
+
+      skipBtn.addEventListener('click', revealSite);
+
+      function typeLine(text) {
+        return new Promise(resolve => {
+          let i = 0;
+          displayEl.textContent = '';
+
+          function tick() {
+            if (skipTriggered) { resolve(); return; }
+            if (i <= text.length) {
+              displayEl.textContent = text.slice(0, i);
+              i++;
+              setTimeout(tick, CHAR_DELAY);
+            } else {
+              resolve();
+            }
+          }
+          tick();
+        });
+      }
+
+      function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        if (skipTriggered) break;
+        await typeLine(lines[idx]);
+        if (skipTriggered) break;
+        await wait(HOLD_MS);
+        if (skipTriggered) break;
+
+        if (idx < lines.length - 1) {
+          displayEl.classList.add('fade-line-out');
+          await wait(FADE_MS);
+          displayEl.classList.remove('fade-line-out');
+          displayEl.textContent = '';
+          await wait(INTER_MS);
+        }
+      }
+
+      if (!skipTriggered) {
+        await wait(600);
+        revealSite();
+      }
+    })();
+  </script>
+
+  <script src="./script.js"></script>
+  <script>
+    (async () => {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        if (data.embedUrl) {
+          document.getElementById('embed-frame').src = data.embedUrl;
+        }
+      } catch (e) {
+        console.error('embed config failed to load', e);
+      }
+    })();
+
+    const input      = document.getElementById('answer-input');
+    const submitBtn  = document.getElementById('answer-submit');
+    const feedback   = document.getElementById('answer-feedback');
+    const flagReveal = document.getElementById('flag-reveal');
+    const flagText   = document.getElementById('flag-text');
+
+    input.addEventListener('input', () => {
+      const pos = input.selectionStart;
+      input.value = input.value.toLowerCase();
+      input.setSelectionRange(pos, pos);
+    });
+
+    async function submitAnswer() {
+      const answer = input.value.trim().toLowerCase();
+      if (!answer) return;
+
+      feedback.textContent = 'checking...';
+      feedback.className = 'core-feedback';
+
+      try {
+        const res = await fetch('/api/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answer })
+        });
+        const data = await res.json();
+
+        if (data.correct) {
+          feedback.textContent = 'correct.';
+          feedback.className = 'core-feedback ok';
+          flagText.textContent = data.flag;
+          flagReveal.classList.remove('hidden');
+          window.dispatchEvent(new CustomEvent('answerCorrect'));
+          if (data.clueHash) {
+            console.log(data.clueHash);
+          }
+        } else {
+          feedback.textContent = 'incorrect. try again.';
+          feedback.className = 'core-feedback error';
+        }
+      } catch (e) {
+        feedback.textContent = 'verification failed.';
+        feedback.className = 'core-feedback error';
+      }
+    }
+
+    submitBtn.addEventListener('click', submitAnswer);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitAnswer();
+    });
+  </script>
+</body>
+</html>

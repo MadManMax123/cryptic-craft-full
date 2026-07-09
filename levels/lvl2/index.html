@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 02</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+</head>
+<body class="level2">
+  <div id="cinematic-intro">
+  <div id="lore-display"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+  <div class="gateway-wrapper">
+    <div class="gateway-header">
+      <div class="gateway-tag">NODE 02 // Geolocation layer </div>
+      <h1>NULL COORDINATE GATEWAY</h1>
+      <p class="gateway-sub">
+        this node will only respond to the exact user comment left by NULL.
+      </p>
+      <p class="gateway-hint">
+        metadata remembers what people forget.
+      </p>
+    </div>
+
+    <div class="input-box">
+      <label for="uc-input" class="input-label">
+        enter the <code>UserComment</code> value (include comma &amp; spacing)
+      </label>
+
+      <div id="lore-block" class="gateway-lore"></div>
+
+      <div class="input-row">
+        <input
+          id="uc-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="paste the exact UserComment value here..."
+        />
+        <button id="uc-submit" type="button">verify</button>
+      </div>
+
+      <div id="uc-feedback" class="input-feedback"></div>
+    </div>
+
+    <div id="flag-panel" class="flag-panel hidden">
+      <p class="flag-label">Level 2 Flag</p>
+      <div id="flag-box" class="flag-box">retrieving flag...</div>
+      <p class="flag-note">
+        you followed NULL’s trail into the grid.
+      </p>
+    </div>
+  </div>
+
+  <p id="next-footer" class="next-footer hidden">
+    Congrats! Now follow the next n<a id="node-link" href="#">o</a>de!
+  </p>
+
+<script>
+const INTRO_LINES = [
+  "Welcome to Artical's geolocation node.",
+  "This node would store all the location of Artical's wireless stations hidden across the globe.",
+  "By solving the previous node, you have not only proved your skills in cryptography...",
+  "But also your problem-solving...",
+  "NULL is impressed.",
+  "But harder times await."
+];
+
+const DRAMATIC = [2, 3, 4, 5];
+
+const introEl = document.getElementById("cinematic-intro");
+const display = document.getElementById("lore-display");
+const skipBtn = document.getElementById("skip-btn");
+
+const input = document.getElementById("uc-input");
+const submit = document.getElementById("uc-submit");
+const feedback = document.getElementById("uc-feedback");
+const flagPanel = document.getElementById("flag-panel");
+const flagBox = document.getElementById("flag-box");
+const nextFooter = document.getElementById("next-footer");
+const nodeLink = document.getElementById("node-link");
+
+let introEnded = false;
+let isChecking = false;
+
+/* ---------------- INTRO ---------------- */
+
+function revealLore() {
+  const loreBlock = document.getElementById("lore-block");
+
+  loreBlock.innerHTML = "";
+
+  const TOTAL_DURATION = 1000;
+  const step = TOTAL_DURATION / INTRO_LINES.length;
+
+  INTRO_LINES.forEach((line, i) => {
+    const p = document.createElement("p");
+    p.className = "gateway-lore-line";
+    p.textContent = "> " + line;
+    loreBlock.appendChild(p);
+
+    setTimeout(() => {
+      p.classList.add("show");
+
+      if (DRAMATIC.includes(i)) {
+        p.classList.add(i % 2 === 0 ? "shudder" : "flicker");
+      }
+    }, i * step);
+  });
+}
+
+async function runIntro() {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+
+  for (let i = 0; i < INTRO_LINES.length; i++) {
+    if (introEnded) return;
+
+    display.textContent = "";
+
+    for (const ch of INTRO_LINES[i]) {
+      if (introEnded) return;
+      display.textContent += ch;
+      await delay(28);
+    }
+
+    if (DRAMATIC.includes(i)) {
+      for (let j = 0; j < 6; j++) {
+        display.style.transform =
+          j % 2 === 0 ? "translateX(-2px)" : "translateX(2px)";
+        await delay(40);
+      }
+      display.style.transform = "translateX(0)";
+    }
+
+    await delay(900);
+
+    display.style.opacity = "0";
+    await delay(300);
+    display.style.opacity = "1";
+  }
+
+  await delay(500);
+  endIntro();
+}
+
+function endIntro() {
+  if (introEnded) return;
+  introEnded = true;
+
+  introEl.classList.add("fade-out");
+
+  setTimeout(() => {
+    introEl.style.display = "none";
+    revealLore();
+  }, 1200);
+}
+
+skipBtn.addEventListener("click", endIntro);
+
+/* ---------------- ANSWER CHECK ---------------- */
+
+async function fetchFlag() {
+  try {
+    const res = await fetch("/api/get-level2-flag", {
+      method: "GET",
+      credentials: "same-origin"
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.flag) {
+      flagBox.textContent = data.flag;
+      return true;
+    }
+
+    flagBox.textContent = "access denied";
+    return false;
+  } catch (err) {
+    flagBox.textContent = "failed to retrieve flag";
+    return false;
+  }
+}
+
+async function checkAnswer() {
+  if (isChecking) return;
+
+  const value = input.value;
+
+  if (!value.trim()) {
+    feedback.textContent = "input cannot be empty";
+    feedback.className = "input-feedback error";
+    return;
+  }
+
+  isChecking = true;
+  input.disabled = true;
+  submit.disabled = true;
+
+  feedback.className = "input-feedback";
+  feedback.textContent = "checking encryption...";
+
+  setTimeout(() => {
+    if (isChecking) feedback.textContent = "verifying hash...";
+  }, 1200);
+
+  setTimeout(() => {
+    if (isChecking) feedback.textContent = "retrieving node response...";
+  }, 2500);
+
+  setTimeout(async () => {
+    try {
+      const res = await fetch("/api/check-level2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ answer: value })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.correct) {
+        feedback.textContent = "match confirmed. access granted.";
+        feedback.className = "input-feedback ok";
+
+        nodeLink.href = data.link || "#";
+
+        flagPanel.classList.remove("hidden");
+        flagPanel.classList.add("visible");
+
+        const gotFlag = await fetchFlag();
+
+        if (gotFlag) {
+          setTimeout(() => {
+            nextFooter.classList.remove("hidden");
+            nextFooter.classList.add("visible");
+          }, 1200);
+        }
+
+      } else {
+        feedback.textContent = "no match. node rejected input.";
+        feedback.className = "input-feedback error";
+
+        input.disabled = false;
+        submit.disabled = false;
+        input.focus();
+      }
+    } catch (err) {
+      feedback.textContent = "gateway error";
+      feedback.className = "input-feedback error";
+
+      input.disabled = false;
+      submit.disabled = false;
+      input.focus();
+    }
+
+    isChecking = false;
+  }, 4200);
+}
+
+submit.addEventListener("click", checkAnswer);
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkAnswer();
+});
+
+/* ---------------- START ---------------- */
+
+runIntro();
+</script>
+</body>
+</html>

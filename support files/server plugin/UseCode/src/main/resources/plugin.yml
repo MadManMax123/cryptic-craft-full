@@ -1,0 +1,8 @@
+name: CodeRewards
+version: 1.0
+main: com.satyaki.coderewards.CodeRewardsPlugin
+api-version: "1.21"
+
+commands:
+  usecode:
+    description: Open code GUI

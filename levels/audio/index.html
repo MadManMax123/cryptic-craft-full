@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="11zon_cropped.png">
+<title>NULL // Node 14</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================
+   BASE
+========================= */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04050a;
+  --panel:rgba(10,14,24,.85);
+  --panel-strong:rgba(14,20,36,.97);
+  --border:rgba(120,160,255,.12);
+  --border-strong:rgba(120,160,255,.26);
+  --text:#edf2ff;
+  --muted:#8090b8;
+  --accent:#98b8ff;
+  --accent2:#5ff0ff;
+  --good:#6df5b8;
+  --warn:#ffd980;
+  --danger:#ff8a9a;
+  --shadow:0 28px 90px rgba(0,0,0,.55);
+  --radius-xl:24px;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --grid:rgba(255,255,255,.025);
+  --font-body:'Space Grotesk',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --font-display:'Syne',sans-serif;
+}
+html,body{min-height:100%;}
+
+/* =========================
+   PAGE
+========================= */
+body.level8,body.level8-flag{
+  min-height:100vh;padding:28px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow-x:hidden;
+  background:
+    radial-gradient(circle at top,rgba(95,240,255,.06),transparent 28%),
+    radial-gradient(circle at 20% 20%,rgba(152,184,255,.08),transparent 22%),
+    linear-gradient(180deg,#06070d 0%,#04050a 100%);
+  color:var(--text);font-family:var(--font-body);
+}
+body.level8::before,body.level8-flag::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;opacity:.55;pointer-events:none;
+}
+body.level8::after,body.level8-flag::after{
+  content:"";position:fixed;inset:0;
+  background:radial-gradient(circle at center,transparent 45%,rgba(0,0,0,.3) 100%);
+  pointer-events:none;
+}
+
+/* =========================
+   WRAPPER
+========================= */
+.l8-wrapper,.flag-wrapper{
+  position:relative;z-index:1;
+  width:min(840px,95vw);padding:36px 30px 28px;
+  border-radius:var(--radius-xl);border:1px solid var(--border-strong);
+  background:linear-gradient(180deg,rgba(14,20,36,.95),rgba(9,12,22,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(255,255,255,.015),
+    0 0 80px rgba(95,240,255,.05),
+    var(--shadow);
+  backdrop-filter:blur(10px);overflow:hidden;
+}
+.l8-wrapper::before,.flag-wrapper::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(95,240,255,.05),transparent 28%,transparent 72%,rgba(152,184,255,.05));
+}
+.l8-wrapper::after,.flag-wrapper::after{
+  content:"";position:absolute;top:14px;left:18px;right:18px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(95,240,255,.42),transparent);
+}
+
+/* =========================
+   HEADER
+========================= */
+.l8-header,.flag-header{text-align:center;margin-bottom:22px;}
+.l8-tag,.flag-tag{
+  display:inline-block;margin-bottom:12px;padding:6px 12px;
+  border-radius:999px;border:1px solid rgba(95,240,255,.18);
+  background:rgba(95,240,255,.06);color:#b8f8ff;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+}
+.l8-wrapper h1,.flag-wrapper h1{
+  font-family:var(--font-display);font-size:clamp(1.1rem,2vw,1.45rem);
+  letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px;text-align:center;
+  text-shadow:0 0 18px rgba(152,184,255,.12);
+}
+.l8-sub,.flag-sub{
+  text-align:center;max-width:60ch;margin:0 auto;
+  font-size:.85rem;line-height:1.7;color:var(--muted);
+}
+
+/* =========================
+   LORE
+========================= */
+.l8-lore{
+  min-height:100px;margin-bottom:20px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(10,15,26,.9),rgba(8,11,19,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),inset 0 0 40px rgba(0,0,0,.18);
+}
+.l8-lore-line{font-size:.9rem;color:#dbe4ee;line-height:1.7;margin-bottom:6px;}
+
+/* =========================
+   CORE BLOCK
+========================= */
+.l8-core{
+  margin-top:12px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid rgba(95,240,255,.14);
+  background:linear-gradient(180deg,rgba(2,6,23,.95),rgba(15,23,42,.88));
+  color:#cbd5e1;opacity:0;transform:translateY(8px);transition:.45s;
+  box-shadow:inset 0 0 16px rgba(95,240,255,.04);
+}
+.l8-core.visible{opacity:1;transform:translateY(0);}
+
+/* =========================
+   ANSWER ROW
+========================= */
+.answer-row{
+  display:flex;align-items:stretch;
+  border:1px solid rgba(95,240,255,.18);border-radius:10px;
+  overflow:hidden;background:rgba(2,6,23,.96);transition:.2s;
+}
+.answer-row:focus-within{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(95,240,255,.1),0 0 14px rgba(95,240,255,.1);
+}
+.answer-row.ok-glow{
+  border-color:rgba(109,245,184,.5);
+  box-shadow:0 0 14px rgba(109,245,184,.14);
+}
+.answer-row.err-glow{
+  border-color:rgba(255,138,154,.4);
+  animation:shake .35s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+.answer-prefix{
+  padding:0 14px;display:flex;align-items:center;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;
+  color:rgba(95,240,255,.5);border-right:1px solid var(--border);
+  user-select:none;white-space:nowrap;
+}
+.answer-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--font-mono);
+  font-size:.9rem;letter-spacing:.06em;padding:.75rem 1rem;
+}
+.answer-input::placeholder{color:var(--muted);font-style:italic;font-size:.78rem;}
+.answer-input:disabled{opacity:.4;cursor:not-allowed;}
+
+/* =========================
+   BUTTON
+========================= */
+.core-submit{
+  margin:14px auto 0;display:block;width:100%;padding:11px 18px;
+  border-radius:10px;border:1px solid rgba(95,240,255,.45);
+  background:linear-gradient(180deg,rgba(95,240,255,.16),rgba(152,184,255,.14));
+  color:#e0f2fe;font-family:var(--font-mono);font-size:.8rem;
+  letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.core-submit:hover:not(:disabled){
+  border-color:rgba(103,232,249,.7);
+  box-shadow:0 0 14px rgba(95,240,255,.28);transform:translateY(-1px);
+}
+.core-submit:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+.core-feedback{
+  min-height:1.4rem;margin-top:10px;
+  font-family:var(--font-mono);font-size:.78rem;letter-spacing:.1em;
+  text-align:center;color:var(--muted);
+}
+.core-feedback.ok{color:#86efac;}
+.core-feedback.error{color:#f87171;}
+
+/* =========================
+   FLAG PAGE
+========================= */
+.flag-wrapper{width:min(620px,94vw);text-align:center;padding:40px 30px 32px;}
+.flag-label{
+  font-size:.74rem;color:#a5f3fc;letter-spacing:.2em;margin-bottom:12px;
+  text-transform:uppercase;font-family:var(--font-mono);
+}
+.flag-box{
+  display:inline-block;max-width:100%;padding:12px 18px;
+  border-radius:10px;border:1px solid rgba(109,245,184,.45);
+  background:rgba(109,245,184,.12);color:#bbf7d0;
+  font-family:var(--font-mono);font-size:.95rem;
+  box-shadow:0 0 16px rgba(109,245,184,.2),inset 0 0 12px rgba(109,245,184,.05);
+  margin-bottom:12px;word-break:break-word;
+}
+.flag-char{opacity:0;transition:opacity .04s;}
+.flag-char.on{opacity:1;}
+.flag-note{font-size:.78rem;color:var(--muted);line-height:1.65;}
+.next-node-btn{
+  display:inline-block;margin-top:18px;padding:11px 18px;
+  border-radius:10px;border:1px solid rgba(95,240,255,.45);
+  background:linear-gradient(180deg,rgba(95,240,255,.16),rgba(152,184,255,.14));
+  color:#e0f2fe;font-family:var(--font-mono);font-size:.8rem;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.next-node-btn:hover{
+  border-color:rgba(103,232,249,.7);
+  box-shadow:0 0 14px rgba(95,240,255,.28);transform:translateY(-1px);
+}
+
+/* =========================
+   CINEMATIC INTRO
+========================= */
+#cinematic-intro{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;display:flex;align-items:center;justify-content:center;padding:40px;
+}
+#cinematic-intro.fade-out{animation:introFadeOut 1.4s ease forwards;pointer-events:none;}
+@keyframes introFadeOut{to{opacity:0;}}
+#cinematic-intro::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);
+  pointer-events:none;z-index:1;
+}
+#cinematic-intro::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.65) 100%);
+  pointer-events:none;z-index:1;
+}
+#lore-display{
+  position:relative;z-index:2;
+  font-family:var(--font-mono);font-size:clamp(.78rem,1.5vw,.95rem);
+  color:rgba(180,210,255,.82);text-align:center;
+  max-width:64ch;line-height:1.8;letter-spacing:.045em;
+  min-height:1.8em;opacity:1;transition:opacity .8s ease;
+}
+#lore-display.fade-line-out{opacity:0;}
+#lore-display::after{
+  content:'';display:inline-block;width:.5em;height:1em;
+  background:rgba(95,240,255,.75);margin-left:3px;
+  vertical-align:text-bottom;animation:blink .65s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#skip-btn{
+  position:absolute;bottom:28px;right:32px;z-index:3;
+  background:transparent;border:1px solid rgba(120,160,255,.2);border-radius:8px;
+  color:rgba(120,160,255,.45);font-family:var(--font-mono);font-size:.66rem;
+  letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:.2s;
+}
+#skip-btn:hover{
+  border-color:rgba(95,240,255,.5);color:rgba(95,240,255,.8);
+  box-shadow:0 0 10px rgba(95,240,255,.12);
+}
+
+/* =========================
+   VIEW MGMT
+========================= */
+.view{display:none;flex-direction:column;align-items:center;width:100%;}
+.view.active{display:flex;}
+
+/* =========================
+   STATUS BADGE
+========================= */
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+  border-radius:999px;font-family:var(--font-mono);font-size:.66rem;
+  letter-spacing:.1em;text-transform:uppercase;border:1px solid;
+}
+.status-badge.online{
+  color:var(--good);border-color:rgba(109,245,184,.3);
+  background:rgba(109,245,184,.06);
+}
+.status-badge.online::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--good);flex-shrink:0;
+  animation:pulsedot 1.6s ease infinite;
+}
+@keyframes pulsedot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+
+/* =========================
+   SPECTROGRAM CANVAS
+========================= */
+.spectro-section{
+  margin-bottom:14px;
+  border-radius:var(--radius-md);border:1px solid rgba(95,240,255,.1);
+  background:#020917;overflow:hidden;
+}
+.spectro-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 14px;border-bottom:1px solid rgba(95,240,255,.06);
+}
+.spectro-label{
+  font-size:.66rem;color:rgba(95,240,255,.45);
+  font-family:var(--font-mono);letter-spacing:.15em;text-transform:uppercase;
+}
+.spectro-status{
+  font-size:.62rem;color:rgba(120,160,255,.35);
+  font-family:var(--font-mono);letter-spacing:.08em;
+}
+.spectro-canvas{
+  width:100%;height:108px;display:block;
+}
+.spectro-footer{
+  padding:5px 14px 7px;border-top:1px solid rgba(95,240,255,.04);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.spectro-hint{
+  font-size:.63rem;color:rgba(95,120,180,.35);
+  font-family:var(--font-mono);letter-spacing:.04em;
+}
+.spectro-freq{
+  font-size:.62rem;color:rgba(95,240,255,.25);
+  font-family:var(--font-mono);
+}
+
+/* =========================
+   CUSTOM AUDIO PLAYER
+========================= */
+.audio-section{
+  margin-bottom:14px;padding:12px 14px;
+  border-radius:var(--radius-md);border:1px solid rgba(95,240,255,.1);
+  background:rgba(2,6,23,.88);
+}
+.audio-section-label{
+  font-size:.66rem;color:rgba(95,240,255,.4);
+  font-family:var(--font-mono);letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.audio-section-label::before{
+  content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:rgba(95,240,255,.35);flex-shrink:0;
+}
+.audio-player-row{display:flex;align-items:center;gap:10px;}
+.play-btn{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(95,240,255,.35);
+  background:rgba(95,240,255,.08);color:var(--accent2);
+  font-size:.8rem;cursor:pointer;transition:.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.play-btn:hover{
+  background:rgba(95,240,255,.18);
+  box-shadow:0 0 12px rgba(95,240,255,.22);
+}
+.audio-controls{flex:1;display:flex;flex-direction:column;gap:6px;}
+.seek-wrap{position:relative;width:100%;}
+.seek-track{
+  width:100%;height:3px;background:rgba(255,255,255,.07);
+  border-radius:3px;cursor:pointer;position:relative;overflow:hidden;
+}
+.seek-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  border-radius:3px;pointer-events:none;transition:width .1s linear;
+}
+.seek-track:hover .seek-fill{filter:brightness(1.15);}
+.audio-meta{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.audio-time{
+  font-family:var(--font-mono);font-size:.63rem;color:var(--muted);
+  letter-spacing:.05em;
+}
+.vol-row{display:flex;align-items:center;gap:6px;}
+.vol-icon{font-size:.7rem;color:rgba(95,240,255,.3);user-select:none;}
+input[type="range"].vol-slider{
+  -webkit-appearance:none;appearance:none;
+  width:56px;height:3px;background:rgba(255,255,255,.08);
+  border-radius:3px;cursor:pointer;outline:none;
+}
+input[type="range"].vol-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:10px;height:10px;
+  border-radius:50%;background:var(--accent);cursor:pointer;
+}
+input[type="range"].vol-slider::-moz-range-thumb{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:none;
+}
+.audio-filename{
+  font-family:var(--font-mono);font-size:.62rem;
+  color:rgba(95,240,255,.25);letter-spacing:.04em;
+  margin-top:5px;
+}
+
+/* =========================
+   HINT BOX
+========================= */
+.hint-box{
+  padding:10px 14px;margin-bottom:14px;
+  border-radius:var(--radius-md);
+  border:1px solid rgba(255,217,128,.1);
+  background:rgba(255,217,128,.03);
+  font-family:var(--font-mono);font-size:.73rem;
+  color:rgba(253,230,138,.65);line-height:1.7;
+}
+.hint-box b{color:#fde68a;}
+
+/* =========================
+   DIVIDER
+========================= */
+.divider{
+  height:1px;margin:16px 0;
+  background:linear-gradient(90deg,transparent,rgba(95,240,255,.12),transparent);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:640px){
+  body.level8,body.level8-flag{padding:16px;}
+  .l8-wrapper,.flag-wrapper{padding:24px 18px 20px;border-radius:18px;}
+  .l8-wrapper h1,.flag-wrapper h1{font-size:1rem;letter-spacing:.12em;}
+}
+</style>
+</head>
+<body class="level8">
+
+<!-- ══ CINEMATIC INTRO ════════════════════════════════════════════════ -->
+<div id="cinematic-intro">
+  <div id="lore-display"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+
+<!-- ══ VIEW: TERMINAL LOG ════════════════════════════════════════════ -->
+<div class="view" id="view-log">
+  <div class="l8-wrapper">
+    <div class="l8-header">
+      <div class="l8-tag">Node 14 // Spectrum Layer</div>
+      <h1>Audio Analysis Terminal</h1>
+      <p class="l8-sub">Decode the frequencies. Extract the message.</p>
+    </div>
+
+    <div class="l8-lore" id="log-lore"></div>
+
+    <button class="core-submit" id="log-next-btn">Access Terminal →</button>
+  </div>
+</div>
+
+<!-- ══ VIEW: CHALLENGE ════════════════════════════════════════════════ -->
+<div class="view" id="view-challenge">
+  <div class="l8-wrapper">
+    <div class="l8-header">
+      <div class="l8-tag">Node Audio Spectrum // Node 14</div>
+      <h1>Spectrogram Analysis Terminal</h1>
+      <p class="l8-sub">Decode the audio. Extract the message.</p>
+    </div>
+
+    <div class="l8-core visible" id="challenge-core">
+
+      <!-- Status row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="status-badge online">Signal Active</div>
+        <span style="font-family:var(--font-mono);font-size:.62rem;color:rgba(120,150,200,.3);letter-spacing:.06em;">FREQ ANALYSIS v2.1</span>
+      </div>
+
+      <!-- Spectrogram Canvas -->
+      <div class="spectro-section">
+        <div class="spectro-header">
+          <span class="spectro-label">[ Live Frequency Readout ]</span>
+          <span class="spectro-status" id="spectro-status">IDLE — awaiting playback</span>
+        </div>
+        <canvas class="spectro-canvas" id="spectro-canvas"></canvas>
+        <div class="spectro-footer">
+          <span class="spectro-hint">0 – 3 kHz</span>
+          <span class="spectro-freq">0 – 3kHz</span>
+        </div>
+      </div>
+
+      <!-- Custom Audio Player -->
+      <div class="audio-section">
+        <div class="audio-section-label">Recovered Signal File</div>
+        <audio id="challenge-audio" src="/output.wav" preload="metadata" crossorigin="anonymous"></audio>
+        <div class="audio-player-row">
+          <button class="play-btn" id="play-btn" title="Play / Pause">▶</button>
+          <div class="audio-controls">
+            <div class="seek-wrap">
+              <div class="seek-track" id="seek-track">
+                <div class="seek-fill" id="seek-fill"></div>
+              </div>
+            </div>
+            <div class="audio-meta">
+              <span class="audio-time" id="audio-time">0:00 / --:--</span>
+              <div class="vol-row">
+                <span class="vol-icon">🔈</span>
+                <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="1">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="audio-filename">output.wav · intercepted channel · decode required</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Answer input -->
+      <div class="answer-row" id="answer-row">
+        <span class="answer-prefix">DECODE &gt;</span>
+        <input class="answer-input" id="answer-input" type="text"
+               placeholder="enter decoded signal…"
+               autocomplete="off" spellcheck="false" autocapitalize="none"/>
+      </div>
+
+      <button class="core-submit" id="answer-submit">Submit Decoded Signal</button>
+      <div class="core-feedback" id="core-feedback"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIEW: FLAG ════════════════════════════════════════════════════ -->
+<div class="view" id="view-flag">
+  <div class="flag-wrapper">
+    <div class="flag-header">
+      <div class="flag-tag">NULL // Access Granted</div>
+      <h1>Signal Decoded</h1>
+      <p class="flag-sub">spectrogram analysis complete.<br>encrypted payload extracted.</p>
+    </div>
+
+    <p class="flag-label">access flag</p>
+    <div class="flag-box" id="flag-box">—</div>
+
+    <button class="next-node-btn" id="flag-copy-btn">⎘ &nbsp;copy flag</button>
+
+    <p class="flag-note" style="margin-top:20px;">
+      submit this flag to the challenge portal.<br>
+      the frequencies have been decoded. node cleared.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   LORE DATA
+══════════════════════════════════════════════════════════════════════ */
+const INTRO_LINES = [
+  "NULL has intercepted a new transmission.",
+  "An audio file — exposed, yet again.",
+  "Tones mean something...",
+  "Crack the audio. Crack the node."
+];
+
+const LOG_LINES = [
+  "NULL has exposed an audio file, yet again.",
+  "Tones mean something... Crack the audio, crack the node.",
+  "Signal recovered from intercepted channel — encoding type unknown.",
+  "Standard decryption failed. Visual frequency analysis required.",
+  "Load the recovered file and inspect the spectrogram layer."
+];
+
+/* ══════════════════════════════════════════════════════════════════════
+   STATE & UTILS
+══════════════════════════════════════════════════════════════════════ */
+let capturedFlag = "";
+const $ = id => document.getElementById(id);
+
+function showView(id) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+function formatTime(sec) {
+  if (!isFinite(sec)) return "--:--";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CINEMATIC INTRO
+══════════════════════════════════════════════════════════════════════ */
+let loreIdx = 0;
+const loreEl = $("lore-display");
+
+function typeWriter(text, el, done) {
+  let i = 0;
+  el.textContent = "";
+  const iv = setInterval(() => {
+    if (i < text.length) { el.textContent += text[i++]; }
+    else { clearInterval(iv); setTimeout(done, 1100); }
+  }, 26);
+}
+
+function nextLoreLine() {
+  if (loreIdx >= INTRO_LINES.length) { endIntro(); return; }
+  loreEl.classList.remove("fade-line-out");
+  typeWriter(INTRO_LINES[loreIdx], loreEl, () => {
+    loreEl.classList.add("fade-line-out");
+    loreIdx++;
+    setTimeout(nextLoreLine, 800);
+  });
+}
+
+function endIntro() {
+  const intro = $("cinematic-intro");
+  if (!intro) return;
+  intro.classList.add("fade-out");
+  setTimeout(() => { intro.remove(); showNodeLog(); }, 1400);
+}
+
+$("skip-btn").onclick = endIntro;
+nextLoreLine();
+
+/* ══════════════════════════════════════════════════════════════════════
+   NODE LOG VIEW
+══════════════════════════════════════════════════════════════════════ */
+function showNodeLog() {
+  showView("view-log");
+  const container = $("log-lore");
+  container.innerHTML = "";
+  LOG_LINES.forEach((line, i) => {
+    const div = document.createElement("div");
+    div.className = "l8-lore-line";
+    div.style.cssText = "opacity:0;transform:translateX(-10px);transition:all .4s ease;";
+    div.textContent = "> " + line;
+    container.appendChild(div);
+    setTimeout(() => {
+      div.style.opacity = "1";
+      div.style.transform = "translateX(0)";
+    }, 80 + i * 180);
+  });
+}
+
+$("log-next-btn").onclick = () => {
+  showView("view-challenge");
+  setTimeout(() => {
+    initSpectrogram();
+    $("answer-input").focus();
+  }, 120);
+};
+
+/* ══════════════════════════════════════════════════════════════════════
+   WEB AUDIO API + SPECTROGRAM
+══════════════════════════════════════════════════════════════════════ */
+let audioCtx = null;
+let analyser = null;
+let mediaSource = null;
+let spectroRunning = false;
+
+function setupWebAudio(audioEl) {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.78;
+    mediaSource = audioCtx.createMediaElementSource(audioEl);
+    mediaSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    return true;
+  } catch (e) {
+    console.warn("Web Audio API unavailable:", e);
+    return false;
+  }
+}
+
+function initSpectrogram() {
+  const canvas = $("spectro-canvas");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = 108 * dpr;
+    canvas.style.width = rect.width + "px";
+    canvas.style.height = "108px";
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  /* ── 3 bars, one per 1 kHz band (0–1, 1–2, 2–3 kHz) ── */
+  const BAR_COUNT = 30;
+  let idlePhase = 0;
+  spectroRunning = true;
+
+  function getIdleBars() {
+    idlePhase += 0.014;
+    const bars = [];
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const t = idlePhase + i * 0.2;
+      const v = 0.03 + Math.abs(Math.sin(t * 0.5)) * 0.06
+               + Math.abs(Math.sin(t * 2.3 + i * 0.09)) * 0.04;
+      bars.push(v);
+    }
+    return bars;
+  }
+
+  function getLiveBars() {
+    if (!analyser) return null;
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(buf);
+    /* 30 bars × 100 Hz = 0–3000 Hz */
+    const nyquist = audioCtx.sampleRate / 2;
+    const hzPerBin = nyquist / buf.length;
+    const out = [];
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const freqLow  = i * 100;
+      const freqHigh = freqLow + 100;
+      const binLow   = Math.floor(freqLow  / hzPerBin);
+      const binHigh  = Math.ceil(freqHigh / hzPerBin);
+      let sum = 0, count = 0;
+      for (let b = binLow; b < binHigh && b < buf.length; b++) {
+        sum += buf[b]; count++;
+      }
+      out.push(count > 0 ? (sum / count) / 255 : 0);
+    }
+    return out;
+  }
+
+  function draw() {
+    if (!spectroRunning) return;
+    requestAnimationFrame(draw);
+
+    const audio = $("challenge-audio");
+    const isLive = analyser && !audio.paused;
+    const values = isLive ? getLiveBars() : getIdleBars();
+    const W = parseInt(canvas.style.width);
+    const H = 108;
+
+    ctx.clearRect(0, 0, W, H);
+
+    /* Background grid */
+    ctx.strokeStyle = "rgba(95,240,255,0.03)";
+    ctx.lineWidth = 1;
+    for (let y = 0; y <= 4; y++) {
+      const yPos = Math.floor((y / 4) * H) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, yPos);
+      ctx.lineTo(W, yPos);
+      ctx.stroke();
+    }
+
+    /* kHz tick marks at 0, 1, 2, 3 kHz */
+    ctx.strokeStyle = "rgba(95,240,255,0.08)";
+    ctx.lineWidth = 1;
+    for (let k = 0; k <= 3; k++) {
+      const xPos = Math.floor((k * 10 / BAR_COUNT) * W) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(xPos, 0);
+      ctx.lineTo(xPos, H);
+      ctx.stroke();
+    }
+
+    /* Each bar fits within its slot with a 1px gap */
+    const slotW = W / BAR_COUNT;
+    const barW = Math.max(1, slotW - 1);
+
+    values.forEach((val, i) => {
+      const barH = Math.max(2, val * H * 0.9);
+      const x = i * slotW;
+      const y = H - barH;
+      const hue = 185 + (i / BAR_COUNT) * 45 + val * 18;
+      const alpha = isLive ? (0.25 + val * 0.75) : (0.15 + val * 0.55);
+
+      const g = ctx.createLinearGradient(x, y, x, H);
+      g.addColorStop(0, `hsla(${hue}, 88%, 72%, ${alpha})`);
+      g.addColorStop(1, `hsla(${hue + 12}, 78%, 48%, ${alpha * 0.35})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(x, y, barW, barH);
+
+      /* Bright top cap */
+      if (val > 0.06) {
+        ctx.fillStyle = `hsla(${hue}, 100%, 88%, ${alpha * 0.85})`;
+        ctx.fillRect(x, y, barW, 2);
+      }
+    });
+
+    /* Scan line sweep (idle only) */
+    if (!isLive) {
+      const scanX = ((idlePhase * 18) % (W + 40)) - 20;
+      const g2 = ctx.createLinearGradient(scanX - 12, 0, scanX + 12, 0);
+      g2.addColorStop(0, "transparent");
+      g2.addColorStop(0.5, "rgba(95,240,255,0.06)");
+      g2.addColorStop(1, "transparent");
+      ctx.fillStyle = g2;
+      ctx.fillRect(scanX - 12, 0, 24, H);
+    }
+  }
+
+  draw();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CUSTOM AUDIO PLAYER
+══════════════════════════════════════════════════════════════════════ */
+const audio      = $("challenge-audio");
+const playBtn    = $("play-btn");
+const seekTrack  = $("seek-track");
+const seekFill   = $("seek-fill");
+const audioTime  = $("audio-time");
+const volSlider  = $("vol-slider");
+const spectroSt  = $("spectro-status");
+
+/* Play / pause toggle */
+playBtn.addEventListener("click", async () => {
+  if (!audioCtx) setupWebAudio(audio);
+  if (audioCtx && audioCtx.state === "suspended") await audioCtx.resume();
+
+  if (audio.paused) {
+    try {
+      await audio.play();
+      playBtn.textContent = "⏸";
+      spectroSt.textContent = "LIVE — frequency capture active";
+      spectroSt.style.color = "rgba(109,245,184,0.5)";
+    } catch (e) {
+      spectroSt.textContent = "ERROR — unable to load audio";
+    }
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+    spectroSt.textContent = "PAUSED — playback suspended";
+    spectroSt.style.color = "";
+  }
+});
+
+/* Ended */
+audio.addEventListener("ended", () => {
+  playBtn.textContent = "▶";
+  spectroSt.textContent = "IDLE — playback complete";
+  spectroSt.style.color = "";
+});
+
+/* Duration loaded */
+audio.addEventListener("loadedmetadata", () => {
+  audioTime.textContent = `0:00 / ${formatTime(audio.duration)}`;
+});
+
+/* Progress update */
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  seekFill.style.width = pct + "%";
+  audioTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+});
+
+/* Seek on click */
+seekTrack.addEventListener("click", e => {
+  if (!audio.duration) return;
+  const rect = seekTrack.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  audio.currentTime = ratio * audio.duration;
+});
+
+/* Volume */
+volSlider.addEventListener("input", () => { audio.volume = parseFloat(volSlider.value); });
+
+/* ══════════════════════════════════════════════════════════════════════
+   INPUT NORMALIZATION
+   Normalize on every keystroke: lowercase + remove all punctuation
+══════════════════════════════════════════════════════════════════════ */
+$("answer-input").addEventListener("input", function () {
+  const pos = this.selectionStart;
+  const cleaned = this.value
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, "");
+  if (cleaned !== this.value) {
+    this.value = cleaned;
+    try { this.setSelectionRange(pos, pos); } catch (_) {}
+  }
+});
+
+function normalizeAnswer(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, "")
+    .replace(/ +/g, " ")
+    .trim();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SUBMIT ANSWER
+══════════════════════════════════════════════════════════════════════ */
+async function submitAnswer() {
+  const input     = $("answer-input");
+  const submitBtn = $("answer-submit");
+  const row       = $("answer-row");
+  const fb        = $("core-feedback");
+
+  const raw = input.value.trim();
+  if (!raw || input.disabled) return;
+
+  const normalized = normalizeAnswer(raw);
+
+  /* Lock UI */
+  input.disabled  = true;
+  submitBtn.disabled = true;
+  fb.className    = "core-feedback";
+  fb.textContent  = "routing query…";
+
+  let result;
+  try {
+    const res = await fetch("/api/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answer: normalized }),
+      credentials: "same-origin"
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    result = await res.json();
+  } catch (err) {
+    fb.className  = "core-feedback error";
+    fb.textContent = "✗  connection error — retry";
+    input.disabled  = false;
+    submitBtn.disabled = false;
+    return;
+  }
+
+  if (result.correct) {
+    row.classList.add("ok-glow");
+    fb.className  = "core-feedback ok";
+    fb.textContent = "✓  ACCESS GRANTED — fetching payload…";
+
+    /* Fetch flag via verified cookie */
+    let flag = "—";
+    try {
+      const fr = await fetch("/api/fetch", { credentials: "same-origin" });
+      if (fr.ok) {
+        const fd = await fr.json();
+        flag = fd.flag || "—";
+      }
+    } catch (_) {}
+
+    capturedFlag = flag;
+    setTimeout(() => {
+      console.warn("next clue: node-interf.vercel.app");
+      showFlag(flag);
+    }, 1600);
+
+  } else {
+    row.classList.add("err-glow");
+    fb.className  = "core-feedback error";
+    fb.textContent = "✗  ACCESS DENIED — signal mismatch";
+
+    setTimeout(() => {
+      row.className   = "answer-row";
+      input.disabled  = false;
+      submitBtn.disabled = false;
+      input.value     = "";
+      fb.textContent  = "";
+      fb.className    = "core-feedback";
+      input.focus();
+    }, 1600);
+  }
+}
+
+$("answer-submit").onclick = submitAnswer;
+$("answer-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") submitAnswer();
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   FLAG DISPLAY
+══════════════════════════════════════════════════════════════════════ */
+function showFlag(flag) {
+  spectroRunning = false;
+  showView("view-flag");
+
+  const txt = flag || "—";
+  const box = $("flag-box");
+  box.innerHTML = "";
+
+  txt.split("").forEach((ch, i) => {
+    const span = document.createElement("span");
+    span.className = "flag-char";
+    span.textContent = ch;
+    box.appendChild(span);
+    setTimeout(() => span.classList.add("on"), 500 + i * 45);
+  });
+
+  $("flag-copy-btn").onclick = () => {
+    navigator.clipboard.writeText(txt).then(() => {
+      $("flag-copy-btn").textContent = "✓  copied";
+      setTimeout(() => { $("flag-copy-btn").textContent = "⎘  copy flag"; }, 2000);
+    });
+  };
+}
+</script>
+</body>
+</html>

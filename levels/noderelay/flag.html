@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULL // Flag Decrypted</title>
+<link rel="icon" type="image/png" href="11zon_cropped.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #04050a;
+  --border: rgba(120,160,255,.12);
+  --border-strong: rgba(120,160,255,.26);
+  --text: #edf2ff;
+  --muted: #8090b8;
+  --accent2: #5ff0ff;
+  --good: #6df5b8;
+  --shadow: 0 28px 90px rgba(0,0,0,.55);
+  --radius-xl: 24px;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Syne', sans-serif;
+}
+
+html, body { min-height: 100%; }
+
+body {
+  min-height: 100vh;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(circle at top, rgba(95,240,255,.06), transparent 28%),
+    radial-gradient(circle at 20% 20%, rgba(152,184,255,.08), transparent 22%),
+    linear-gradient(180deg, #06070d 0%, #04050a 100%);
+  color: var(--text);
+  font-family: var(--font-body);
+  user-select: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: .55;
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 45%, rgba(0,0,0,.3) 100%);
+  pointer-events: none;
+}
+
+.flag-wrapper {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 94vw);
+  text-align: center;
+  padding: 40px 30px 32px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-strong);
+  background: linear-gradient(180deg, rgba(14,20,36,.95), rgba(9,12,22,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 80px rgba(95,240,255,.05),
+    var(--shadow);
+  backdrop-filter: blur(10px);
+}
+.flag-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(95,240,255,.05), transparent 28%, transparent 72%, rgba(152,184,255,.05));
+}
+.flag-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(95,240,255,.42), transparent);
+}
+
+.flag-tag {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(109,245,184,.18);
+  background: rgba(109,245,184,.06);
+  color: #a5f3fc;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.flag-wrapper h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.flag-sub {
+  font-size: .85rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 24px;
+  max-width: 50ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flag-label {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: #a5f3fc;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.flag-box {
+  display: inline-block;
+  max-width: 100%;
+  padding: 14px 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(109,245,184,.45);
+  background: rgba(109,245,184,.08);
+  color: #bbf7d0;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  box-shadow: 0 0 20px rgba(109,245,184,.15), inset 0 0 12px rgba(109,245,184,.04);
+  word-break: break-word;
+  letter-spacing: .06em;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.flag-box:hover {
+  background: rgba(109,245,184,.12);
+  box-shadow: 0 0 24px rgba(109,245,184,.25), inset 0 0 12px rgba(109,245,184,.08);
+}
+
+.flag-note {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.copy-hint {
+  display: block;
+  font-size: .7rem;
+  color: #8fb9d9;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.flag-box:hover .copy-hint { opacity: 1; }
+
+.copy-msg {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(109,245,184,.9);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.copy-msg.show { opacity: 1; }
+
+@media (max-width: 640px) {
+  body { padding: 16px; }
+  .flag-wrapper { padding: 24px 18px 20px; border-radius: 18px; }
+  .flag-wrapper h1 { font-size: 1rem; letter-spacing: .12em; }
+}
+</style>
+</head>
+<body>
+
+<div class="flag-wrapper">
+  <div style="position:relative;z-index:1;">
+    <div class="flag-tag">NODE RELAY // FLAG</div>
+    <h1>All Locks Broken</h1>
+    <p class="flag-sub">You have torn through the encryption schema. The node yields its content.</p>
+    <div class="flag-label">// ARTICAL PROCESSING LAYER — DECRYPTED</div>
+    <div class="flag-box" id="flag-value">
+      <span id="flag-text">loading…</span>
+      <div class="copy-hint">click to copy</div>
+    </div>
+    <p class="flag-note">Submit this flag to the challenge website.</p>
+  </div>
+</div>
+
+<div class="copy-msg" id="copy-msg">✓ Copied to clipboard</div>
+
+<script>
+const flagValue = document.getElementById('flag-value');
+const flagText = document.getElementById('flag-text');
+const copyMsg = document.getElementById('copy-msg');
+
+  console.log("\n╔════════════════════════════════════════════════════════╗");
+  console.log("║ S = k × ln(Ω) + \"channel\"                              ║");
+  console.log("║ Craft your own URL                                     ║");
+  console.log("╚════════════════════════════════════════════════════════╝\n");
+
+// Fetch flag on load
+async function loadFlag() {
+  try {
+    const res = await fetch('/api/get-flag', {
+      credentials: 'same-origin',
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.flag) {
+        flagText.textContent = data.flag;
+      } else {
+        flagText.textContent = 'Error: ' + (data.error || 'Unknown error');
+      }
+    } else if (res.status === 403 || res.status === 401) {
+      window.location.href = '/access-denied.html';
+    } else {
+      flagText.textContent = 'Error: ' + res.statusText;
+    }
+  } catch (err) {
+    flagText.textContent = 'Error: Network failure';
+  }
+}
+
+// Copy to clipboard
+flagValue.addEventListener('click', async () => {
+  const text = flagText.textContent;
+  if (text && text !== 'loading…' && !text.startsWith('Error:')) {
+    try {
+      await navigator.clipboard.writeText(text);
+      copyMsg.classList.add('show');
+      setTimeout(() => copyMsg.classList.remove('show'), 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  }
+});
+
+loadFlag();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 06</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+</head>
+<body class="level4">
+  <div class="noise-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <main class="l4-wrapper">
+    <div class="l4-header">
+      <div class="l4-tag">NODE 06 // Decryption Layer</div>
+      <h1>NULL PRIME DECRYPTION INTERFACE</h1>
+      <p class="l4-sub">
+        well done making it this far.
+      </p>
+    </div>
+
+    <section class="prime-box">
+      <div class="prime-row">
+        <span class="prime-label">p</span>
+        <span class="prime-equals">=</span>
+        <span id="prime-p" class="prime-value">539447</span>
+        <span id="status-p" class="prime-status"></span>
+      </div>
+
+      <div class="prime-row">
+        <span class="prime-label">q</span>
+        <span class="prime-equals">=</span>
+        <span id="prime-q" class="prime-value corrupted" data-text="UNKNOWN">UNKNOWN</span>
+        <span id="status-q" class="prime-status"></span>
+      </div>
+    </section>
+
+    <div class="action-row">
+      <button id="decrypt-btn" class="decrypt-btn" type="button">
+        initiate decryption
+      </button>
+    </div>
+
+    <section class="console-shell">
+      <div class="console-header">
+        <span class="console-dot"></span>
+        <span class="console-dot"></span>
+        <span class="console-dot"></span>
+        <span class="console-title">system log</span>
+      </div>
+      <div id="log-box" class="log-box" aria-live="polite"></div>
+    </section>
+
+    <section class="product-box">
+      <label for="product-input" class="product-label">
+        enter <code>p × q</code> (decimal)
+      </label>
+
+      <div class="product-row">
+        <input
+          id="product-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          disabled
+          placeholder="product locked until recovery sequence completes"
+        />
+        <button id="product-submit" type="button" disabled>
+          submit
+        </button>
+      </div>
+
+      <div id="product-feedback" class="product-feedback"></div>
+    </section>
+
+    <section id="flag-panel" class="flag-panel hidden">
+      <p class="flag-label">LEVEL 6 FLAG</p>
+      <div id="flag-box" class="flag-box">retrieving flag...</div>
+      <p class="flag-note">
+        you repaired what NULL tried to break. the next node won’t be this forgiving.
+      </p>
+    </section>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>

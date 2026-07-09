@@ -1,0 +1,3 @@
+make pg.txt
+edit .env
+fix the math

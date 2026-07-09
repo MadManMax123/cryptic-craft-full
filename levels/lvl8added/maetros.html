@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Metro</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            color: white;
+            background-image: url("https://commons.wikimedia.org/wiki/Special:FilePath/Seoul-metro-639-Anam-station-platform-20181125-150834.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        h1 {
+            margin-top: 25px;
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 2px 2px 6px black;
+        }
+        p {
+            width: 85%;
+            margin: auto;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.6;
+            text-shadow: 1px 1px 4px black;
+        }
+        /* Invisible clickable area over the metro train */
+        #metro {
+            position: fixed;
+            left: 12%;
+            top: 30%;
+            width: 36%;
+            height: 40%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catch the Metro</h1>
+    <p>
+        A metro, short for metropolitan railway, is a high-capacity rapid transit
+        system built to move large numbers of people quickly through dense urban
+        areas. Most metro lines run on dedicated tracks, fully separated from road
+        traffic, often underground in tunnels or elevated above the street on
+        viaducts, which lets trains keep a tight, predictable schedule.
+        <br><br>
+        The world's first underground metro opened in London in 1863, running on
+        steam power before electrification took over. Since then, metro networks
+        have spread to hundreds of cities worldwide, from the sprawling systems of
+        Tokyo, New York, and Moscow to newer builds racing to keep pace with rapid
+        urban growth. Trains typically run on a fixed rail gauge, drawing power
+        from a third rail or overhead wire, and stations are spaced to balance
+        speed with accessibility.
+        <br><br>
+    </p>
+    <!-- Invisible clickable area -->
+    <div id="metro"></div>
+    <script>
+        let clicks = 0;
+        document.getElementById("metro").addEventListener("click", function () {
+            clicks++;
+            if (clicks >= 5) {
+                alert("🚇 You caught the metro!\n\nHere's ur reward - 4reyp5vz\n\nsomeone's trash is another's treasure");
+                clicks = 0;
+            }
+        });
+    </script>
+</body>
+</html>

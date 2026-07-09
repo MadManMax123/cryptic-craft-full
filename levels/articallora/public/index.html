@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NULL // Node 08</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Login page base ── */
+    body.login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(95, 240, 255, 0.04), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(152, 184, 255, 0.05), transparent 30%),
+        linear-gradient(180deg, #06070d 0%, #04050a 100%);
+      font-family: var(--font-mono);
+      overflow: hidden;
+    }
+
+    /* ── Login wrap ── */
+    .login-wrap {
+      position: relative;
+      z-index: 2;
+      width: min(460px, 94vw);
+    }
+
+    /* ── Terminal top bar ── */
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      background: rgba(8, 11, 22, 0.98);
+      border: 1px solid var(--border-strong);
+      border-bottom: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.r { background: #ff5f56; }
+    .dot.y { background: #ffbd2e; }
+    .dot.g { background: #27c93f; }
+
+    .term-title {
+      margin-left: auto;
+      margin-right: auto;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+    }
+
+    /* ── Login box ── */
+    .login-box {
+      background: linear-gradient(180deg, rgba(10, 14, 26, 0.97), rgba(7, 10, 18, 0.99));
+      border: 1px solid var(--border-strong);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 32px 28px 28px;
+      box-shadow:
+        0 0 60px rgba(95, 240, 255, 0.05),
+        0 40px 100px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .login-box::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(95, 240, 255, 0.45), transparent);
+    }
+
+    /* ── Boot lines ── */
+    .boot-lines {
+      margin-bottom: 26px;
+      min-height: 72px;
+    }
+
+    .boot-line {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      line-height: 1.95;
+      letter-spacing: 0.03em;
+      white-space: pre-wrap;
+      color: rgba(175, 205, 255, .78);
+      opacity: 0;
+      animation: lineIn .2s ease forwards;
+    }
+
+    @keyframes lineIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .boot-line.ok   { color: #55f0a0; text-shadow: 0 0 9px rgba(50, 230, 130, .38); }
+    .boot-line.warn { color: #ffaa38; text-shadow: 0 0 7px rgba(255, 148, 20, .38); }
+    .boot-line.cyan { color: var(--accent2); }
+    .boot-line.err  { color: #ff3d3d; text-shadow: 0 0 9px rgba(255, 40, 20, .6); }
+    .boot-line.dim  { color: rgba(85, 115, 165, .55); }
+
+    /* ── Auth form ── */
+    .auth-form { display: flex; flex-direction: column; gap: 14px; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+    .field-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field-prompt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(4, 6, 14, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .field-prompt:focus-within {
+      border-color: rgba(95, 240, 255, 0.38);
+      box-shadow: 0 0 14px rgba(95, 240, 255, 0.08);
+    }
+
+    .prompt-char { color: var(--accent2); font-size: 0.8rem; user-select: none; }
+
+    .field-prompt input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      caret-color: var(--accent2);
+    }
+
+    .field-prompt input::placeholder { color: rgba(128, 144, 184, 0.35); }
+
+    /* ── Submit button ── */
+    .submit-btn {
+      margin-top: 6px;
+      padding: 13px;
+      width: 100%;
+      background: linear-gradient(180deg, rgba(95, 240, 255, 0.13), rgba(152, 184, 255, 0.1));
+      border: 1px solid rgba(95, 240, 255, 0.32);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, rgba(95, 240, 255, 0.2), rgba(152, 184, 255, 0.16));
+      border-color: rgba(95, 240, 255, 0.52);
+      box-shadow: 0 8px 24px rgba(95, 240, 255, 0.12);
+    }
+
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .submit-btn .btn-text { position: relative; z-index: 1; }
+
+    /* ── Status ── */
+    .status-line {
+      margin-top: 12px;
+      min-height: 18px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .status-line.err  { color: var(--danger); }
+    .status-line.ok   { color: var(--good); }
+    .status-line.info { color: var(--muted); }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(95, 240, 255, 0.2);
+      border-top-color: var(--accent2);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Divider ── */
+    .divider {
+      margin: 22px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+    .divider span { color: var(--muted); font-size: 0.66rem; letter-spacing: 0.2em; white-space: nowrap; }
+
+    .null-sig {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.64rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="login-page">
+
+  <div class="noise-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <!-- ── Main login UI — visible immediately, no cinematic ── -->
+  <div class="login-wrap" id="main-login">
+    <div class="term-bar">
+      <span class="dot r"></span>
+      <span class="dot y"></span>
+      <span class="dot g"></span>
+      <span class="term-title">null-auth — bash — 80×24</span>
+    </div>
+
+    <div class="login-box">
+      <div class="boot-lines" id="bootLines"></div>
+
+      <div class="auth-form" id="authForm" style="display:none">
+        <div class="field-group">
+          <label class="field-label">Team Identifier</label>
+          <div class="field-prompt">
+            <span class="prompt-char">$</span>
+            <input type="text" id="teamId" placeholder="team_001" autocomplete="off" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Access Token</label>
+          <div class="field-prompt">
+            <span class="prompt-char">></span>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="off" />
+          </div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="doLogin()">
+          <span class="btn-text">AUTHENTICATE</span>
+        </button>
+
+        <div class="status-line info" id="statusLine"></div>
+      </div>
+
+      <div class="divider" id="divider" style="display:none">
+        <hr /><span>NULL TRANSMISSION</span><hr />
+      </div>
+      <div class="null-sig" id="nullSig" style="display:none">
+        v0.9.4 // OPERATOR ACCESS ONLY
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Login box boot sequence ──────────────────────────────────────
+    function runLoginBootSequence() {
+      const lines = [
+        { text: "BIOS v2.1.0 ... OK",               cls: "ok",   delay: 80 },
+        { text: "Loading kernel modules ...",         cls: "dim",  delay: 300 },
+        { text: "RF stack initialized",               cls: "ok",   delay: 550 },
+        { text: "Checking secure enclave ...",        cls: "dim",  delay: 800 },
+        { text: "WARNING: anomalous signal detected", cls: "warn", delay: 1100 },
+        { text: "NULL node contact: PENDING",         cls: "cyan", delay: 1450 },
+        { text: "Awaiting operator credentials",      cls: "dim",  delay: 1750 },
+      ];
+
+      const container = document.getElementById("bootLines");
+
+      lines.forEach(({ text, cls, delay }) => {
+        setTimeout(() => {
+          const s = document.createElement("span");
+          s.className = "boot-line " + cls;
+          s.textContent = text;
+          container.appendChild(s);
+        }, delay);
+      });
+
+      setTimeout(() => {
+        document.getElementById("authForm").style.display = "flex";
+        document.getElementById("divider").style.display = "flex";
+        document.getElementById("nullSig").style.display = "block";
+        document.getElementById("teamId").focus();
+      }, 2100);
+    }
+
+    // Run immediately on page load — no cinematic intro
+    window.addEventListener("DOMContentLoaded", runLoginBootSequence);
+
+    // ── Login ──────────────────────────────────────────────────────
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") doLogin();
+    });
+
+    async function doLogin() {
+      const teamId   = document.getElementById("teamId").value.trim();
+      const password = document.getElementById("password").value;
+      const btn      = document.getElementById("submitBtn");
+      const status   = document.getElementById("statusLine");
+
+      if (!teamId || !password) {
+        setStatus("Missing credentials", "err");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.querySelector(".btn-text").innerHTML =
+        '<span class="spinner"></span>VERIFYING';
+      setStatus("Contacting authentication node...", "info");
+
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          credentials: "include",
+          body: JSON.stringify({ team_id: teamId, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setStatus("AUTH OK — Redirecting...", "ok");
+          setTimeout(() => { window.location.href = "main"; }, 900);
+        } else {
+          const msg = data.error || "Authentication failed";
+          const remaining = data.remaining_attempts !== undefined
+            ? ` (${data.remaining_attempts} attempts left)` : "";
+          setStatus(msg + remaining, "err");
+          btn.disabled = false;
+          btn.querySelector(".btn-text").textContent = "AUTHENTICATE";
+        }
+      } catch (e) {
+        setStatus("Network error — node unreachable", "err");
+        btn.disabled = false;
+        btn.querySelector(".btn-text").textContent = "AUTHENTICATE";
+      }
+    }
+
+    function setStatus(msg, cls) {
+      const el = document.getElementById("statusLine");
+      el.textContent = msg;
+      el.className = "status-line " + cls;
+    }
+  </script>
+</body>
+</html>

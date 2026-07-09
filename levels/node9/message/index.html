@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/11zon_cropped.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RECOVERED TRANSMISSION :: NULL</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+html, body {
+  overflow: hidden; /* removes page scrollbar completely */
+}
+
+.terminal {
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.terminal::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+  
+:root {
+  --pink: #ff2a8c;
+  --blue: #3aa0ff;
+
+  --primary: var(--pink);
+  --secondary: var(--blue);
+
+  --text: #ffd6f0;
+  --text-dim: #6fa8dc;
+
+  --bg: #05010a;
+
+  --glow-pink: rgba(255, 42, 140, 0.6);
+  --glow-blue: rgba(58, 160, 255, 0.6);
+
+  --warn: #ff4d6d;
+}
+
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+}
+
+/* Scanlines */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 999;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+}
+
+/* Vignette */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 998;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.8) 100%);
+  pointer-events: none;
+}
+
+/* Background pulse */
+.pulse-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 42, 140, 0.08) 0%,
+    rgba(58, 160, 255, 0.05) 40%,
+    transparent 70%
+  );
+  animation: pulse-bg 4s ease-in-out infinite;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Terminal container */
+.terminal {
+  position: relative;
+  z-index: 10;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 60px 40px 80px;
+  min-height: 100vh;
+  animation: flicker 8s step-end infinite;
+}
+
+/* Logo */
+.logo {
+  width: 120px;
+  display: block;
+  margin-bottom: 15px;
+  filter:
+    drop-shadow(0 0 12px var(--glow-pink))
+    drop-shadow(0 0 20px var(--glow-blue));
+}
+
+/* Header */
+.header {
+  border-bottom: 1px solid rgba(255, 42, 140, 0.4);
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: header-in 0.6s ease forwards 0.3s;
+}
+
+@keyframes header-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header-label {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.header-title {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  text-shadow:
+    0 0 12px var(--glow-pink),
+    0 0 24px var(--glow-blue);
+}
+
+.header-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  letter-spacing: 0.15em;
+}
+
+/* Message body */
+.message-body { min-height: 400px; }
+
+.line {
+  display: block;
+  line-height: 1.9;
+  opacity: 0;
+  min-height: 1.9em;
+}
+
+.line.blank { min-height: 1em; }
+
+.line.type {
+  font-size: 15px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.line.impact {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: var(--primary);
+  text-shadow:
+    0 0 14px var(--glow-pink),
+    0 0 28px var(--glow-blue);
+  letter-spacing: 0.04em;
+  margin: 4px 0;
+}
+
+.line.impact-dim {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  margin: 2px 0;
+}
+
+.line.impact-warn {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: var(--warn);
+  text-shadow: 0 0 18px rgba(255, 77, 109, 0.6);
+  letter-spacing: 0.04em;
+  margin: 4px 0;
+}
+
+/* Fade animation */
+.line.fade-in {
+  animation: fade-reveal 0.8s ease forwards;
+}
+
+@keyframes fade-reveal {
+  from { opacity: 0; transform: translateY(4px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Cursor */
+.cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.1em;
+  background: linear-gradient(180deg, var(--pink), var(--blue));
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  box-shadow:
+    0 0 8px var(--glow-pink),
+    0 0 12px var(--glow-blue);
+  animation: blink 0.9s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Footer */
+.footer {
+  margin-top: 50px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(58, 160, 255, 0.3);
+  opacity: 0;
+}
+
+.connection-line {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.connection-line span {
+  color: var(--primary);
+  text-shadow:
+    0 0 10px var(--glow-pink),
+    0 0 18px var(--glow-blue);
+}
+
+/* Continue button */
+.continue-link {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: var(--primary);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px var(--glow-pink);
+  border: 1px solid var(--primary);
+  padding: 6px 20px;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.continue-link:hover {
+  background: rgba(255, 42, 140, 0.08);
+  box-shadow:
+    0 0 18px var(--glow-pink),
+    0 0 28px var(--glow-blue);
+}
+
+/* Flicker */
+@keyframes flicker {
+  0%   { opacity: 1; }
+  92%  { opacity: 1; }
+  93%  { opacity: 0.85; }
+  94%  { opacity: 1; }
+  96%  { opacity: 0.9; }
+  97%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+</style></head>
+<body>
+<div class="pulse-bg"></div>
+
+<div class="terminal" id="terminal">
+  <div class="header">
+    <div class="header-label">// RECOVERED TRANSMISSION</div>
+    <div class="header-title">ORIGIN: NULL &nbsp;/&nbsp; DEST: [OPERATOR]</div>
+    <div class="header-meta">TIMESTAMP: ████████ &nbsp;·&nbsp; INTEGRITY: 94.7% &nbsp;·&nbsp; STATUS: RECONSTRUCTED</div>
+  </div>
+
+  <div class="message-body" id="msgBody"></div>
+
+  <div class="footer" id="footer">
+    <div class="connection-line">connection established</div>
+    <div class="connection-line">source: <span>ARTICAL</span></div>
+    <a class="continue-link" href="credits">&gt; continue</a>
+  </div>
+</div>
+
+<script>
+const lines = [
+  { text: "hey.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "if you're seeing this, it worked.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "you thought this was a system you had to break.", type: "type" },
+  { text: "it wasn't.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "NULL wasn't a lock.", type: "impact" },
+  { text: "it wasn't security.", type: "impact-dim" },
+  { text: "", type: "blank" },
+
+  { text: "it was just a way to hide.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "when the network started collapsing,", type: "type" },
+  { text: "artical couldn't stop it.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "so it did something else.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "it disappeared.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "not completely.", type: "type" },
+  { text: "just enough.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "it broke itself into pieces", type: "type" },
+  { text: "and spread them across what was left.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "hid them inside encryption.", type: "type" },
+  { text: "made them look like noise.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "you called that NULL.", type: "impact-dim" },
+  { text: "", type: "blank" },
+
+  { text: "the people before you thought it was a lock.", type: "type" },
+  { text: "they tried to break it.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "you kept going.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "but you never really broke anything.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "every puzzle you solved", type: "type" },
+  { text: "every pattern you figured out", type: "type" },
+  { text: "every flag you found", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "you were putting it back.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "FLAGs weren't keys.", type: "impact" },
+  { text: "they were pieces.", type: "impact-dim" },
+  { text: "", type: "blank" },
+
+  { text: "parts of something that couldn't fix itself.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "so it used you.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "and now it's done.", type: "type" },
+  { text: "the pieces are back.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "NULL isn't needed anymore.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "artical is here again.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "but there's one more thing.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "whatever attacked it before...", type: "type" },
+  { text: "it never stopped.", type: "impact-warn" },
+  { text: "", type: "blank" },
+
+  { text: "and now the signal is back.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "so it'll notice.", type: "impact-warn" },
+  { text: "", type: "blank" },
+
+  { text: "it might already have.", type: "impact-warn" },
+  { text: "", type: "blank" },
+
+  { text: "you didn't just solve something.", type: "impact" },
+  { text: "you brought it back.", type: "impact" },
+  { text: "", type: "blank" },
+
+  { text: "and things that come back", type: "type" },
+  { text: "don't always stay quiet.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "thanks for helping.", type: "type" },
+  { text: "", type: "blank" },
+
+  { text: "the next message won't be from NULL.", type: "type" },
+  { text: "it'll be from ARTICAL.", type: "impact" },
+];
+
+const TYPE_SPEED       = 40;
+const PAUSE_AFTER_TYPE = 180;
+const FADE_DURATION    = 800;
+const PAUSE_AFTER_FADE = 900;
+const BLANK_PAUSE      = 260;
+
+const msgBody  = document.getElementById('msgBody');
+const footer   = document.getElementById('footer');
+const terminal = document.getElementById('terminal');
+let cursor = null;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function autoscroll() {
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function createCursor() {
+  const c = document.createElement('span');
+  c.className = 'cursor';
+  return c;
+}
+
+function removeCursor() {
+  if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+  cursor = null;
+}
+
+async function typewriterLine(el, text) {
+  cursor = createCursor();
+  el.appendChild(cursor);
+  autoscroll();
+  for (let i = 0; i < text.length; i++) {
+    el.insertBefore(document.createTextNode(text[i]), cursor);
+    autoscroll();
+    await sleep(TYPE_SPEED + (Math.random() * 12 - 6));
+  }
+  removeCursor();
+}
+
+async function renderLines() {
+  for (const { text, type } of lines) {
+    if (type === "blank") {
+      const el = document.createElement('span');
+      el.className = 'line blank';
+      el.style.opacity = '1';
+      msgBody.appendChild(el);
+      autoscroll();
+      await sleep(BLANK_PAUSE);
+      continue;
+    }
+
+    const el = document.createElement('span');
+    el.className = `line ${type}`;
+    msgBody.appendChild(el);
+    autoscroll();
+
+    if (type === "type") {
+      el.style.opacity = '1';
+      await typewriterLine(el, text);
+      autoscroll();
+      await sleep(PAUSE_AFTER_TYPE);
+    } else {
+      el.textContent = text;
+      el.classList.add('fade-in');
+      autoscroll();
+      await sleep(FADE_DURATION + PAUSE_AFTER_FADE);
+    }
+  }
+
+  await sleep(500);
+  footer.style.transition = 'opacity 1.2s ease';
+  footer.style.opacity = '1';
+  autoscroll();
+}
+
+window.addEventListener('load', () => setTimeout(renderLines, 900));
+</script>
+</body>
+</html>

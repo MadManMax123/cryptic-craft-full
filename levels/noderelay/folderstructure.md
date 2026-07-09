@@ -1,0 +1,11 @@
+/api
+  check.js
+  get-flag.js
+/lib
+  grader.js
+  hmac.js
+/public
+  index.html
+/package.json
+/.env.example
+/vercel.json

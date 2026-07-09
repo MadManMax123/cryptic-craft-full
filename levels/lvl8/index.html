@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 15</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+
+  <style>
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes introFadeOut {
+      to { opacity: 0; }
+    }
+
+    #lore-display {
+      position: relative;
+      z-index: 2;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(180, 210, 255, 0.82);
+      text-align: center;
+      max-width: 64ch;
+      line-height: 1.8;
+      letter-spacing: .045em;
+      min-height: 1.8em;
+      opacity: 1;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display.fade-line-out {
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95, 240, 255, .75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.18) 2px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #skip-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 32px;
+      z-index: 3;
+      background: transparent;
+      border: 1px solid rgba(120, 160, 255, .2);
+      border-radius: 8px;
+      color: rgba(120, 160, 255, .45);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .66rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95, 240, 255, .5);
+      color: rgba(95, 240, 255, .8);
+      box-shadow: 0 0 10px rgba(95, 240, 255, .12);
+    }
+    #cinematic-intro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%),
+    linear-gradient(
+      135deg, /* ← FIXED direction */
+      transparent 0%,
+      transparent 45%,
+      rgba(95, 240, 255, 0.06) 50%,
+      transparent 55%,
+      transparent 100%
+    );
+  background-size: 100% 100%, 200% 200%;
+  animation: diagonalShimmer 6s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes diagonalShimmer {
+  0% {
+    background-position: center, 100% 100%;
+  }
+  100% {
+    background-position: center, 0% 0%;
+  }
+}
+  </style>
+</head>
+<body class="level8">
+
+  <div id="cinematic-intro">
+    <div id="lore-display"></div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <main class="l8-wrapper" id="main-site" style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+    <div class="l8-header">
+      <div class="l8-tag">Node 15 // Node Ascension</div>
+      <h1>NODE CORE INTERFACE</h1>
+      <p class="l8-sub">
+        the final outer layer has exposed a narrow interface into the core vocabulary set.
+      </p>
+    </div>
+    <div id="lore-block" class="l8-lore"></div>
+    <section id="core-block" class="l8-core hidden">
+      <p class="core-intro">
+        the surrounding fragments are already seen. the correct center pattern is the only sequence this interface will accept.
+      </p>
+      <div class="word-rectangle">
+        <div class="word-row">
+          <span class="core-word">honor</span>
+          <span class="core-word">prone</span>
+          <span class="core-word">medal</span>
+          <span class="core-word">chess</span>
+        </div>
+        <div class="word-row">
+          <span class="core-word">vicar</span>
+          <span class="core-word">stone</span>
+          <span class="core-word">forum</span>
+          <span class="core-word">these</span>
+        </div>
+      </div>
+      <div class="core-input-row">
+        <input class="core-char" type="text" maxlength="1" data-index="0" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="1" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="2" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="3" inputmode="text" />
+        <div class="core-gap" aria-hidden="true"></div>
+        <input class="core-char" type="text" maxlength="1" data-index="4" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="5" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="6" inputmode="text" />
+        <input class="core-char" type="text" maxlength="1" data-index="7" inputmode="text" />
+      </div>
+      <p class="core-hint-sub">
+        eight characters. the interface renders them as two linked units.
+      </p>
+      <button id="core-submit" class="core-submit" type="button">
+        unlock node
+      </button>
+      <div id="core-feedback" class="core-feedback"></div>
+    </section>
+  </main>
+
+  <script>
+    (async () => {
+      const introEl   = document.getElementById('cinematic-intro');
+      const displayEl = document.getElementById('lore-display');
+      const skipBtn   = document.getElementById('skip-btn');
+      const mainSite  = document.getElementById('main-site');
+
+      // ── same lines as level8-script.js ──────
+      const lines = [
+  "You are one layer away from the core.",
+  "Every fragment you recovered belonged to the same internal structure.",
+  "Coordinates, primes, traces, and relays all converged here.",
+  "The outer data is noise. The structure lies within each fragment.",
+  "Symmetry is not always horizontal.",
+  "Some observers read across. Others read through.",
+  "The center is consistent, but alignment defines meaning.",
+  "Only one path resolves into something recognizable.",
+  "Recognize the center pattern and the node will open."
+];
+
+      // ── config ───────────────────────────────
+      const CHAR_DELAY = 38;
+      const HOLD_MS    = 2200;
+      const FADE_MS    = 800;
+      const INTER_MS   = 80;
+      // ─────────────────────────────────────────
+
+      let skipTriggered = false;
+
+      function revealSite() {
+        skipTriggered = true;
+        introEl.classList.add('fade-out');
+        setTimeout(() => {
+          introEl.style.display = 'none';
+          mainSite.style.visibility = 'visible';
+          mainSite.style.opacity    = '1';
+        }, 1200);
+      }
+
+      skipBtn.addEventListener('click', revealSite);
+
+      function typeLine(text) {
+        return new Promise(resolve => {
+          let i = 0;
+          displayEl.textContent = '';
+
+          function tick() {
+            if (skipTriggered) { resolve(); return; }
+            if (i <= text.length) {
+              displayEl.textContent = text.slice(0, i);
+              i++;
+              setTimeout(tick, CHAR_DELAY);
+            } else {
+              resolve();
+            }
+          }
+
+          tick();
+        });
+      }
+
+      function wait(ms) {
+        return new Promise(r => setTimeout(r, ms));
+      }
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        if (skipTriggered) break;
+
+        await typeLine(lines[idx]);
+        if (skipTriggered) break;
+
+        await wait(HOLD_MS);
+        if (skipTriggered) break;
+
+        if (idx < lines.length - 1) {
+          displayEl.classList.add('fade-line-out');
+          await wait(FADE_MS);
+          displayEl.classList.remove('fade-line-out');
+          displayEl.textContent = '';
+          await wait(INTER_MS);
+        }
+      }
+
+      if (!skipTriggered) {
+        await wait(600);
+        revealSite();
+      }
+    })();
+  </script>
+
+  <script src="/level8-script.js"></script>
+</body>
+</html>

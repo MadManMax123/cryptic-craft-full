@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NULL // Node 08</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Terminal layout ── */
+    body.level5 {
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 18px 48px;
+    }
+
+    /* ── Main site wrapper — inherits l3-wrapper aesthetic ── */
+    .l5-wrapper {
+      width: min(960px, 97vw);
+      padding: 0;
+      overflow: visible;
+      background: none;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    /* ── Term top bar ── */
+    .term-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      background: rgba(7, 9, 18, 0.99);
+      border-bottom: 1px solid var(--border);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .tdot { width: 12px; height: 12px; border-radius: 50%; }
+    .tdot.r { background: #ff5f56; }
+    .tdot.y { background: #ffbd2e; }
+    .tdot.g { background: #27c93f; }
+
+    .tbar-title {
+      margin: 0 auto;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+    }
+
+    .tbar-badge {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.1em;
+      color: var(--accent2);
+      border: 1px solid rgba(95, 240, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* ── Terminal body ── */
+    .term-body {
+      padding: 22px 24px 28px;
+      min-height: 520px;
+      background: linear-gradient(180deg, rgba(5, 7, 14, 0.99), rgba(4, 5, 10, 1));
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      overflow: hidden;
+    }
+
+    /* ── Log stream ── */
+    #logStream {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-ok    { color: var(--good); }
+    .log-warn  { color: var(--warn); }
+    .log-cyan  { color: var(--accent2); }
+    .log-dim   { color: rgba(128, 144, 184, 0.38); }
+    .log-white { color: var(--text); }
+    .log-err   { color: var(--danger); }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      48%       { opacity: 0.96; }
+      50%       { opacity: 0.82; }
+      52%       { opacity: 0.97; }
+    }
+
+    .flicker { animation: flicker 4s ease-in-out infinite; }
+
+    /* ══════════════════════════════════════════
+       MISSION BANNER — Reference l3-wrapper style
+    ══════════════════════════════════════════ */
+    #missionBanner {
+      display: none;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+      padding: 28px 24px 22px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-strong);
+      background: linear-gradient(180deg, rgba(14, 20, 36, 0.95), rgba(9, 12, 22, 0.98));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.015),
+        0 0 80px rgba(95, 240, 255, 0.05),
+        var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    #missionBanner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(95, 240, 255, 0.05), transparent 28%, transparent 72%, rgba(152, 184, 255, 0.05));
+    }
+
+    #missionBanner::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(95, 240, 255, 0.42), transparent);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Header tag — squircle pill like l3-tag */
+    .banner-header {
+      text-align: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .banner-tag {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(95, 240, 255, 0.18);
+      background: rgba(95, 240, 255, 0.06);
+      color: #b8f8ff;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .banner-h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1.06;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(152, 184, 255, 0.12);
+      animation: subtleGlitch 4s infinite;
+    }
+
+    @keyframes subtleGlitch {
+      0%  { text-shadow: 0 0 24px rgba(152, 184, 255, 0.12); }
+      48% { text-shadow: 0 0 24px rgba(152, 184, 255, 0.12); }
+      49% { text-shadow: -2px 0 rgba(95, 240, 255, 0.75), 2px 0 rgba(152, 184, 255, 0.5); }
+      50% { text-shadow: 2px 0 rgba(95, 240, 255, 0.75), -2px 0 rgba(152, 184, 255, 0.5); }
+      51% { text-shadow: 0 0 24px rgba(152, 184, 255, 0.12); }
+      100%{ text-shadow: 0 0 24px rgba(152, 184, 255, 0.12); }
+    }
+
+    .banner-sub {
+      max-width: 58ch;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.68;
+      text-align: center;
+    }
+
+    /* Banner clue block — mirrors l3-clue */
+    .banner-clue {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      margin: 18px auto 0;
+      color: var(--text);
+    }
+
+    .banner-clue pre {
+      margin-top: 6px;
+      margin-bottom: 0;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(95, 240, 255, 0.14);
+      background: linear-gradient(180deg, rgba(6, 9, 16, 0.96), rgba(9, 12, 20, 0.94));
+      color: #dfe9ff;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      box-shadow:
+        inset 0 0 12px rgba(95, 240, 255, 0.05),
+        0 0 0 1px rgba(255, 255, 255, 0.01);
+    }
+
+    .banner-footnote {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.75;
+      font-family: var(--font-mono);
+    }
+
+    .banner-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      justify-content: center;
+    }
+
+    .banner-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(95, 240, 255, 0.12);
+      background: rgba(95, 240, 255, 0.05);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.1em;
+      color: rgba(185, 215, 255, 0.7);
+    }
+
+    .banner-pill .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent2);
+      animation: dotBlink 1.8s ease-in-out infinite;
+    }
+
+    .banner-pill .dot.warn { background: var(--warn); }
+    .banner-pill .dot.good { background: var(--good); }
+
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ── Phases ── */
+    .phase { display: none; }
+    .phase.active { display: block; }
+
+    /* ══════════════════════════════════════════
+       PHASE SECTIONS — Reference l3-wrapper blocks
+    ══════════════════════════════════════════ */
+
+    /* Shared phase wrapper */
+    .phase-block {
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+      padding: 28px 24px 24px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-strong);
+      background: linear-gradient(180deg, rgba(14, 20, 36, 0.95), rgba(9, 12, 22, 0.98));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.015),
+        0 0 80px rgba(95, 240, 255, 0.05),
+        var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .phase-block::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(95, 240, 255, 0.05), transparent 28%, transparent 72%, rgba(152, 184, 255, 0.05));
+    }
+
+    .phase-block::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(95, 240, 255, 0.42), transparent);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Phase header tag — squircle pill */
+    .phase-tag {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(95, 240, 255, 0.18);
+      background: rgba(95, 240, 255, 0.06);
+      color: #b8f8ff;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .phase-h1 {
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      line-height: 1.06;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(152, 184, 255, 0.12);
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .phase-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.68;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Frequency input ── */
+    .freq-clue {
+      position: relative;
+      z-index: 1;
+    }
+
+    .freq-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .freq-field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: linear-gradient(180deg, rgba(6, 9, 16, 0.96), rgba(9, 12, 20, 0.94));
+      border: 1px solid rgba(95, 240, 255, 0.14);
+      border-radius: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .freq-field:focus-within {
+      border-color: rgba(95, 240, 255, 0.4);
+      box-shadow: 0 0 18px rgba(95, 240, 255, 0.07), inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .freq-field input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      caret-color: var(--accent2);
+    }
+
+    .freq-unit {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+    }
+
+    .scan-btn {
+      padding: 12px 24px;
+      background: linear-gradient(180deg, rgba(95, 240, 255, 0.14), rgba(152, 184, 255, 0.1));
+      border: 1px solid rgba(95, 240, 255, 0.3);
+      border-radius: 999px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .scan-btn:hover {
+      border-color: rgba(95, 240, 255, 0.55);
+      box-shadow: 0 8px 20px rgba(95, 240, 255, 0.1);
+      transform: translateY(-1px);
+      background: linear-gradient(180deg, rgba(95, 240, 255, 0.2), rgba(152, 184, 255, 0.16));
+    }
+
+    .scan-btn:active { transform: translateY(0); }
+    .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── RF Scan animation ── */
+    #scanAnim {
+      display: none;
+      margin: 18px 0;
+      height: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-bar {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, var(--accent2), transparent);
+      animation: sweep 1.2s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--accent2);
+    }
+
+    .scan-spectrum {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      padding: 0 4px;
+    }
+
+    .spec-bar {
+      flex: 1;
+      border-radius: 2px 2px 0 0;
+      opacity: 0.5;
+      transition: height 0.12s;
+    }
+
+    @keyframes sweep {
+      0%   { left: 0%; }
+      100% { left: 100%; }
+    }
+
+    .monoline {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Packets ── */
+    #packetsSection { display: none; margin-top: 18px; }
+
+    .packet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .packet-card {
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(6, 9, 16, 0.96), rgba(9, 12, 20, 0.94));
+      border: 1px solid rgba(95, 240, 255, 0.14);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .packet-card:hover {
+      border-color: rgba(120, 160, 255, 0.35);
+      box-shadow: 0 0 18px rgba(95, 240, 255, 0.08), inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .packet-card.selected {
+      border-color: rgba(109, 245, 184, 0.5);
+      box-shadow: 0 0 20px rgba(109, 245, 184, 0.12), inset 0 0 14px rgba(109, 245, 184, 0.04);
+    }
+
+    .packet-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(95, 240, 255, 0.3), transparent);
+    }
+
+    .pkt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .pkt-id {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+
+    .pkt-rssi {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      color: var(--muted);
+    }
+
+    .pkt-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+
+    .pkt-key {
+      font-family: var(--font-mono);
+      font-size: 0.63rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(128, 144, 184, 0.6);
+    }
+
+    .pkt-val {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #dfe9ff;
+      word-break: break-all;
+    }
+
+    .pkt-select-indicator {
+      display: none;
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--good);
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #000;
+    }
+
+    .packet-card.selected .pkt-select-indicator { display: flex; }
+
+    /* ── City submission ── */
+    #citySection { display: none; margin-top: 14px; position: relative; z-index: 1; }
+
+    .city-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .city-field {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: linear-gradient(180deg, rgba(6, 9, 16, 0.96), rgba(9, 12, 20, 0.94));
+      border: 1px solid rgba(95, 240, 255, 0.14);
+      border-radius: 16px;
+      transition: border-color 0.2s;
+      box-shadow: inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .city-field:focus-within {
+      border-color: rgba(95, 240, 255, 0.4);
+      box-shadow: 0 0 18px rgba(95, 240, 255, 0.07), inset 0 0 12px rgba(95, 240, 255, 0.05);
+    }
+
+    .city-field input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #dfe9ff;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      caret-color: var(--accent2);
+    }
+
+    /* ── Attempt display ── */
+    .attempt-bar {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .att-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      opacity: 0.3;
+    }
+
+    .att-dot.used { opacity: 1; }
+
+    /* ── Flag reveal ── */
+    #flagSection { display: none; margin-top: 18px; }
+
+    .flag-box {
+      position: relative;
+      z-index: 1;
+      padding: 28px 24px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(109, 245, 184, 0.35);
+      background: linear-gradient(180deg, rgba(14, 20, 36, 0.95), rgba(9, 12, 22, 0.98));
+      text-align: center;
+      box-shadow:
+        0 0 40px rgba(109, 245, 184, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        var(--shadow);
+      overflow: hidden;
+      animation: flagReveal 0.6s ease-out forwards;
+    }
+
+    .flag-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(109, 245, 184, 0.05), transparent 28%, transparent 72%, rgba(95, 240, 255, 0.03));
+    }
+
+    .flag-box::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(109, 245, 184, 0.42), transparent);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes flagReveal {
+      from { opacity: 0; transform: scale(0.97); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Flag header pill */
+    .flag-tag {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(109, 245, 184, 0.28);
+      background: rgba(109, 245, 184, 0.06);
+      color: var(--good);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flag-h1 {
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(109, 245, 184, 0.2);
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flag-value {
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-mono);
+      font-size: clamp(0.88rem, 2vw, 1.05rem);
+      color: #d7fff0;
+      background: linear-gradient(180deg, rgba(6, 9, 16, 0.96), rgba(9, 12, 20, 0.94));
+      border: 1px solid rgba(109, 245, 184, 0.28);
+      border-radius: 16px;
+      padding: 14px 22px;
+      letter-spacing: 0.04em;
+      word-break: break-all;
+      box-shadow:
+        0 0 20px rgba(109, 245, 184, 0.15),
+        inset 0 0 12px rgba(109, 245, 184, 0.05);
+    }
+
+    .flag-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.75;
+      position: relative;
+      z-index: 1;
+    }
+
+    .copy-feedback {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .copy-feedback.ok { color: var(--good); }
+
+    /* ── SIDE POPUP countdown ── */
+    #countdown-popup {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      width: 300px;
+      background: linear-gradient(180deg, rgba(14, 20, 36, 0.98), rgba(9, 12, 22, 0.98));
+      border: 1px solid rgba(109, 245, 184, 0.4);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow:
+        0 0 40px rgba(109, 245, 184, 0.12),
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      display: none;
+      animation: popupIn 0.4s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    @keyframes popupIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #countdown-popup::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 10px; right: 10px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(109, 245, 184, 0.5), transparent);
+    }
+
+    .popup-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--good);
+      margin-bottom: 10px;
+    }
+
+    .popup-msg {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .popup-timer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .popup-timer-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(109, 245, 184, 0.12);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .popup-timer-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--good), var(--accent2));
+      border-radius: 99px;
+      transition: width 1s linear;
+      width: 100%;
+    }
+
+    .popup-timer-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--good);
+      min-width: 22px;
+      text-align: right;
+    }
+
+    @media (max-width: 640px) {
+      .freq-input-row { flex-direction: column; }
+      .scan-btn { width: 100%; border-radius: 16px; }
+      .city-row { flex-direction: column; }
+      .banner-pills { justify-content: flex-start; }
+
+      #countdown-popup {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body class="level5">
+
+  <!-- ── Cinematic Intro (UNCHANGED) ── -->
+  <div id="cinematic-intro">
+    <div id="breach-overlay"></div>
+    <div id="warn-triangle">
+      <svg viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 6L95 84H5L50 6Z" stroke="#ff3322" stroke-width="3.5"
+              fill="rgba(255,20,10,.07)"/>
+        <text x="50" y="70" text-anchor="middle"
+              font-family="monospace" font-size="40"
+              font-weight="bold" fill="#ff4433">!</text>
+      </svg>
+    </div>
+    <div id="terminal-panel">
+      <div id="terminal"></div>
+    </div>
+    <div id="lore-panel">
+      <div id="lore-display"></div>
+    </div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <div class="noise-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <!-- ── Main site ── -->
+  <div class="l5-wrapper" id="main-site"
+       style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+
+    <!-- Terminal chrome top bar -->
+    <div class="term-topbar">
+      <span class="tdot r"></span>
+      <span class="tdot y"></span>
+      <span class="tdot g"></span>
+      <span class="tbar-title">null-operator — session active</span>
+      <span class="tbar-badge" id="teamBadge">TEAM_???</span>
+    </div>
+
+    <div class="term-body">
+      <!-- Boot log stream -->
+      <div id="logStream" class="flicker"></div>
+
+      <!-- ── Mission Banner ── -->
+      <div id="missionBanner">
+        <div class="banner-header">
+          <div class="banner-tag">NODE 08 // Transmission Layer</div>
+          <h1 class="banner-h1">LoRa Relay Reciever</h1>
+          <p class="banner-sub">
+            NULL is broadcasting across multiple long-range LoRa nodes.<br/>
+            Most transmissions have been spoofed — only one is authentic.
+          </p>
+        </div>
+
+        <div class="banner-clue">
+          <pre><code>Scan the correct frequency to intercept the packet stream.
+Verify the AUTH code and digital signature.
+Decode the DATA field to extract the target location.</code></pre>
+          <p class="banner-footnote">
+            Identify the authentic transmission — the spoofed nodes will not authenticate.
+          </p>
+        </div>
+
+        <div class="banner-pills">
+          <span class="banner-pill"><span class="dot good"></span>RF BAND: ONLINE</span>
+          <span class="banner-pill"><span class="dot warn"></span>SPOOFED NODES: 9729 DETECTED</span>
+          <span class="banner-pill"><span class="dot good"></span>SESSION: SECURE</span>
+        </div>
+      </div>
+
+      <!-- ── Phase 1: Frequency input ── -->
+      <div id="freqPhase" class="phase">
+        <div class="phase-block">
+          <div class="phase-tag">rf_frequency_scan</div>
+          <h2 class="phase-h1">Signal Acquisition</h2>
+          <p class="phase-sub">
+            Enter the frequency to begin packet interception. The NULL node operates on a known band.
+          </p>
+
+          <div class="freq-clue">
+            <div class="freq-input-row">
+              <div class="freq-field">
+                <span style="color:var(--accent2);font-family:var(--font-mono);font-size:0.8rem;">~</span>
+                <input type="number" id="freqInput" placeholder="000.000" step="0.001" min="100" max="1100" />
+                <span class="freq-unit">MHz</span>
+              </div>
+              <button class="scan-btn" id="scanBtn" onclick="startScan()">scan frequency</button>
+            </div>
+
+            <div id="scanAnim">
+              <div class="scan-spectrum" id="scanSpectrum"></div>
+              <div class="scan-bar"></div>
+            </div>
+
+            <div class="monoline" id="freqFeedback"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Phase 2: Packets ── -->
+      <div id="packetsSection">
+        <div class="phase-block" style="margin-top:18px;">
+          <div class="phase-tag">intercepted_packets</div>
+          <h2 class="phase-h1">Packet Stream</h2>
+          <p class="phase-sub">
+            3 packets intercepted. Identify the authentic transmission — verify AUTH code and digital signature.
+          </p>
+          <div class="packet-grid" id="packetGrid"></div>
+        </div>
+
+        <!-- City submit -->
+        <div id="citySection">
+          <div class="phase-block" style="margin-top:18px;">
+            <div class="phase-tag">location_extraction</div>
+            <h2 class="phase-h1">Decode Target</h2>
+            <p class="phase-sub">
+              Decode the DATA field of the authentic packet. Identify the nearest city of transmission.
+            </p>
+
+            <div class="city-row">
+              <div class="city-field">
+                <span style="color:var(--accent2);font-family:var(--font-mono);font-size:0.8rem;">>_</span>
+                <input type="text" id="cityInput" placeholder="city name..." autocomplete="off" spellcheck="false"/>
+              </div>
+              <button class="scan-btn" id="cityBtn" onclick="submitCity()">submit</button>
+            </div>
+
+            <div id="attemptDisplay" class="attempt-bar" style="margin-top:12px;"></div>
+            <div id="cityFeedback" class="monoline"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Phase 3: FLAG ── -->
+      <div id="flagSection">
+        <div class="flag-box">
+          <div class="flag-tag">✓ transmission verified</div>
+          <h2 class="flag-h1">Flag Captured</h2>
+          <div class="flag-value" id="flagValue"></div>
+          <p class="flag-note">ARTICAL LoRaWAN packet authenticated. Mission complete.</p>
+          <button class="scan-btn" style="margin-top:18px;display:inline-block;" onclick="copyFlag()">copy flag</button>
+          <div class="copy-feedback" id="flagCopyFb"></div>
+        </div>
+      </div>
+
+    </div><!-- /term-body -->
+  </div><!-- /l5-wrapper -->
+
+  <!-- ── Countdown side popup ── -->
+  <div id="countdown-popup">
+    <div class="popup-label">✓ Flag Captured — Session Closing</div>
+    <div class="popup-msg">Clearing all session data and redirecting to auth portal in:</div>
+    <div class="popup-timer-row">
+      <div class="popup-timer-track">
+        <div class="popup-timer-bar" id="popupTimerBar"></div>
+      </div>
+      <div class="popup-timer-num" id="popupTimerNum">10</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

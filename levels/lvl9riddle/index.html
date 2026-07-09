@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULL // Node 11</title>
+<link rel="icon" type="image/png" href="11zon_cropped.png" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================
+   BASE
+========================= */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04050a;
+  --panel:rgba(10,14,24,.85);
+  --panel-strong:rgba(14,20,36,.97);
+  --border:rgba(120,160,255,.12);
+  --border-strong:rgba(120,160,255,.26);
+  --text:#edf2ff;
+  --muted:#8090b8;
+  --accent:#98b8ff;
+  --accent2:#5ff0ff;
+  --good:#6df5b8;
+  --warn:#ffd980;
+  --danger:#ff8a9a;
+  --shadow:0 28px 90px rgba(0,0,0,.55);
+  --radius-xl:24px;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --grid:rgba(255,255,255,.025);
+  --font-body:'Space Grotesk',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --font-display:'Syne',sans-serif;
+}
+html,body{min-height:100%;}
+
+/* =========================
+   PAGE
+========================= */
+body.level8,body.level8-flag{
+  min-height:100vh;padding:28px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow-x:hidden;
+  background:
+    radial-gradient(circle at top,rgba(95,240,255,.06),transparent 28%),
+    radial-gradient(circle at 20% 20%,rgba(152,184,255,.08),transparent 22%),
+    linear-gradient(180deg,#06070d 0%,#04050a 100%);
+  color:var(--text);font-family:var(--font-body);
+}
+body.level8::before,body.level8-flag::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;opacity:.55;pointer-events:none;
+}
+body.level8::after,body.level8-flag::after{
+  content:"";position:fixed;inset:0;
+  background:radial-gradient(circle at center,transparent 45%,rgba(0,0,0,.3) 100%);
+  pointer-events:none;
+}
+
+/* =========================
+   WRAPPER
+========================= */
+.l8-wrapper,.flag-wrapper{
+  position:relative;z-index:1;
+  width:min(840px,95vw);padding:36px 30px 28px;
+  border-radius:var(--radius-xl);border:1px solid var(--border-strong);
+  background:linear-gradient(180deg,rgba(14,20,36,.95),rgba(9,12,22,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(255,255,255,.015),
+    0 0 80px rgba(95,240,255,.05),
+    var(--shadow);
+  backdrop-filter:blur(10px);overflow:hidden;
+}
+.l8-wrapper::before,.flag-wrapper::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(95,240,255,.05),transparent 28%,transparent 72%,rgba(152,184,255,.05));
+}
+.l8-wrapper::after,.flag-wrapper::after{
+  content:"";position:absolute;top:14px;left:18px;right:18px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(95,240,255,.42),transparent);
+}
+
+/* =========================
+   HEADER
+========================= */
+.l8-header,.flag-header{text-align:center;margin-bottom:22px;}
+.l8-tag,.flag-tag{
+  display:inline-block;margin-bottom:12px;padding:6px 12px;
+  border-radius:999px;border:1px solid rgba(95,240,255,.18);
+  background:rgba(95,240,255,.06);color:#b8f8ff;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+}
+.l8-wrapper h1,.flag-wrapper h1{
+  font-family:var(--font-display);font-size:clamp(1.1rem,2vw,1.45rem);
+  letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px;text-align:center;
+  text-shadow:0 0 18px rgba(152,184,255,.12);
+}
+.l8-sub,.flag-sub{
+  text-align:center;max-width:60ch;margin:0 auto;
+  font-size:.85rem;line-height:1.7;color:var(--muted);
+}
+
+/* =========================
+   LORE
+========================= */
+.l8-lore{
+  min-height:150px;margin-bottom:20px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(10,15,26,.9),rgba(8,11,19,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),inset 0 0 40px rgba(0,0,0,.18);
+}
+.l8-lore-line{font-size:.9rem;color:#dbe4ee;line-height:1.7;margin-bottom:6px;}
+
+/* =========================
+   CORE BLOCK
+========================= */
+.l8-core{
+  margin-top:12px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid rgba(95,240,255,.14);
+  background:linear-gradient(180deg,rgba(2,6,23,.95),rgba(15,23,42,.88));
+  color:#cbd5e1;opacity:0;transform:translateY(8px);transition:.45s;
+  box-shadow:inset 0 0 16px rgba(95,240,255,.04);
+}
+.l8-core.visible{opacity:1;transform:translateY(0);}
+.core-intro{font-size:.82rem;color:var(--muted);margin-bottom:14px;}
+
+/* =========================
+   POEM BLOCK
+========================= */
+.riddle-poem{
+  padding:14px 18px;margin-bottom:16px;
+  border-radius:14px;border:1px solid var(--border);
+  background:rgba(2,6,23,.92);
+  box-shadow:inset 0 0 12px rgba(95,240,255,.04);
+  font-family:var(--font-mono);font-size:.82rem;
+  line-height:2;color:#dbe4ee;text-align:center;
+}
+.poem-line{display:block;}
+.poem-line.corrupted{
+  color:rgba(255,138,154,.65);
+  text-decoration:line-through rgba(255,138,154,.35) wavy;
+  font-style:italic;
+}
+.poem-line.partial{color:rgba(219,228,238,.42);letter-spacing:.02em;}
+
+/* =========================
+   PROGRESS PIPS
+========================= */
+.progress-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;margin-bottom:20px;
+}
+.pip{
+  width:28px;height:5px;border-radius:3px;
+  background:rgba(120,160,255,.15);border:1px solid rgba(120,160,255,.18);transition:.4s;
+}
+.pip.done{background:var(--good);border-color:var(--good);box-shadow:0 0 8px rgba(109,245,184,.4);}
+.pip.active{background:var(--accent2);border-color:var(--accent2);box-shadow:0 0 8px rgba(95,240,255,.4);}
+.pip.fail{background:var(--danger);border-color:var(--danger);}
+
+/* =========================
+   ANSWER ROW
+========================= */
+.answer-row{
+  display:flex;align-items:stretch;
+  border:1px solid rgba(95,240,255,.18);border-radius:10px;
+  overflow:hidden;background:rgba(2,6,23,.96);transition:.2s;
+}
+.answer-row:focus-within{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(95,240,255,.1),0 0 14px rgba(95,240,255,.1);
+}
+.answer-row.ok-glow{border-color:rgba(109,245,184,.5);box-shadow:0 0 14px rgba(109,245,184,.14);}
+.answer-row.err-glow{border-color:rgba(255,138,154,.4);animation:shake .35s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.answer-prefix{
+  padding:0 14px;display:flex;align-items:center;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;
+  color:rgba(95,240,255,.5);border-right:1px solid var(--border);
+  user-select:none;white-space:nowrap;
+}
+.answer-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--font-mono);
+  font-size:.9rem;letter-spacing:.06em;padding:.75rem 1rem;
+}
+.answer-input::placeholder{color:var(--muted);font-style:italic;font-size:.78rem;}
+.answer-input:disabled{opacity:.4;cursor:not-allowed;}
+
+/* =========================
+   BUTTON
+========================= */
+.core-submit{
+  margin:14px auto 0;display:block;padding:11px 18px;
+  border-radius:10px;border:1px solid rgba(95,240,255,.45);
+  background:linear-gradient(180deg,rgba(95,240,255,.16),rgba(152,184,255,.14));
+  color:#e0f2fe;font-family:var(--font-mono);font-size:.8rem;
+  letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.core-submit:hover{
+  border-color:rgba(103,232,249,.7);
+  box-shadow:0 0 14px rgba(95,240,255,.28);transform:translateY(-1px);
+}
+.core-submit:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+.core-feedback{
+  min-height:1.1rem;margin-top:10px;font-size:.78rem;
+  text-align:center;color:var(--muted);
+}
+.core-feedback.ok{color:#86efac;}
+.core-feedback.error{color:#f87171;}
+
+/* =========================
+   FLAG PAGE
+========================= */
+.flag-wrapper{width:min(620px,94vw);text-align:center;padding:40px 30px 32px;}
+.flag-label{font-size:.74rem;color:#a5f3fc;letter-spacing:.2em;margin-bottom:12px;text-transform:uppercase;}
+.flag-box{
+  display:inline-block;max-width:100%;padding:12px 18px;
+  border-radius:10px;border:1px solid rgba(109,245,184,.45);
+  background:rgba(109,245,184,.12);color:#bbf7d0;
+  font-family:var(--font-mono);font-size:.95rem;
+  box-shadow:0 0 16px rgba(109,245,184,.2),inset 0 0 12px rgba(109,245,184,.05);
+  margin-bottom:12px;word-break:break-word;
+}
+.flag-char{opacity:0;transition:opacity .04s;}
+.flag-char.on{opacity:1;}
+.flag-note{font-size:.78rem;color:var(--muted);line-height:1.65;}
+.next-node-btn{
+  display:inline-block;margin-top:18px;padding:11px 18px;
+  border-radius:10px;border:1px solid rgba(95,240,255,.45);
+  background:linear-gradient(180deg,rgba(95,240,255,.16),rgba(152,184,255,.14));
+  color:#e0f2fe;font-family:var(--font-mono);font-size:.8rem;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.next-node-btn:hover{
+  border-color:rgba(103,232,249,.7);
+  box-shadow:0 0 14px rgba(95,240,255,.28);transform:translateY(-1px);
+}
+
+/* =========================
+   CINEMATIC INTRO
+========================= */
+#cinematic-intro{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;display:flex;align-items:center;justify-content:center;padding:40px;
+}
+#cinematic-intro.fade-out{animation:introFadeOut 1.4s ease forwards;pointer-events:none;}
+@keyframes introFadeOut{to{opacity:0;}}
+#cinematic-intro::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);
+  pointer-events:none;z-index:1;
+}
+#cinematic-intro::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.65) 100%);
+  pointer-events:none;z-index:1;
+}
+#lore-display{
+  position:relative;z-index:2;
+  font-family:var(--font-mono);font-size:clamp(.78rem,1.5vw,.95rem);
+  color:rgba(180,210,255,.82);text-align:center;
+  max-width:64ch;line-height:1.8;letter-spacing:.045em;
+  min-height:1.8em;opacity:1;transition:opacity .8s ease;
+}
+#lore-display.fade-line-out{opacity:0;}
+#lore-display::after{
+  content:'';display:inline-block;width:.5em;height:1em;
+  background:rgba(95,240,255,.75);margin-left:3px;
+  vertical-align:text-bottom;animation:blink .65s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#skip-btn{
+  position:absolute;bottom:28px;right:32px;z-index:3;
+  background:transparent;border:1px solid rgba(120,160,255,.2);border-radius:8px;
+  color:rgba(120,160,255,.45);font-family:var(--font-mono);font-size:.66rem;
+  letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:.2s;
+}
+#skip-btn:hover{border-color:rgba(95,240,255,.5);color:rgba(95,240,255,.8);box-shadow:0 0 10px rgba(95,240,255,.12);}
+
+/* =========================
+   VIEW MGMT
+========================= */
+.view{display:none;flex-direction:column;align-items:center;width:100%;}
+.view.active{display:flex;}
+.hidden{display:none!important;}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:640px){
+  body.level8,body.level8-flag{padding:16px;}
+  .l8-wrapper,.flag-wrapper{padding:24px 18px 20px;border-radius:18px;}
+  .l8-wrapper h1,.flag-wrapper h1{font-size:1rem;letter-spacing:.12em;}
+}
+</style>
+</head>
+<body class="level8">
+
+<!-- ══ CINEMATIC INTRO ════════════════════════════════════════════════ -->
+<div id="cinematic-intro">
+  <div id="lore-display"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+
+<!-- ══ VIEW: NODE LOG ════════════════════════════════════════════════ -->
+<div class="view" id="view-log">
+  <div class="l8-wrapper">
+    <div class="l8-header">
+      <div class="l8-tag">NODE 11 // Sphinx Layer</div>
+      <h1>Node Logic Guard</h1>
+      <p class="l8-sub">NULL has locked this layer with logical encryptions...</p>
+    </div>
+
+    <div class="l8-lore" id="log-lore"></div>
+
+    <button class="core-submit" id="log-next-btn">Proceed to Encryptions →</button>
+  </div>
+</div>
+
+<!-- ══ VIEW: RIDDLE ════════════════════════════════════════════════════ -->
+<div class="view" id="view-riddle">
+  <div class="l8-wrapper">
+    <div class="l8-header">
+      <div class="l8-tag" id="riddle-tag">NODE 11 // Sphinx Layer</div>
+      <h1>Node Sphinx Layer</h1>
+    </div>
+
+    <div class="progress-row">
+      <div class="pip active" id="pip-1"></div>
+      <div class="pip" id="pip-2"></div>
+      <div class="pip" id="pip-3"></div>
+    </div>
+
+    <div class="l8-core visible" id="riddle-core">
+      <p class="core-intro" id="riddle-intro-text"></p>
+
+      <div class="riddle-poem" id="riddle-poem"></div>
+
+      <div class="answer-row" id="answer-row">
+        <span class="answer-prefix">DECODE &gt;</span>
+        <input class="answer-input" id="answer-input" type="text"
+               placeholder="enter decryption key…" autocomplete="off" spellcheck="false"/>
+      </div>
+
+      <button class="core-submit" id="answer-submit">Submit</button>
+      <div class="core-feedback" id="core-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIEW: FLAG ════════════════════════════════════════════════════ -->
+<div class="view" id="view-flag">
+  <div class="flag-wrapper">
+    <div class="flag-header">
+      <div class="flag-tag">NODE 11 // Sphinx Layer</div>
+      <h1>Sphinx Layer Cracked</h1>
+      <p class="flag-sub">all three encryptions resolved.<br>node access granted.</p>
+    </div>
+
+    <p class="flag-label">access flag</p>
+    <div class="flag-box" id="flag-box">—</div>
+
+    <button class="next-node-btn" id="flag-copy-btn">⎘ &nbsp;copy flag</button>
+
+    <p class="flag-note" style="margin-top:20px;">
+      submit this flag to the challenge website.<br>
+      node 11 — sphinx layer — is now unlocked.
+      Use the words to unlock the next challenge.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ══ DATA ══════════════════════════════════════════════════════════════ */
+const LORE_LINES = [
+  "NULL has routed you to the Sphinx layer.",
+  "This was the guard to Artical's logic layer.",
+  "The node hides 3 encryptions waiting to be broken.",
+  "Some text was corrupted.",
+  "The investigators tried to fix them and could recover most of it to some extent.",
+  "Now it is your turn to crack them..."
+];
+
+const RIDDLES = [
+  {
+    label: "Encryption 01 / 03",
+    intro: "Decryption required — analyse the corrupted fragment and identify the encrypted subject.",
+    subtitle: "Credits: Longfellow",
+    lines: [
+      { text: "I stand where whispers learn to cling,",                       cls: "" },
+      { text: "My windows stare but never see.",                              cls: "" },
+      { text: "By day I wear a silence thin,",                                cls: "" },
+      { text: "By night, a thicker secrecy.",                                 cls: "" },
+      { text: "My halls remember every foot",                                 cls: "" },
+      { text: "Yet keep no prints upon the floor;",                           cls: "" },
+      { text: "I feast on time, but not on fruit,",                           cls: "partial" },
+      { text: "[CORRUPTED — data unrecoverable]",                             cls: "corrupted" },
+      { text: "Candles bloom and die in vain,",                               cls: "" },
+      { text: "For still my heart is never bright.",                          cls: "" },
+      { text: "What home am I to dust and pain,",                             cls: "" },
+      { text: "Where all move on—except the night?",                          cls: "" },
+    ]
+  },
+  {
+    label: "Encryption 02 / 03",
+    intro: "Fragment partially recovered — two lines lost, one degraded. Identify the subject.",
+    lines: [
+      { text: "I speak in tongues of crooked signs,",                         cls: "" },
+      { text: "yet never move my lips.",                                      cls: "" },
+      { text: "I ride on wires, glass, and light,",                           cls: "" },
+      { text: "but never board a ship.",                                      cls: "" },
+      { text: "[FRAGMENT LOST — partial: ...eyes that cannot see...]",        cls: "corrupted" },
+      { text: "I'm read by minds half-blind.",                                cls: "" },
+      { text: "You hear me every passing day,",                               cls: "partial" },
+      { text: "but not my tru██ kind.",                                       cls: "partial" },
+      { text: "The surface shows you words and sounds,",                      cls: "" },
+      { text: "a message, plain and glowed—",                                 cls: "" },
+      { text: "still underneath, a second voice",                             cls: "" },
+      { text: "walks paths you've never strode.",                             cls: "" },
+    ]
+  },
+  {
+    label: "Encryption 03 / 03",
+    intro: "Final encryption. One line destroyed, one degraded. Crack the seal.",
+    lines: [
+      { text: "I am a question carved in stone,",                             cls: "" },
+      { text: "asked in a language no tongue owns.",                          cls: "" },
+      { text: "My mouth is sealed with dust and years,",                      cls: "" },
+      { text: "[DATA CORRUPTED — recovered fragment: ...silence fattens...]", cls: "corrupted" },
+      { text: "Names that knew me turned to breath,",                         cls: "" },
+      { text: "maps that held me slept in death.",                            cls: "partial" },
+      { text: "You know I'm there, yet not quite where—",                     cls: "" },
+      { text: "half in rumor, half in air.",                                  cls: "" },
+      { text: "Seek me, and the past exhumes;",                               cls: "" },
+      { text: "touch me, and time resumes.",                                  cls: "" },
+    ]
+  }
+];
+
+/* ══ STATE ════════════════════════════════════════════════════════════ */
+let currentRiddle = 0;
+let results = [null, null, null];
+let capturedFlag = "";
+
+const $ = id => document.getElementById(id);
+
+function showView(id) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+/* ══ CINEMATIC INTRO ══════════════════════════════════════════════════ */
+let loreIdx = 0;
+const loreEl = $("lore-display");
+
+function typeWriter(text, el, done) {
+  let i = 0;
+  el.textContent = "";
+  const iv = setInterval(() => {
+    if (i < text.length) el.textContent += text[i++];
+    else { clearInterval(iv); setTimeout(done, 1100); }
+  }, 26);
+}
+
+function nextLoreLine() {
+  if (loreIdx >= LORE_LINES.length) { endIntro(); return; }
+  loreEl.classList.remove("fade-line-out");
+  typeWriter(LORE_LINES[loreIdx], loreEl, () => {
+    loreEl.classList.add("fade-line-out");
+    loreIdx++;
+    setTimeout(nextLoreLine, 800);
+  });
+}
+
+function endIntro() {
+  const intro = $("cinematic-intro");
+  intro.classList.add("fade-out");
+  setTimeout(() => { intro.remove(); showNodeLog(); }, 1400);
+}
+
+$("skip-btn").onclick = endIntro;
+nextLoreLine();
+
+/* ══ NODE LOG ══════════════════════════════════════════════════════════ */
+function showNodeLog() {
+  showView("view-log");
+  const container = $("log-lore");
+  container.innerHTML = "";
+  LORE_LINES.forEach((line, i) => {
+    const div = document.createElement("div");
+    div.className = "l8-lore-line";
+    div.style.cssText = "opacity:0;transform:translateX(-10px);transition:all .4s ease;";
+    div.textContent = "> " + line;
+    container.appendChild(div);
+    setTimeout(() => { div.style.opacity = "1"; div.style.transform = "translateX(0)"; }, 80 + i * 180);
+  });
+}
+
+$("log-next-btn").onclick = () => {
+  showView("view-riddle");
+  loadRiddle(0);
+};
+
+/* ══ RIDDLE LOADER ════════════════════════════════════════════════════ */
+function loadRiddle(idx) {
+  currentRiddle = idx;
+  const r = RIDDLES[idx];
+
+  $("riddle-tag").textContent = r.label;
+  $("riddle-intro-text").textContent = r.intro;  
+  // Add subtitle if it exists
+  let subtitleEl = $('riddle-subtitle');
+  if (r.subtitle) {
+    if (!subtitleEl) {
+      subtitleEl = document.createElement('p');
+      subtitleEl.id = 'riddle-subtitle';
+      subtitleEl.style.cssText = 'font-size:.7rem;color:rgba(255,255,255,.4);margin-top:6px;letter-spacing:.08em;';
+      $('riddle-intro-text').parentElement.appendChild(subtitleEl);
+    }
+    subtitleEl.textContent = r.subtitle;
+    subtitleEl.style.display = 'block';
+  } else if (subtitleEl) {
+    subtitleEl.style.display = 'none';
+  }
+  // pips
+  for (let i = 0; i < 3; i++) {
+    const pip = $(`pip-${i + 1}`);
+    pip.className = "pip";
+    if      (results[i] === "pass") pip.classList.add("done");
+    else if (results[i] === "fail") pip.classList.add("fail");
+    else if (i === idx)             pip.classList.add("active");
+  }
+
+  // poem
+  const poem = $("riddle-poem");
+  poem.innerHTML = "";
+  r.lines.forEach((ln, i) => {
+    const span = document.createElement("span");
+    span.className = "poem-line" + (ln.cls ? " " + ln.cls : "");
+    span.textContent = ln.text;
+    span.style.cssText = `opacity:0;transform:translateY(4px);transition:opacity .35s ease ${0.06 + i * 0.055}s,transform .35s ease ${0.06 + i * 0.055}s;`;
+    poem.appendChild(span);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      span.style.opacity = ln.cls === "corrupted" ? ".6" : ln.cls === "partial" ? ".4" : "1";
+      span.style.transform = "translateY(0)";
+    }));
+  });
+
+  // reset input
+  const input = $("answer-input");
+  input.value = "";
+  input.disabled = false;
+  $("answer-submit").disabled = false;
+  $("core-feedback").textContent = "";
+  $("core-feedback").className = "core-feedback";
+  $("answer-row").className = "answer-row";
+
+  setTimeout(() => input.focus(), 200);
+}
+
+/* ══ API CHECK ════════════════════════════════════════════════════════ */
+async function checkAnswer(riddleNum, answer) {
+  const res = await fetch("/api/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ riddle: riddleNum, answer })
+  });
+  if (!res.ok) throw new Error("server error " + res.status);
+  return await res.json();
+}
+
+/* ══ SUBMIT ═══════════════════════════════════════════════════════════ */
+async function submitAnswer() {
+  const input = $("answer-input");
+  const val = input.value.trim();
+  if (!val || input.disabled) return;
+
+  input.disabled = true;
+  $("answer-submit").disabled = true;
+  $("core-feedback").className = "core-feedback";
+  $("core-feedback").textContent = "routing query…";
+
+  let correct = false, flag = null;
+
+  try {
+    ({ correct, flag } = await checkAnswer(currentRiddle + 1, val));
+  } catch (err) {
+    $("core-feedback").className = "core-feedback error";
+    $("core-feedback").textContent = "✗  connection error — try again";
+    input.disabled = false;
+    $("answer-submit").disabled = false;
+    return;
+  }
+
+  if (flag) capturedFlag = flag;
+
+  const row = $("answer-row");
+  const fb  = $("core-feedback");
+  const pip = $(`pip-${currentRiddle + 1}`);
+
+  if (correct) {
+    results[currentRiddle] = "pass";
+    row.classList.add("ok-glow");
+    fb.className = "core-feedback ok";
+    fb.textContent = "✓  encryption broken — layer advancing";
+    pip.className = "pip done";
+
+    setTimeout(() => {
+      if (currentRiddle < 2) loadRiddle(currentRiddle + 1);
+      else showFlag();
+    }, 1800);
+
+  } else {
+    results[currentRiddle] = "fail";
+    row.classList.add("err-glow");
+    fb.className = "core-feedback error";
+    fb.textContent = "✗  key mismatch — cipher holds";
+    pip.className = "pip fail";
+
+    setTimeout(() => {
+      row.className = "answer-row";
+      pip.className = "pip active";
+      results[currentRiddle] = null;
+      input.disabled = false;
+      $("answer-submit").disabled = false;
+      input.value = "";
+      fb.textContent = "";
+      fb.className = "core-feedback";
+      input.focus();
+    }, 1400);
+  }
+}
+
+$("answer-submit").onclick = submitAnswer;
+$("answer-input").addEventListener("keydown", e => { if (e.key === "Enter") submitAnswer(); });
+
+/* ══ FLAG ══════════════════════════════════════════════════════════════ */
+function showFlag() {
+  showView("view-flag");
+  const flagText = capturedFlag || "—";
+  const box = $("flag-box");
+  box.innerHTML = "";
+  flagText.split("").forEach((ch, i) => {
+    const span = document.createElement("span");
+    span.className = "flag-char";
+    span.textContent = ch;
+    box.appendChild(span);
+    setTimeout(() => span.classList.add("on"), 500 + i * 45);
+  });
+
+  $("flag-copy-btn").onclick = () => {
+    navigator.clipboard.writeText(flagText).then(() => {
+      $("flag-copy-btn").textContent = "✓  copied";
+      setTimeout(() => { $("flag-copy-btn").textContent = "⎘  copy flag"; }, 2000);
+    });
+  };
+}
+</script>
+</body>
+</html>

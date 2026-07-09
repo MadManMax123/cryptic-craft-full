@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 05</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+
+  <style>
+    /* ── Flag notice ─────────────────────────────────────────────── */
+    #flag-notice {
+      display: none;
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; padding: 18px 32px;
+      border-radius: 14px; border: 1px solid rgba(109,245,184,.3);
+      background: rgba(6,14,10,.97);
+      font-family: monospace; color: #6df5b8;
+      letter-spacing: .06em; text-align: center;
+      box-shadow: 0 0 40px rgba(109,245,184,.14), 0 0 80px rgba(109,245,184,.05);
+      white-space: nowrap;
+    }
+    #flag-label { font-size: 0.72rem; color: rgba(109,245,184,.5); margin-bottom: 6px; }
+    #flag-text  { font-size: 1rem; word-break: break-all; margin-bottom: 8px; }
+    #countdown  { font-size: 0.72rem; color: rgba(109,245,184,.45); }
+
+    /* ── Error notice ────────────────────────────────────────────── */
+    #error-notice {
+      display: none;
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; padding: 18px 32px;
+      border-radius: 14px; border: 1px solid rgba(245,109,109,.3);
+      background: rgba(14,6,6,.97);
+      font-family: monospace; color: #f56d6d;
+      letter-spacing: .06em; text-align: center;
+      box-shadow: 0 0 40px rgba(245,109,109,.14), 0 0 80px rgba(245,109,109,.05);
+      white-space: nowrap;
+    }
+    #error-label { font-size: 0.72rem; color: rgba(245,109,109,.5); margin-bottom: 6px; }
+    #error-text  { font-size: 1rem; word-break: break-all; }
+
+    /* ── Bottom-right flag display ───────────────────────────────── */
+    #flag-display {
+      display: none;
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 9998; padding: 16px 24px;
+      border-radius: 10px; border: 1px solid rgba(109,245,184,.3);
+      background: rgba(6,14,10,.97);
+      font-family: monospace; color: #6df5b8;
+      font-size: 0.85rem; letter-spacing: .04em;
+      box-shadow: 0 0 32px rgba(109,245,184,.12), 0 0 64px rgba(109,245,184,.04);
+      max-width: 320px; word-break: break-all;
+    }
+    #flag-display-label { font-size: 0.7rem; color: rgba(109,245,184,.5); margin-bottom: 8px; }
+    #flag-display-value { font-weight: bold; }
+
+    /* ── Inputs ──────────────────────────────────────────────────── */
+    .l3-input-group { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .l3-input {
+      flex: 1; min-width: 120px;
+      background: rgba(6,9,16,.96);
+      border: 1px solid rgba(95,240,255,.18);
+      border-radius: 10px; color: var(--text);
+      font-family: var(--font-mono); font-size: 0.9rem;
+      padding: 12px 16px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .l3-input:focus {
+      border-color: rgba(95,240,255,.45);
+      box-shadow: 0 0 14px rgba(95,240,255,.1);
+    }
+    .l3-btn {
+      padding: 12px 22px; border-radius: 10px;
+      border: 1px solid rgba(95,240,255,.28);
+      background: linear-gradient(180deg, rgba(95,240,255,.1), rgba(152,184,255,.08));
+      color: var(--text); font-family: var(--font-mono);
+      font-size: 0.85rem; letter-spacing: .08em;
+      cursor: pointer; transition: .2s; white-space: nowrap;
+    }
+    .l3-btn:hover {
+      border-color: rgba(95,240,255,.5);
+      box-shadow: 0 0 16px rgba(95,240,255,.14);
+    }
+    .l3-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .l3-status {
+      margin-top: 12px; font-family: monospace;
+      font-size: 0.82rem; min-height: 1.5em;
+    }
+    .l3-status.ok  { color: var(--good); }
+    .l3-status.err { color: var(--danger); }
+    .l3-back {
+      display: inline-block; margin-top: 16px;
+      color: var(--muted); font-family: var(--font-mono);
+      font-size: 0.78rem; text-decoration: underline;
+      text-underline-offset: 3px; opacity: .6;
+      cursor: pointer; transition: opacity .2s; background: none; border: none;
+    }
+    .l3-back:hover { opacity: 1; }
+  </style>
+</head>
+
+<body class="level3">
+
+<!-- FLAG NOTICE (timed) -->
+<div id="flag-notice">
+  <div id="flag-label">// TRANSMISSION DECRYPTED</div>
+  <div id="flag-text"></div>
+  <div id="countdown"></div>
+</div>
+
+<!-- ERROR NOTICE (timed) -->
+<div id="error-notice">
+  <div id="error-label">// TRANSMISSION FAILED</div>
+  <div id="error-text"></div>
+</div>
+
+<!-- FLAG DISPLAY (bottom-right) -->
+<div id="flag-display">
+  <div id="flag-display-label">🔓 FLAG RETRIEVED</div>
+  <div id="flag-display-value"></div>
+</div>
+
+<div class="noise-overlay"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<main class="l3-wrapper">
+
+  <div class="l3-header">
+    <div class="l3-tag">NODE 05 // Informatics Layer</div>
+    <h1>ENTROPY LOCK</h1>
+    <p class="l3-sub">
+      the corpus encodes a ▮▮▮▮▮▮▮▮.
+    </p>
+  </div>
+
+  <section class="l3-clue">
+
+<pre><code>
+
+  a  →  total pages in corpus sum
+  b  →  total word count
+  -c  →  total line sum</code></pre>
+
+
+    <div class="l3-input-group">
+      <input id="root1" class="l3-input" type="text" placeholder="Answer 2" autocomplete="off" spellcheck="false" />
+      <input id="root2" class="l3-input" type="text" placeholder="Answer 1" autocomplete="off" spellcheck="false" />
+      <button id="submit-btn" class="l3-btn">SOLVE</button>
+    </div>
+    <div id="status" class="l3-status"></div>
+
+    <button class="l3-back" onclick="window.location.href='/'">← return to previous layer</button>
+
+  </section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btn    = document.getElementById("submit-btn");
+  const r1in   = document.getElementById("root1");
+  const r2in   = document.getElementById("root2");
+  const status = document.getElementById("status");
+  const notice = document.getElementById("flag-notice");
+  const flagTxt = document.getElementById("flag-text");
+  const cntdn  = document.getElementById("countdown");
+  const flagDisplay = document.getElementById("flag-display");
+  const flagDisplayValue = document.getElementById("flag-display-value");
+  const errorNotice = document.getElementById("error-notice");
+  const errorTxt = document.getElementById("error-text");
+
+  btn.addEventListener("click", async () => {
+    const root1 = r1in.value.trim();
+    const root2 = r2in.value.trim();
+    if (!root1 || !root2) return;
+    btn.disabled = true;
+    status.className = "l3-status";
+    status.textContent = "verifying...";
+
+    try {
+      const res = await fetch("/api/verify-layer2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ root1, root2 }),
+        credentials: "same-origin"
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showFlag(data.flag, data.notice);
+      } else if (res.status === 403) {
+        showError("session expired or invalid — return to node 01.");
+        btn.disabled = false;
+      } else if (res.status === 429) {
+        showError("rate limited. stand by.");
+        btn.disabled = false;
+      } else {
+        showError("incorrect roots.");
+        btn.disabled = false;
+      }
+    } catch {
+      showError("connection failure.");
+      btn.disabled = false;
+    }
+  });
+
+  function showFlag(flag, noticeText) {
+    status.className = "l3-status ok";
+    status.textContent = "✓ lock broken.";
+
+    flagTxt.textContent = noticeText || flag;
+    notice.style.display = "block";
+
+    // Display flag in bottom-right corner
+    flagDisplayValue.textContent = flag;
+    flagDisplay.style.display = "block";
+
+    let t = 8;
+    cntdn.textContent = "secure data channel closes in " + t + "s.";
+
+    const iv = setInterval(() => {
+      t--;
+      if (t <= 0) {
+        clearInterval(iv);
+        localStorage.clear();
+        document.cookie = "null_relay=; Path=/; Max-Age=0; SameSite=Strict";
+        window.location.href = "/";
+      } else {
+        cntdn.textContent = "secure data channel closes in " + t + "s";
+      }
+    }, 1000);
+  }
+
+  function showError(message) {
+    status.className = "l3-status err";
+    status.textContent = "✗ " + message;
+
+    errorTxt.textContent = message;
+    errorNotice.style.display = "block";
+
+    let t = 4;
+    setTimeout(() => {
+      errorNotice.style.display = "none";
+    }, t * 1000);
+  }
+
+  [r1in, r2in].forEach(el => {
+    el.addEventListener("keydown", e => { if (e.key === "Enter") btn.click(); });
+  });
+
+});
+</script>
+
+</body>
+</html>

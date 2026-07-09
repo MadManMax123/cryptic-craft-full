@@ -1,0 +1,10 @@
+name: EscapeRoomPlugin
+version: 1.0
+main: com.satyaki.escaperoom.EscapeRoomPlugin
+api-version: 1.21
+
+commands:
+  refillwand:
+    description: Gives refill wand
+  bossfight:
+    description: Starts boss fight

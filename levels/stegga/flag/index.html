@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 12</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+</head>
+<body class="level8-flag">
+  <main class="flag-wrapper">
+    <div class="flag-header">
+      <div class="flag-tag">NODE 12 // Image Layer</div>
+      <h1>LEVEL 12 COMPLETE</h1>
+      <p class="flag-sub">
+        what NULL left behind has been decoded. the signal was always visible.
+      </p>
+    </div>
+
+    <p class="flag-label">Level 12 Flag</p>
+    <div id="flag-box" class="flag-box">retrieving flag...</div>
+
+    <p class="flag-note">
+      steganography is not always invisible ink.<br />
+      sometimes the message is just standing on a street corner.
+<br><br>
+      use what you found to get to your next node...
+    </p>
+
+   
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const flagBox = document.getElementById("flag-box");
+
+      /* Read token from query string */
+      const params = new URLSearchParams(window.location.search);
+      const token  = params.get("t");
+
+      if (!token) {
+        flagBox.textContent = "access denied — no token";
+        flagBox.style.color = "#f87171";
+        return;
+      }
+
+      try {
+        const res  = await fetch(`/api/get-flag?t=${encodeURIComponent(token)}`, {
+          method: "GET",
+          credentials: "same-origin"
+        });
+        const data = await res.json();
+
+        if (res.ok && data.flag) {
+          /* Type-reveal animation */
+          flagBox.textContent = "";
+          let i = 0;
+          const text = data.flag;
+          function tick() {
+            if (i <= text.length) {
+              flagBox.textContent = text.slice(0, i++);
+              setTimeout(tick, 38);
+            }
+          }
+          tick();
+        } else {
+          flagBox.textContent = "access denied — invalid token";
+          flagBox.style.color = "#f87171";
+        }
+      } catch (err) {
+        console.error("Failed to fetch flag:", err);
+        flagBox.textContent = "failed to retrieve flag";
+        flagBox.style.color = "#f87171";
+      }
+    });
+  </script>
+</body>
+</html>

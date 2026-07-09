@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LEVEL 1 CLEARED</title>
+  <link rel="icon" type="image/png" href="11zon_cropped.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="level1-flag">
+  <div class="flag-wrapper">
+    <h1>LEVEL 1: VERIFIED</h1>
+    <p id="typewriter" class="typewriter-line"></p>
+  <br>
+    <button id="revealBtn" class="reveal-btn">
+      click to reveal flag
+    </button>
+
+    <div id="flagContainer" class="flag-container hidden">
+      <p class="flag-label">FLAG TO SUBMIT</p>
+      <div class="flag-box" id="flagBox">decrypting...</div>
+      <p class="flag-note">
+        Keep this safe. You will need it for scoring.
+        <br>Use the hints you have been sent.
+        <br>Use the flag to claim your points.
+      </p>
+    </div>
+  </div>
+</body>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // ── Session + access guard ───────────────────────────────────────────────
+      // We verify the session by calling the flag endpoint immediately in the
+      // background; if it returns 401 (no session) we redirect to login,
+      // if 403 (no level1_access cookie) we redirect to access-denied.
+      // The reveal button fetches again when clicked, which is the real guard.
+
+      const el = document.getElementById("typewriter");
+      const text = "connection established...";
+      let idx = 0;
+
+      function type() {
+        if (idx <= text.length) {
+          el.textContent = text.slice(0, idx);
+          idx++;
+          setTimeout(type, 70);
+        }
+      }
+      type();
+
+      const revealBtn     = document.getElementById("revealBtn");
+      const flagContainer = document.getElementById("flagContainer");
+      const flagBox       = document.getElementById("flagBox");
+
+      revealBtn.addEventListener("click", async () => {
+        revealBtn.disabled = true;
+        revealBtn.textContent = "decrypting...";
+
+        setTimeout(async () => {
+          revealBtn.style.display = "none";
+          flagContainer.classList.remove("hidden");
+          flagContainer.classList.add("revealed");
+
+          try {
+            // Credentials: "same-origin" ensures HttpOnly cookies are sent
+            const res  = await fetch("/api/get-level1-flag", { credentials: "same-origin" });
+            const data = await res.json();
+
+            if (res.status === 401) {
+              // No session → back to login
+              window.location.href = "/login.html";
+              return;
+            }
+
+            if (res.ok && data.flag) {
+              flagBox.textContent = data.flag;
+            } else {
+              // Level1 cookie missing / invalid / expired → access denied
+              window.location.href = "/access-denied.html";
+            }
+          } catch (err) {
+            console.error(err);
+            flagBox.textContent = "failed to retrieve flag";
+          }
+        }, 1200);
+      });
+    });
+  </script>
+
+</html>

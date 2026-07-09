@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b5618bd3-7e57-41b4-b16d-3d1f9a5472bc" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="35" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="EscapeRoomPlugin" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.000095112863728" />
+      <entry key="MS500" value="1.1575155695970478" />
+      <entry key="S2" value="1.8916554691738425" />
+      <entry key="S5" value="2.728864673763498" />
+      <entry key="S10" value="3.352683127027318" />
+      <entry key="S30" value="4.721568290935147" />
+      <entry key="S60" value="6.325413763223055" />
+      <entry key="M2" value="8.041703610023653" />
+      <entry key="M5" value="11.344588714199078" />
+      <entry key="M10" value="18.5346142506669" />
+      <entry key="M15" value="24.497017897172622" />
+      <entry key="M30" value="34.58393362393548" />
+      <entry key="H1" value="42.08788339438448" />
+      <entry key="H2" value="46.695969724438285" />
+      <entry key="H4" value="49.254239999527314" />
+      <entry key="D1" value="51.52873293690375" />
+      <entry key="W1" value="51.93233365363832" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="7.32656590157944E-12" />
+      <entry key="MS500" value="0.005928981456929898" />
+      <entry key="S2" value="0.2774885215470359" />
+      <entry key="S5" value="0.5988227222744532" />
+      <entry key="S10" value="0.7746626707674318" />
+      <entry key="S30" value="1.0660809633603034" />
+      <entry key="S60" value="1.5017656367371535" />
+      <entry key="M2" value="2.0213306709486507" />
+      <entry key="M5" value="2.538052070816856" />
+      <entry key="M10" value="2.856030797015548" />
+      <entry key="M15" value="3.110519935026016" />
+      <entry key="M30" value="3.661535039481384" />
+      <entry key="H1" value="4.179374787975982" />
+      <entry key="H2" value="4.542036518390224" />
+      <entry key="H4" value="4.757600541996857" />
+      <entry key="D1" value="4.957593128761194" />
+      <entry key="W1" value="4.993890739845944" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.005640349145663323" />
+      <entry key="MS500" value="0.3706869322015278" />
+      <entry key="S2" value="1.5006314593879742" />
+      <entry key="S5" value="2.880247265385733" />
+      <entry key="S10" value="3.851990555338854" />
+      <entry key="S30" value="5.639118622670027" />
+      <entry key="S60" value="7.692165487087737" />
+      <entry key="M2" value="9.957103595063934" />
+      <entry key="M5" value="13.824561584248976" />
+      <entry key="M10" value="21.357767313518025" />
+      <entry key="M15" value="27.584447945191155" />
+      <entry key="M30" value="38.23312117563745" />
+      <entry key="H1" value="46.260807325875106" />
+      <entry key="H2" value="51.234696380682266" />
+      <entry key="H4" value="54.01016208498136" />
+      <entry key="D1" value="56.48604282009825" />
+      <entry key="W1" value="56.92618384075172" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="3FH5BwlXcIp5I38PDr8JdfDXwPM" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.EscapeRoomPlugin [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EscapeRoomPlugin [clean].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="gradle clean" />
+      <command value="gradle build" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Gradle.EscapeRoomPlugin [build]">
+    <configuration name="EscapeRoomPlugin [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="EscapeRoomPlugin [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.EscapeRoomPlugin [build]" />
+        <item itemvalue="Gradle.EscapeRoomPlugin [clean]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b5618bd3-7e57-41b4-b16d-3d1f9a5472bc" name="Changes" comment="" />
+      <created>1781719026742</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781719026742</updated>
+      <workItem from="1781719031130" duration="1800000" />
+      <workItem from="1781720903234" duration="2837000" />
+      <workItem from="1781768673297" duration="943000" />
+      <workItem from="1781769985059" duration="3195000" />
+      <workItem from="1781782819381" duration="3974000" />
+      <workItem from="1781855621929" duration="1608000" />
+      <workItem from="1781857953446" duration="720000" />
+      <workItem from="1782131360841" duration="4264000" />
+      <workItem from="1782319390754" duration="1747000" />
+      <workItem from="1782322162611" duration="923000" />
+      <workItem from="1782323243447" duration="10000" />
+      <workItem from="1782323276530" duration="63000" />
+      <workItem from="1782323554253" duration="88000" />
+      <workItem from="1782324555872" duration="1203000" />
+      <workItem from="1782325806843" duration="5000" />
+      <workItem from="1782326320566" duration="209000" />
+      <workItem from="1782443520124" duration="5000" />
+      <workItem from="1782443580458" duration="493000" />
+      <workItem from="1782449950012" duration="41000" />
+      <workItem from="1782450377278" duration="1927000" />
+      <workItem from="1782459225918" duration="774000" />
+      <workItem from="1782460396597" duration="283000" />
+      <workItem from="1782739108245" duration="7000" />
+      <workItem from="1783020507813" duration="23000" />
+      <workItem from="1783048398831" duration="316000" />
+      <workItem from="1783049873516" duration="1050000" />
+      <workItem from="1783060005362" duration="960000" />
+      <workItem from="1783100765227" duration="8000" />
+      <workItem from="1783103890965" duration="608000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 12</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+
+  <style>
+    /* ── Cinematic intro (same pattern as level 8) ── */
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes introFadeOut { to { opacity: 0; } }
+
+    #lore-display {
+      position: relative;
+      z-index: 2;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(180, 210, 255, 0.82);
+      text-align: center;
+      max-width: 64ch;
+      line-height: 1.8;
+      letter-spacing: .045em;
+      min-height: 1.8em;
+      opacity: 1;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display.fade-line-out {
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95, 240, 255, .75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(0,0,0,.18) 2px, rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #skip-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 32px;
+      z-index: 3;
+      background: transparent;
+      border: 1px solid rgba(120, 160, 255, .2);
+      border-radius: 8px;
+      color: rgba(120, 160, 255, .45);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .66rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95, 240, 255, .5);
+      color: rgba(95, 240, 255, .8);
+      box-shadow: 0 0 10px rgba(95, 240, 255, .12);
+    }
+
+    /* ── Image section ── */
+    .l10-image-section {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .l10-image-frame {
+      position: relative;
+      display: inline-block;
+      border: 1px solid rgba(95, 240, 255, 0.22);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow:
+        0 0 48px rgba(95, 240, 255, 0.07),
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 28px 80px rgba(0,0,0,0.5);
+    }
+
+    .l10-image {
+      display: block;
+      max-width: min(400px, 86vw);
+      height: auto;
+      border-radius: 13px;
+    }
+
+    .l10-image-scanline {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 3px,
+        rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+    }
+
+    .l10-image-caption {
+      margin-top: 9px;
+      font-size: 0.68rem;
+      color: rgba(95, 240, 255, 0.35);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.16em;
+    }
+
+    /* ── Sign form section ── */
+    .l10-sign-section {
+      margin-top: 14px;
+      padding: 18px 18px 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(95, 240, 255, 0.13);
+      background: linear-gradient(180deg, rgba(10,15,26,.92), rgba(8,11,19,.96));
+      box-shadow: inset 0 0 16px rgba(95,240,255,.03);
+      text-align: center;
+    }
+
+    .l10-sign-intro {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.07em;
+    }
+
+    /* Sign assembly */
+    .sign-assembly {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      width: fit-content;
+      margin: 0 auto 22px;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6));
+    }
+
+    /* Arrow board */
+    .sign-arrow-board {
+      width: 84px;
+      height: 56px;
+      background: linear-gradient(180deg, #0e3d8a, #0a2e6e);
+      border: 3px solid #4a6aaa;
+      border-radius: 6px 6px 3px 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .sign-arrow-icon {
+      color: #fff;
+      font-size: 1.8rem;
+      line-height: 1;
+      text-shadow: 0 0 8px rgba(255,255,255,0.2);
+    }
+
+    /* Speed ring */
+    .sign-speed-ring {
+      width: 136px;
+      height: 136px;
+      border-radius: 50%;
+      background: linear-gradient(160deg, #f9f9f9 0%, #efefef 100%);
+      border: 13px solid #c9111a;
+      outline: 3px solid #1a1a1a;
+      outline-offset: -1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 4px 18px rgba(0,0,0,0.55),
+        inset 0 1px 0 rgba(255,255,255,0.9),
+        inset 0 -1px 0 rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 2;
+      margin-top: -3px;
+    }
+
+    .sign-speed-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    /* Street plate */
+    .sign-street-plate {
+      background: linear-gradient(180deg, #f7f7f7, #eeeeee);
+      border: 3px solid #1e1e1e;
+      border-top: 2px solid #1e1e1e;
+      border-radius: 3px 3px 5px 5px;
+      padding: 7px 14px 8px;
+      width: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      margin-top: 1px;
+    }
+
+    /* Pole */
+    .sign-pole {
+      width: 9px;
+      height: 52px;
+      background: linear-gradient(90deg,
+        #444 0%, #888 18%, #ccc 40%, #ddd 50%, #bbb 62%, #777 80%, #444 100%
+      );
+      border-radius: 2px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Inputs within sign */
+    .sign-input {
+      background: transparent;
+      border: none;
+      border-bottom: 2px dashed rgba(150,150,150,0.5);
+      outline: none;
+      text-align: center;
+      font-weight: 800;
+      transition: border-bottom-color .2s;
+    }
+
+    .sign-input:focus {
+      border-bottom-color: #0a2e6e;
+    }
+
+    .sign-num {
+      width: 60px;
+      font-size: 2.1rem;
+      line-height: 1;
+      color: #111;
+      font-family: 'Arial Black', 'JetBrains Mono', monospace;
+      letter-spacing: -0.02em;
+      border-bottom-color: rgba(200,0,20,0.4);
+    }
+
+    .sign-num:focus { border-bottom-color: #c9111a; }
+
+    .sign-zone {
+      width: 66px;
+      font-size: 0.62rem;
+      color: #1a1a1a;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      border-bottom-color: rgba(200,0,20,0.3);
+      margin-top: 2px;
+    }
+
+    .sign-zone:focus { border-bottom-color: #c9111a; }
+
+    .sign-street {
+      width: 140px;
+      font-size: 0.77rem;
+      color: #111;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+      border-bottom-color: rgba(60,60,60,0.35);
+    }
+
+    .sign-street:focus { border-bottom-color: #333; }
+
+    .sign-input::placeholder { color: #bbb; }
+
+    /* Correct / error flash */
+    .sign-input.flash-ok    { border-bottom-color: #16a34a !important; }
+    .sign-input.flash-error { border-bottom-color: #dc2626 !important; }
+
+    /* ── Download button ── */
+    .img-download-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(95, 240, 255, 0.22);
+      background: rgba(95, 240, 255, 0.05);
+      color: rgba(95, 240, 255, 0.55);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .img-download-btn:hover {
+      border-color: rgba(95, 240, 255, 0.5);
+      color: rgba(95, 240, 255, 0.9);
+      background: rgba(95, 240, 255, 0.09);
+      box-shadow: 0 0 10px rgba(95, 240, 255, 0.1);
+    }
+
+    /* ── Ghost hint ── */
+    #ghost-hint {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: rgba(95, 240, 255, 0.028);
+      letter-spacing: 0.2em;
+      pointer-events: none;
+      z-index: 9000;
+      white-space: nowrap;
+      transition: color 0.12s ease;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="level8">
+
+  <!-- ── Cinematic intro ── -->
+  <div id="cinematic-intro">
+    <div id="lore-display"></div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <!-- ── Main site ── -->
+  <main class="l8-wrapper" id="main-site" style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+
+    <div class="l8-header">
+      <div class="l8-tag">NODE 12 // Image Layer</div>
+      <h1>NODE IMAGE</h1>
+      <p class="l8-sub">
+        This image was only recovered from this damaged node. It only had a CCTV screenshot of the facility.
+        Maybe NULL left some hidden clues in the node itself?
+      </p>
+    </div>
+
+    <!-- Lore block -->
+    <div class="l8-lore">
+      <p class="l8-lore-line">// Session log — node_12 investigation</p>
+      <p class="l8-lore-line">// NULL transmitted a single compressed file. no cipher. no coordinates. no protocol.</p>
+      <p class="l8-lore-line">// the investigators found nothing else. the data held only this image.</p>
+      <p class="l8-lore-line">// perhaps you will see what they could not.</p>
+    </div>
+
+    <!-- Image -->
+    <section class="l10-image-section">
+      <div class="l10-image-frame">
+        <img src="/image.jpg" alt="NULL transmission" class="l10-image" />
+        <div class="l10-image-scanline"></div>
+      </div>
+      <p class="l10-image-caption">null::transmission::img_only · no metadata found</p>
+      <a href="/image.jpg" download="null_transmission.jpg" class="img-download-btn">
+        ↓ download transmission
+      </a>
+    </section>
+
+    <!-- Sign form -->
+    <section class="l10-sign-section">
+      <p class="l10-sign-intro">Fill this in with what you see...</p>
+
+      <div class="sign-assembly">
+        <!-- Arrow board (decorative) -->
+        <div class="sign-arrow-board">
+          <span class="sign-arrow-icon">↑</span>
+        </div>
+
+        <!-- Speed ring -->
+        <div class="sign-speed-ring">
+          <div class="sign-speed-content">
+            <input
+              class="sign-input sign-num"
+              id="inp-speed"
+              type="text"
+              maxlength="2"
+              placeholder="__"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <input
+              class="sign-input sign-zone"
+              id="inp-zone"
+              type="text"
+              maxlength="4"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <!-- Street plate -->
+        <div class="sign-street-plate">
+          <input
+            class="sign-input sign-street"
+            id="inp-street"
+            type="text"
+            maxlength="24"
+            placeholder="_____ ______"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <!-- Post -->
+        <div class="sign-pole"></div>
+      </div>
+
+      <button id="sign-submit" class="core-submit" type="button">
+        verify signal
+      </button>
+      <div id="sign-feedback" class="core-feedback"></div>
+    </section>
+
+  </main>
+
+  <!-- Ghost hint — barely visible, flickers occasionally -->
+  <div id="ghost-hint">yield_pass();</div>
+
+  <!-- ── Scripts ── -->
+  <script>
+    /* ── Cinematic intro ── */
+    (async () => {
+      const introEl   = document.getElementById('cinematic-intro');
+      const displayEl = document.getElementById('lore-display');
+      const skipBtn   = document.getElementById('skip-btn');
+      const mainSite  = document.getElementById('main-site');
+
+      const lines = [
+        "Investigators reached Node 12.",
+        "They expected ciphers. Coordinates. Encoded sequences.",
+        "NULL left none of those.",
+        "Only an image.",
+        "No metadata. No embedded protocol. Just the file.",
+        "The investigators were confused.",
+        "They did not know how to read what was visible.",
+        "Perhaps you will.",
+        "Look at what was left behind."
+      ];
+
+      const CHAR_DELAY = 36;
+      const HOLD_MS    = 2100;
+      const FADE_MS    = 800;
+      const INTER_MS   = 80;
+
+      let skipTriggered = false;
+
+      function revealSite() {
+        skipTriggered = true;
+        introEl.classList.add('fade-out');
+        setTimeout(() => {
+          introEl.style.display = 'none';
+          mainSite.style.visibility = 'visible';
+          mainSite.style.opacity    = '1';
+          startGhostHint();
+        }, 1200);
+      }
+
+      skipBtn.addEventListener('click', revealSite);
+
+      function typeLine(text) {
+        return new Promise(resolve => {
+          let i = 0;
+          displayEl.textContent = '';
+          function tick() {
+            if (skipTriggered) { resolve(); return; }
+            if (i <= text.length) {
+              displayEl.textContent = text.slice(0, i++);
+              setTimeout(tick, CHAR_DELAY);
+            } else { resolve(); }
+          }
+          tick();
+        });
+      }
+
+      const wait = ms => new Promise(r => setTimeout(r, ms));
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        if (skipTriggered) break;
+        await typeLine(lines[idx]);
+        if (skipTriggered) break;
+        await wait(HOLD_MS);
+        if (skipTriggered) break;
+        if (idx < lines.length - 1) {
+          displayEl.classList.add('fade-line-out');
+          await wait(FADE_MS);
+          displayEl.classList.remove('fade-line-out');
+          displayEl.textContent = '';
+          await wait(INTER_MS);
+        }
+      }
+
+      if (!skipTriggered) {
+        await wait(600);
+        revealSite();
+      }
+    })();
+  </script>
+
+  <script>
+    /* ── Ghost hint random flicker ── */
+    function startGhostHint() {
+      const hint = document.getElementById('ghost-hint');
+      function scheduleFlicker() {
+        // Fires every 10–22 seconds
+        const delay = 10000 + Math.random() * 12000;
+        setTimeout(() => {
+          // Brief double-flicker
+          hint.style.color = 'rgba(95, 240, 255, 0.52)';
+          setTimeout(() => {
+            hint.style.color = 'rgba(95, 240, 255, 0.04)';
+            setTimeout(() => {
+              hint.style.color = 'rgba(95, 240, 255, 0.48)';
+              setTimeout(() => {
+                hint.style.color = 'rgba(95, 240, 255, 0.028)';
+                scheduleFlicker();
+              }, 160);
+            }, 80);
+          }, 200);
+        }, delay);
+      }
+      // First flicker after 5–10 s (earlier than usual — better discovery chance)
+      setTimeout(scheduleFlicker, 5000 + Math.random() * 5000);
+    }
+
+    /* ── Input auto-advance (same UX as level 8 char inputs) ── */
+    const inpSpeed  = document.getElementById('inp-speed');
+    const inpZone   = document.getElementById('inp-zone');
+    const inpStreet = document.getElementById('inp-street');
+
+    inpSpeed.addEventListener('input', () => {
+      if (inpSpeed.value.length >= 2) inpZone.focus();
+    });
+    inpZone.addEventListener('input', () => {
+      if (inpZone.value.length >= 4) inpStreet.focus();
+    });
+
+    /* ── Form submission ── */
+    const submitBtn  = document.getElementById('sign-submit');
+    const feedbackEl = document.getElementById('sign-feedback');
+
+    function setFeedback(msg, type) {
+      feedbackEl.textContent = msg;
+      feedbackEl.className = 'core-feedback ' + (type || '');
+    }
+
+    function flashInputs(cls) {
+      [inpSpeed, inpZone, inpStreet].forEach(el => {
+        el.classList.add(cls);
+        setTimeout(() => el.classList.remove(cls), 900);
+      });
+    }
+
+    submitBtn.addEventListener('click', async () => {
+      const speed  = inpSpeed.value.trim();
+      const zone   = inpZone.value.trim();
+      const street = inpStreet.value.trim();
+
+      if (!speed || !zone || !street) {
+        setFeedback('// incomplete transmission — all fields required', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      setFeedback('// verifying signal…', '');
+
+      try {
+        const res  = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ speed, zone, street })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          flashInputs('flash-ok');
+          setFeedback('// signal verified — node unlocking…', 'ok');
+          setTimeout(() => {
+            window.location.href = `flag?t=${encodeURIComponent(data.token)}`;
+          }, 1200);
+        } else {
+          flashInputs('flash-error');
+          setFeedback('// sequence mismatch — examine the transmission again', 'error');
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        setFeedback('// connection error — retry', 'error');
+        submitBtn.disabled = false;
+      }
+    });
+
+    /* Enter key submits */
+    [inpSpeed, inpZone, inpStreet].forEach(el => {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitBtn.click();
+      });
+    });
+  </script>
+  <script src="/script.js"></script>
+</body>
+</html>

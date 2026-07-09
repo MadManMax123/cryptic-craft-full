@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OPERATION: NULL OVERRIDE — Access Request</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="11zon_cropped.png">
+</head>
+
+<body>
+
+<!-- START MENU -->
+<div id="startMenu" class="start-menu-overlay">
+  <div class="start-menu-box">
+
+    <h1 class="start-title">OPERATION: <span class="accent">NULL OVERRIDE</span></h1>
+    <p class="start-subtitle">UNAUTHORISED CONNECTION DETECTED</p>
+
+    <div class="start-buttons">
+      <button id="skipToChallengeBtn" class="menu-btn">Skip to Challenge</button>
+      <button id="missionBriefingBtn" class="menu-btn">Mission Briefing</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- LORE SCREEN -->
+<div id="introOverlay" class="intro-overlay intro-hidden">
+  <div class="intro-inner">
+    <p id="introLine" class="intro-line"></p>
+  </div>
+</div>
+
+
+<!-- MAIN PAGE -->
+<div id="mainPage" class="main-hidden">
+
+<div class="wrapper">
+
+<header class="header">
+  <h1 class="title">OPERATION: <span class="accent">NULL OVERRIDE</span></h1>
+  <p class="subtitle">ACCESS NODE: PUBLIC • STATUS: UNAUTHORISED CONNECTION</p>
+</header>
+
+
+<main class="content">
+
+<div class="block">
+<p>Ghost traffic detected near the old relay.</p>
+<p>Every system insists the line is dead.</p>
+<p>Logs show nothing, but someone is definitely listening.</p>
+<p>A hundred pings go out. One comes back.</p>
+<p>The response ignores every protocol we know.</p>
+<p>We called that anomaly “NULL”.</p>
+</div>
+
+<div class="block">
+<p>Gates were built to keep anomalies out, not invite them in.</p>
+<p>All firewalls trust the same authorities.</p>
+<p>Trust was the first thing NULL refused to obey.</p>
+<p>Every trace points to a silent gateway, outside the mapped net.</p>
+<p>WAY beyond anything the official grid admits exists.</p>
+</div>
+
+<div class="block final-block">
+<p>If you still want to proceed,</p>
+<p>type the only word that doesn’t belong</p>
+<p>after the main address in your browser.</p>
+<p>No second chances. No menu. No help.</p>
+<p>Just you and the gateway.</p>
+
+<strong>The answer is somewhere in this page...</strong>
+</div>
+
+<div class="terminal-hint">
+<div class="label">SIMULATED INPUT LINE (ON YOUR URL ADDRESS BAR)</div>
+
+<div class="terminal-line">
+<span class="url-base">landing404.vercel.app</span>
+<span id="typed"></span>
+<span class="cursor" id="cursor">█</span>
+</div>
+
+</div>
+
+</main>
+
+<footer class="footer">
+<p>TRACE ID: 000-NULL-GATEWAY-BOOT</p>
+</footer>
+
+</div>
+</div>
+
+
+<script>
+
+
+/* ================================
+   LORE TEXT
+================================ */
+
+const loreLines = [
+'A powerful experimental distributed intelligence system called "Artical" was created.',
+'Then a massive DDoS attack struck its network.',
+'The attack caused severe data loss.',
+'Artical’s software was lost, and its hardware was left heavily damaged.',
+'With funding cut off, the project was officially disbanded.',
+'But a breakaway group of investigators refused to let it die.',
+'They began trying to recover whatever remained of Artical.',
+'During the search, they discovered a network anomaly spread across multiple nodes.',
+'It identified itself only as "NULL".',
+'Believing NULL to be Artical’s security system, they attempted to break through it.',
+'At each node, encrypted values could be recovered by solving protected cryptographic layers.',
+'These values were called FLAGs — Fragmented Locked Algorithm Gateways.',
+'But an accident caused a fire in their lab.',
+'There were no survivors.',
+'But they left their findings scattered across a secure network.',
+'The investigators believed that bringing together every FLAG would collapse NULL.',
+'And beyond NULL, they hoped to find Artical.'
+];
+
+
+/* ================================
+   ELEMENT REFERENCES
+================================ */
+
+const startMenu = document.getElementById("startMenu");
+const skipToChallengeBtn = document.getElementById("skipToChallengeBtn");
+const missionBriefingBtn = document.getElementById("missionBriefingBtn");
+
+const introOverlay = document.getElementById("introOverlay");
+const introLine = document.getElementById("introLine");
+
+const mainPage = document.getElementById("mainPage");
+
+const typedSpan = document.getElementById("typed");
+const cursor = document.getElementById("cursor");
+
+
+/* ================================
+   VARIABLES
+================================ */
+
+let currentLine = 0;
+let currentChar = 0;
+
+let typingStarted = false;
+let index = 0;
+
+const toType = "/{YOUR_CODE}";
+
+
+/* ================================
+   CONSOLE HEARTBEAT
+================================ */
+
+setInterval(() => {
+  console.log("NULL awaits...");
+}, 15000);
+
+
+/* ================================
+   FULLSCREEN
+================================ */
+
+function enterFullscreen() {
+
+const elem = document.documentElement;
+
+if (elem.requestFullscreen) {
+  elem.requestFullscreen();
+}
+
+else if (elem.webkitRequestFullscreen) {
+  elem.webkitRequestFullscreen();
+}
+
+else if (elem.msRequestFullscreen) {
+  elem.msRequestFullscreen();
+}
+
+}
+
+
+/* ================================
+   LORE TYPEWRITER
+================================ */
+
+function typeSentence(lineText, done) {
+
+introLine.textContent = "";
+currentChar = 0;
+
+function typeChar() {
+
+if (currentChar < lineText.length) {
+
+introLine.textContent += lineText.charAt(currentChar);
+currentChar++;
+
+setTimeout(typeChar, 28);
+
+}
+
+else {
+
+done();
+
+}
+
+}
+
+typeChar();
+
+}
+
+
+/* ================================
+   PLAY LORE
+================================ */
+
+function playLore() {
+
+if (currentLine >= loreLines.length) {
+
+setTimeout(() => {
+revealMainPage();
+}, 700);
+
+return;
+
+}
+
+typeSentence(loreLines[currentLine], () => {
+
+setTimeout(() => {
+
+introLine.classList.add("intro-line-fade");
+
+setTimeout(() => {
+
+introLine.classList.remove("intro-line-fade");
+
+currentLine++;
+playLore();
+
+}, 450);
+
+}, 1200);
+
+});
+
+}
+
+
+/* ================================
+   TERMINAL URL TYPE
+================================ */
+
+function typeNext() {
+
+if (typingStarted) return;
+typingStarted = true;
+
+function doType() {
+
+if (index < toType.length) {
+
+typedSpan.textContent += toType.charAt(index);
+index++;
+
+setTimeout(doType, 120);
+
+}
+
+else {
+
+cursor.classList.add("cursor-blink");
+
+}
+
+}
+
+doType();
+
+}
+
+
+/* ================================
+   PAGE REVEAL
+================================ */
+
+function revealMainPage() {
+
+introOverlay.classList.add("intro-fadeout");
+
+mainPage.classList.remove("main-hidden");
+mainPage.classList.add("main-revealed");
+
+setTimeout(() => {
+
+introOverlay.style.display = "none";
+
+typeNext();
+
+}, 900);
+
+}
+
+
+/* ================================
+   SKIP CHALLENGE
+================================ */
+
+function skipToChallenge() {
+
+startMenu.classList.add("start-fadeout");
+
+mainPage.classList.remove("main-hidden");
+mainPage.classList.add("main-revealed");
+
+setTimeout(() => {
+
+startMenu.style.display = "none";
+
+typeNext();
+
+}, 700);
+
+}
+
+
+/* ================================
+   START BRIEFING
+================================ */
+
+function startMissionBriefing() {
+
+enterFullscreen();
+
+startMenu.classList.add("start-fadeout");
+
+setTimeout(() => {
+
+startMenu.style.display = "none";
+
+introOverlay.classList.remove("intro-hidden");
+
+playLore();
+
+}, 700);
+
+}
+
+
+/* ================================
+   BUTTON EVENTS
+================================ */
+
+skipToChallengeBtn.addEventListener("click", skipToChallenge);
+
+missionBriefingBtn.addEventListener("click", startMissionBriefing);
+
+
+</script>
+
+</body>
+</html>

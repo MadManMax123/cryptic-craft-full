@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULL // Node 9</title>
+<link rel="icon" type="image/png" href="11zon_cropped.png" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================
+   BASE
+========================= */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04050a;
+  --panel:rgba(10,14,24,.85);
+  --panel-strong:rgba(14,20,36,.97);
+  --border:rgba(120,160,255,.12);
+  --border-strong:rgba(120,160,255,.26);
+  --text:#edf2ff;
+  --muted:#8090b8;
+  --accent:#98b8ff;
+  --accent2:#5ff0ff;
+  --good:#6df5b8;
+  --warn:#ffd980;
+  --danger:#ff8a9a;
+  --shadow:0 28px 90px rgba(0,0,0,.55);
+  --radius-xl:24px;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --grid:rgba(255,255,255,.025);
+  --font-body:'Space Grotesk',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --font-display:'Syne',sans-serif;
+}
+html,body{min-height:100%;}
+
+/* =========================
+   PAGE
+========================= */
+body.level6{
+  min-height:100vh;padding:28px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow-x:hidden;
+  background:
+    radial-gradient(circle at top,rgba(95,240,255,.06),transparent 28%),
+    radial-gradient(circle at 20% 20%,rgba(152,184,255,.08),transparent 22%),
+    linear-gradient(180deg,#06070d 0%,#04050a 100%);
+  color:var(--text);font-family:var(--font-body);
+}
+body.level6::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;opacity:.55;pointer-events:none;
+}
+body.level6::after{
+  content:"";position:fixed;inset:0;
+  background:radial-gradient(circle at center,transparent 45%,rgba(0,0,0,.3) 100%);
+  pointer-events:none;
+}
+
+/* =========================
+   WRAPPER
+========================= */
+.l6-wrapper{
+  position:relative;z-index:1;
+  width:min(840px,95vw);padding:36px 30px 28px;
+  border-radius:var(--radius-xl);border:1px solid var(--border-strong);
+  background:linear-gradient(180deg,rgba(14,20,36,.95),rgba(9,12,22,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(255,255,255,.015),
+    0 0 80px rgba(95,240,255,.05),
+    var(--shadow);
+  backdrop-filter:blur(10px);overflow:hidden;
+}
+.l6-wrapper::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(95,240,255,.05),transparent 28%,transparent 72%,rgba(152,184,255,.05));
+}
+.l6-wrapper::after{
+  content:"";position:absolute;top:14px;left:18px;right:18px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(95,240,255,.42),transparent);
+}
+
+/* =========================
+   HEADER
+========================= */
+.l6-header{text-align:center;margin-bottom:22px;}
+.l6-tag{
+  display:inline-block;margin-bottom:12px;padding:6px 12px;
+  border-radius:999px;border:1px solid rgba(95,240,255,.18);
+  background:rgba(95,240,255,.06);color:#b8f8ff;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+}
+.l6-wrapper h1{
+  font-family:var(--font-display);font-size:clamp(1.1rem,2vw,1.45rem);
+  letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px;text-align:center;
+  text-shadow:0 0 18px rgba(152,184,255,.12);
+}
+.l6-sub{
+  text-align:center;max-width:60ch;margin:0 auto;
+  font-size:.85rem;line-height:1.7;color:var(--muted);
+}
+
+/* =========================
+   LORE
+========================= */
+.l6-lore{
+  min-height:150px;margin-bottom:20px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(10,15,26,.9),rgba(8,11,19,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),inset 0 0 40px rgba(0,0,0,.18);
+}
+.l6-lore-line{font-size:.9rem;color:#dbe4ee;line-height:1.7;margin-bottom:6px;}
+
+/* =========================
+   CORE BLOCK
+========================= */
+.l6-core{
+  margin-top:12px;padding:18px;
+  border-radius:var(--radius-lg);border:1px solid rgba(95,240,255,.14);
+  background:linear-gradient(180deg,rgba(2,6,23,.95),rgba(15,23,42,.88));
+  color:#cbd5e1;opacity:0;transform:translateY(8px);transition:.45s;
+  box-shadow:inset 0 0 16px rgba(95,240,255,.04);
+}
+.l6-core.visible{opacity:1;transform:translateY(0);}
+.core-intro{font-size:.82rem;color:var(--muted);margin-bottom:14px;}
+
+/* =========================
+   ANSWER ROW
+========================= */
+.answer-row{
+  display:flex;align-items:stretch;
+  border:1px solid rgba(95,240,255,.18);border-radius:10px;
+  overflow:hidden;background:rgba(2,6,23,.96);transition:.2s;
+}
+.answer-row:focus-within{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(95,240,255,.1),0 0 14px rgba(95,240,255,.1);
+}
+.answer-row.ok-glow{border-color:rgba(109,245,184,.5);box-shadow:0 0 14px rgba(109,245,184,.14);}
+.answer-row.err-glow{border-color:rgba(255,138,154,.4);animation:shake .35s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* XYZ coords grid */
+.coords-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:0;border:1px solid rgba(95,240,255,.18);border-radius:10px;
+  overflow:hidden;background:rgba(2,6,23,.96);transition:.2s;
+}
+.coords-grid:focus-within{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(95,240,255,.1),0 0 14px rgba(95,240,255,.1);
+}
+.coords-grid.ok-glow{border-color:rgba(109,245,184,.5);box-shadow:0 0 14px rgba(109,245,184,.14);}
+.coords-grid.err-glow{border-color:rgba(255,138,154,.4);animation:shake .35s ease;}
+
+.coord-cell{
+  display:flex;flex-direction:column;
+  border-right:1px solid rgba(95,240,255,.10);
+}
+.coord-cell:last-child{border-right:none;}
+
+.coord-label{
+  padding:6px 14px 4px;
+  font-family:var(--font-mono);font-size:.62rem;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(95,240,255,.45);
+  border-bottom:1px solid rgba(95,240,255,.08);user-select:none;
+}
+.coord-input{
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--font-mono);
+  font-size:.9rem;letter-spacing:.06em;
+  padding:.65rem 1rem;width:100%;
+  -moz-appearance:textfield;
+  appearance:textfield;
+}
+.coord-input::-webkit-outer-spin-button,
+.coord-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.coord-input::placeholder{color:var(--muted);font-style:italic;font-size:.78rem;}
+.coord-input:disabled{opacity:.4;cursor:not-allowed;}
+
+/* =========================
+   BUTTON
+========================= */
+.core-submit{
+  margin:14px auto 0;display:block;padding:11px 18px;
+  border-radius:10px;border:1px solid rgba(95,240,255,.45);
+  background:linear-gradient(180deg,rgba(95,240,255,.16),rgba(152,184,255,.14));
+  color:#e0f2fe;font-family:var(--font-mono);font-size:.8rem;
+  letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.core-submit:hover{
+  border-color:rgba(103,232,249,.7);
+  box-shadow:0 0 14px rgba(95,240,255,.28);transform:translateY(-1px);
+}
+.core-submit:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+.core-feedback{
+  min-height:1.1rem;margin-top:10px;font-size:.78rem;
+  text-align:center;color:var(--muted);
+}
+.core-feedback.ok{color:#86efac;}
+.core-feedback.error{color:#f87171;}
+
+/* =========================
+   SUCCESS PANEL
+========================= */
+.success-reveal{
+  margin-top:18px;padding:18px 20px;
+  border-radius:var(--radius-lg);border:1px solid rgba(109,245,184,.22);
+  background:linear-gradient(180deg,rgba(6,9,16,.97),rgba(9,13,22,.95));
+  box-shadow:inset 0 0 18px rgba(109,245,184,.06);
+  text-align:center;display:none;
+}
+.success-reveal.visible{display:block;animation:fadeUp .55s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.success-label{
+  font-family:var(--font-mono);font-size:.7rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--good);margin-bottom:8px;
+}
+.success-next{color:var(--muted);font-size:.85rem;line-height:1.65;}
+.success-next a{
+  color:var(--accent2);text-decoration:none;
+  border-bottom:1px solid rgba(95,240,255,.3);transition:.2s;
+}
+.success-next a:hover{color:#fff;border-color:rgba(95,240,255,.7);}
+.success-next code{
+  font-family:var(--font-mono);font-size:.82rem;
+  color:var(--accent);background:rgba(95,240,255,.07);
+  padding:1px 5px;border-radius:4px;
+}
+.lvl6-download{
+  display:inline-block;margin:10px auto 0;padding:10px 18px;
+  border-radius:10px;border:1px solid rgba(109,245,184,.4);
+  background:linear-gradient(180deg,rgba(109,245,184,.1),rgba(109,245,184,.06));
+  color:#bbf7d0;font-family:var(--font-mono);font-size:.82rem;
+  letter-spacing:.05em;text-decoration:none;transition:.2s;
+}
+.lvl6-download:hover{
+  border-color:rgba(109,245,184,.7);
+  box-shadow:0 0 14px rgba(109,245,184,.2);transform:translateY(-1px);
+}
+
+/* =========================
+   CINEMATIC INTRO
+========================= */
+#cinematic-intro{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;display:flex;align-items:center;justify-content:center;padding:40px;
+}
+#cinematic-intro.fade-out{animation:introFadeOut 1.4s ease forwards;pointer-events:none;}
+@keyframes introFadeOut{to{opacity:0;}}
+#cinematic-intro::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);
+  pointer-events:none;z-index:1;
+}
+#cinematic-intro::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.65) 100%);
+  pointer-events:none;z-index:1;
+}
+#lore-display{
+  position:relative;z-index:2;
+  font-family:var(--font-mono);font-size:clamp(.78rem,1.5vw,.95rem);
+  color:rgba(180,210,255,.82);text-align:center;
+  max-width:64ch;line-height:1.8;letter-spacing:.045em;
+  min-height:1.8em;opacity:1;transition:opacity .8s ease;
+}
+#lore-display.fade-line-out{opacity:0;}
+#lore-display::after{
+  content:'';display:inline-block;width:.5em;height:1em;
+  background:rgba(95,240,255,.75);margin-left:3px;
+  vertical-align:text-bottom;animation:blink .65s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#skip-btn{
+  position:absolute;bottom:28px;right:32px;z-index:3;
+  background:transparent;border:1px solid rgba(120,160,255,.2);border-radius:8px;
+  color:rgba(120,160,255,.45);font-family:var(--font-mono);font-size:.66rem;
+  letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:.2s;
+}
+#skip-btn:hover{border-color:rgba(95,240,255,.5);color:rgba(95,240,255,.8);box-shadow:0 0 10px rgba(95,240,255,.12);}
+
+/* =========================
+   VIEW MGMT
+========================= */
+.view{display:none;flex-direction:column;align-items:center;width:100%;}
+.view.active{display:flex;}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:640px){
+  body.level6{padding:16px;}
+  .l6-wrapper{padding:24px 18px 20px;border-radius:18px;}
+  .l6-wrapper h1{font-size:1rem;letter-spacing:.12em;}
+  .coords-grid{grid-template-columns:1fr;}
+  .coord-cell{border-right:none;border-bottom:1px solid rgba(95,240,255,.10);}
+  .coord-cell:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body class="level6">
+
+<!-- ══ CINEMATIC INTRO ════════════════════════════════════════════════ -->
+<div id="cinematic-intro">
+  <div id="lore-display"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+
+<!-- ══ VIEW: NODE LOG ════════════════════════════════════════════════ -->
+<div class="view" id="view-log">
+  <div class="l6-wrapper">
+    <div class="l6-header">
+      <div class="l6-tag">NODE 09 // Compiler layer</div>
+      <h1>BYTECODE RELAY</h1>
+      <p class="l6-sub">Node 9 has been partially recovered. Compiler traces remain.</p>
+    </div>
+
+    <div class="l6-lore" id="log-lore"></div>
+
+    <button class="core-submit" id="log-next-btn">Proceed to Extraction →</button>
+  </div>
+</div>
+
+<!-- ══ VIEW: COORDS ═══════════════════════════════════════════════════ -->
+<div class="view" id="view-coords">
+  <div class="l6-wrapper">
+    <div class="l6-header">
+      <div class="l6-tag">NODE 09 // Compiler layer</div>
+      <h1>BYTECODE RELAY</h1>
+    </div>
+
+    <div class="l6-core visible" id="coords-core">
+
+      <div class="coords-grid" id="coords-grid">
+        <div class="coord-cell">
+          <span class="coord-label">X</span>
+          <input class="coord-input" id="coord-x" type="number"
+                 placeholder="—" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="coord-cell">
+          <span class="coord-label">Y</span>
+          <input class="coord-input" id="coord-y" type="number"
+                 placeholder="—" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="coord-cell">
+          <span class="coord-label">Z</span>
+          <input class="coord-input" id="coord-z" type="number"
+                 placeholder="—" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+
+      <button class="core-submit" id="coords-submit">Transmit</button>
+      <div class="core-feedback" id="coords-feedback"></div>
+
+      <div class="success-reveal" id="success-panel">
+        <div class="success-label">// coordinates verified — payload unlocked</div>
+        <a class="lvl6-download" href="level9_payload.zip">⬇ download level9_payload.zip</a>
+        <p class="success-next" style="margin-top:12px;">
+          inside: a single <code>.pyc</code> file and its companion.<br />
+          if you can't read it, you're not supposed to be here yet.
+          <strong>You won't need this site anymore...</strong>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ DATA ══════════════════════════════════════════════════════════════ */
+const LORE_LINES = [
+  "Node 9 used to be the primary encryption node for Artical.",
+  "When the attack struck, this node was permanently damaged.",
+  "Closer investigation by the team has revealed hidden compiler traces.",
+  "The fragments suggest NULL left something behind.",
+  "Maybe NULL has left a message...?"
+];
+
+/* ══ STATE ════════════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+
+function showView(id) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+/* ══ CINEMATIC INTRO ══════════════════════════════════════════════════ */
+let loreIdx = 0;
+const loreEl = $("lore-display");
+
+function typeWriter(text, el, done) {
+  let i = 0;
+  el.textContent = "";
+  const iv = setInterval(() => {
+    if (i < text.length) el.textContent += text[i++];
+    else { clearInterval(iv); setTimeout(done, 1100); }
+  }, 26);
+}
+
+function nextLoreLine() {
+  if (loreIdx >= LORE_LINES.length) { endIntro(); return; }
+  loreEl.classList.remove("fade-line-out");
+  typeWriter(LORE_LINES[loreIdx], loreEl, () => {
+    loreEl.classList.add("fade-line-out");
+    loreIdx++;
+    setTimeout(nextLoreLine, 800);
+  });
+}
+
+function endIntro() {
+  const intro = $("cinematic-intro");
+  intro.classList.add("fade-out");
+  setTimeout(() => { intro.remove(); showNodeLog(); }, 1400);
+}
+
+$("skip-btn").onclick = endIntro;
+nextLoreLine();
+
+/* ══ NODE LOG ══════════════════════════════════════════════════════════ */
+function showNodeLog() {
+  showView("view-log");
+  const container = $("log-lore");
+  container.innerHTML = "";
+  LORE_LINES.forEach((line, i) => {
+    const div = document.createElement("div");
+    div.className = "l6-lore-line";
+    div.style.cssText = "opacity:0;transform:translateX(-10px);transition:all .4s ease;";
+    div.textContent = "> " + line;
+    container.appendChild(div);
+    setTimeout(() => { div.style.opacity = "1"; div.style.transform = "translateX(0)"; }, 80 + i * 180);
+  });
+}
+
+$("log-next-btn").onclick = () => {
+  showView("view-coords");
+  setTimeout(() => $("coord-x").focus(), 200);
+};
+
+/* ══ SUBMIT ═══════════════════════════════════════════════════════════ */
+async function submitCoords() {
+  const x = $("coord-x").value.trim();
+  const y = $("coord-y").value.trim();
+  const z = $("coord-z").value.trim();
+  const fb = $("coords-feedback");
+  const grid = $("coords-grid");
+  const btn = $("coords-submit");
+
+  if (x === "" || y === "" || z === "") {
+    fb.className = "core-feedback error";
+    fb.textContent = "✗  all warden coordinates required";
+    grid.classList.add("err-glow");
+    setTimeout(() => grid.classList.remove("err-glow"), 400);
+    return;
+  }
+
+  // disable while transmitting
+  [$("coord-x"), $("coord-y"), $("coord-z")].forEach(el => el.disabled = true);
+  btn.disabled = true;
+  fb.className = "core-feedback";
+  fb.textContent = "routing query…";
+
+  let data;
+  try {
+    const res = await fetch("/api/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x, y, z }),
+      credentials: "same-origin"
+    });
+    data = await res.json();
+
+    if (res.ok && data.success) {
+      grid.classList.add("ok-glow");
+      fb.className = "core-feedback ok";
+      fb.textContent = "✓  coordinates verified — sector unlocked";
+      $("success-panel").classList.add("visible");
+    } else {
+      grid.classList.add("err-glow");
+      fb.className = "core-feedback error";
+      fb.textContent = "✗  " + (data.message || "coordinate mismatch — access denied");
+      setTimeout(() => {
+        grid.classList.remove("err-glow");
+        [$("coord-x"), $("coord-y"), $("coord-z")].forEach(el => {
+          el.disabled = false; el.value = "";
+        });
+        btn.disabled = false;
+        fb.textContent = "";
+        fb.className = "core-feedback";
+        $("coord-x").focus();
+      }, 1400);
+    }
+  } catch (err) {
+    fb.className = "core-feedback error";
+    fb.textContent = "✗  connection error — try again";
+    [$("coord-x"), $("coord-y"), $("coord-z")].forEach(el => el.disabled = false);
+    btn.disabled = false;
+  }
+}
+
+$("coords-submit").onclick = submitCoords;
+["coord-x","coord-y","coord-z"].forEach(id => {
+  $(id).addEventListener("keydown", e => { if (e.key === "Enter") submitCoords(); });
+});
+</script>
+</body>
+</html>

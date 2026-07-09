@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NODE 16 — NULL CORE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+
+    
+
+    :root {
+      --g:    #00ff99;
+      --gd:  rgba(0,255,153,0.5);
+      --gg:  rgba(0,255,153,0.2);
+      --b:     #00c8ff;
+      --bd:   rgba(0,200,255,0.5);
+      --bg2:   rgba(0,200,255,0.18);
+      --p:   #ff2d8a;
+      --pd: rgba(255,45,138,0.55);
+      --pg: rgba(255,45,138,0.18);
+      --cy:     #40e8d0;
+      --yl:   #ffd166;
+      --rd:      #ff5a6a;
+      --bk:       #000;
+      --rc:    #00f0ff;
+      --rg:   #00ff9c;
+      --ra:   #ffc857;
+      --rr:     #ff4757;
+      --rb:      #020810;
+      --rbd:  rgba(0,240,255,0.15);
+      --rbg:    rgba(0,240,255,0.08);
+      --acc:  #ff2d8a;
+      --acc2: #c020ff;
+      --accg: rgba(255,45,138,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bk);
+      color: var(--g);
+      font-family: "JetBrains Mono", "Consolas", "Courier New", monospace;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .bs {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,45,138,0.07), transparent 52%),
+        radial-gradient(ellipse 80% 50% at 50% 50%, rgba(192,32,255,0.04), transparent 72%),
+        #000;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      overflow-y: auto;
+      padding: 24px 0;
+    }
+    .bsh { opacity: 0; transform: scale(1.015); pointer-events: none; }
+
+    .bb {
+      width: min(860px, calc(100vw - 48px));
+      padding: 32px 34px 28px;
+      border-top: 2px solid rgba(255,45,138,0.7);
+      border-right: 1px solid rgba(192,32,255,0.35);
+      border-bottom: 1px solid rgba(192,32,255,0.35);
+      border-left: 1px solid rgba(255,45,138,0.35);
+      background: rgba(5,0,8,0.96);
+      box-shadow:
+        0 0 90px rgba(255,45,138,0.09),
+        0 0 160px rgba(192,32,255,0.05),
+        inset 0 0 60px rgba(255,45,138,0.03),
+        inset 1px 0 0 rgba(255,45,138,0.06),
+        -1px 0 0 rgba(192,32,255,0.08);
+      position: relative; overflow: hidden;
+    }
+    .bb::after {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, rgba(255,45,138,0.9), rgba(192,32,255,0.7), rgba(255,45,138,0.3));
+      opacity: 0.8;
+    }
+    .bb::before {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, rgba(192,32,255,0.4), rgba(255,45,138,0.5), rgba(192,32,255,0.2));
+      opacity: 0.4;
+    }
+    .bc { position:absolute; width:16px; height:16px; border-style:solid; opacity:0.55; }
+    .tl{top:8px;left:8px;border-width:1px 0 0 1px; border-color:var(--acc);}
+    .tr{top:8px;right:8px;border-width:1px 1px 0 0; border-color:var(--acc2);}
+    .bl{bottom:8px;left:8px;border-width:0 0 1px 1px; border-color:var(--acc2);}
+    .br{bottom:8px;right:8px;border-width:0 1px 1px 0; border-color:var(--acc);}
+
+    .be { font-size:.67rem;letter-spacing:.26em;color:rgba(255,45,138,0.5);margin-bottom:8px; }
+    .bt { font-size:1.8rem;letter-spacing:.16em;font-weight:700;color:var(--acc);margin-bottom:4px;text-shadow:0 0 22px var(--accg), 0 0 42px rgba(255,45,138,0.1); }
+    .bst { font-size:.75rem;letter-spacing:.1em;color:rgba(192,32,255,0.6);margin-bottom:14px; }
+    .bx { color:rgba(240,180,220,0.7);line-height:1.7;margin-bottom:18px;font-size:.85rem;border-left:2px solid rgba(255,45,138,0.45);padding-left:14px; }
+
+    .flag-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .flag-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .flag-entry-label {
+      font-size: .56rem;
+      letter-spacing: .16em;
+      color: rgba(255,45,138,0.45);
+    }
+    .flag-entry-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      height: 38px;
+      border: 1px solid rgba(255,45,138,0.3);
+      background: rgba(255,45,138,0.02);
+      transition: border-color .2s;
+    }
+    .flag-entry-wrap:focus-within {
+      border-color: rgba(255,45,138,0.6);
+    }
+    .flag-entry-wrap.valid {
+      border-color: rgba(0,255,153,0.5);
+      background: rgba(0,255,153,0.02);
+    }
+    .flag-entry-wrap.invalid {
+      border-color: rgba(255,90,106,0.6);
+      animation: eS .28s ease;
+    }
+    .bp { color:var(--acc);font-size:.85rem;user-select:none; }
+    .bi {
+      flex:1;min-width:0;height:36px;border:0;outline:none;
+      background:transparent;color:#f0d0e8;font:inherit;font-size:.82rem;
+      caret-color:var(--acc);
+    }
+    .bi::placeholder { color:rgba(255,45,138,0.18); }
+    .flag-entry-wrap.valid .bi { color: rgba(0,255,153,0.9); }
+    .tick {
+      font-size: .75rem;
+      color: rgba(0,255,153,0.8);
+      display: none;
+    }
+    .flag-entry-wrap.valid .tick { display: block; }
+
+    .bf { display:flex;gap:10px;align-items:stretch; }
+    .bn {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 20px;
+      border: 1px solid rgba(255,45,138,0.5);
+      background: transparent;
+      color: var(--acc);
+      font: inherit;
+      font-size: .88rem;
+      letter-spacing: .12em;
+      cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s;
+      text-shadow: 0 0 8px var(--accg);
+    }
+    .bn:hover,.bn:focus-visible { background: var(--acc); color: #000; box-shadow: 0 0 28px rgba(255,45,138,.35); text-shadow: none; }
+    .bn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .bsb { margin-top:16px;display:flex;gap:20px;font-size:.68rem;letter-spacing:.06em;flex-wrap:wrap; }
+    .bsb span { display:flex;align-items:center;gap:6px; }
+    .sd { width:5px;height:5px;border-radius:50%;background:currentColor; }
+    .sg  { color:rgba(0,255,153,.7); }
+    .sb   { color:rgba(192,32,255,.65); }
+    .sy { color:rgba(255,209,102,.65); }
+    .sg2 { color:rgba(255,45,138,.55); }
+    .bno { margin-top:10px;color:rgba(255,45,138,.28);font-size:.7rem;letter-spacing:.05em; }
+    .ber {
+      margin-top:10px;font-size:.78rem;letter-spacing:.08em;
+      color:var(--rd);text-shadow:0 0 8px rgba(255,90,106,.35);
+      animation:eS .28s ease;
+    }
+    @keyframes eS {
+      0%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} 100%{transform:translateX(0)}
+    }
+
+    .progress-bar-wrap {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .64rem;
+      letter-spacing: .1em;
+      color: rgba(255,45,138,.45);
+    }
+    .progress-bar-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,45,138,.1);
+      border: 1px solid rgba(255,45,138,.2);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--acc), var(--acc2));
+      box-shadow: 0 0 8px rgba(255,45,138,.5);
+      transition: width .4s ease;
+    }
+
+    .co {
+      pointer-events:none;position:absolute;inset:0;z-index:2;
+      background:repeating-linear-gradient(to bottom,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,rgba(0,0,0,0) 2px,rgba(0,0,0,0) 4px);
+      mix-blend-mode:screen;animation:cF .15s infinite alternate;
+    }
+    @keyframes cF { 0%{opacity:.12} 100%{opacity:.2} }
+
+    .ls {
+      position:relative; height:100vh;
+      display:flex; flex-direction:column;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 50%, rgba(255,45,138,.02), transparent 65%),
+        radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,200,255,.02), transparent 65%),
+        radial-gradient(circle at 50% 50%, rgba(0,255,153,.025), transparent 60%),
+        #000;
+    }
+
+    .lh {
+      position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;
+      padding:0 20px;height:44px;border-bottom:1px solid rgba(255,45,138,.15);
+      background:rgba(8,0,12,.92);backdrop-filter:blur(4px);
+      flex-shrink: 0;
+    }
+    .lhl { display:flex;align-items:center;gap:0;font-size:.72rem;letter-spacing:.08em; }
+    .lhs { padding:0 14px;height:44px;display:flex;align-items:center;border-right:1px solid rgba(255,45,138,.12); }
+    .lhs:first-child { padding-left:0; }
+    .lht  { color:var(--acc);font-weight:500;letter-spacing:.14em;text-shadow:0 0 8px var(--accg); }
+    .lhn   { color:var(--bd); }
+    .lhst { color:rgba(0,255,153,.5); }
+    .lhr { display:flex;align-items:center;gap:12px;font-size:.68rem;color:rgba(0,255,153,.4);letter-spacing:.06em; }
+    .pd { width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pD 1.2s ease-in-out infinite; }
+    @keyframes pD { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.65)} }
+
+    .lc {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      z-index: 3;
+    }
+
+    .lb {
+      flex: 1 1 0;
+      min-width: 0;
+      padding:16px 26px;
+      overflow-y:auto;overflow-x:hidden;
+      border-right: 1px solid rgba(0,240,255,0.08);
+    }
+    .lb::-webkit-scrollbar { width:5px; }
+    .lb::-webkit-scrollbar-track { background:transparent; }
+    .lb::-webkit-scrollbar-thumb { background:rgba(255,45,138,.2);border-radius:3px; }
+
+    .ll {
+      font-size:.875rem;line-height:1.48;margin-bottom:2px;
+      opacity:1;
+      white-space:pre-wrap;word-break:break-word;
+    }
+
+    .dl     { color:rgba(0,255,153,.35); }
+    .sl  { color:rgba(140,230,255,.78);text-shadow:0 0 6px rgba(0,200,255,.14); }
+    .bl2    { color:var(--b);text-shadow:0 0 8px var(--bg2); }
+    .bld     { color:rgba(0,200,255,.48); }
+    .cl    { color:var(--cy);text-shadow:0 0 6px rgba(64,232,208,.2); }
+    .pl  { color:var(--acc);text-shadow:0 0 8px var(--accg); }
+    .pld   { color:rgba(255,45,138,.48); }
+    .wl    { color:var(--yl);text-shadow:0 0 6px rgba(255,209,102,.18); }
+    .el   { color:var(--rd);text-shadow:0 0 8px rgba(255,90,90,.28); font-weight:500; }
+    .dv  { color:rgba(255,45,138,.18); }
+    .dvb  { color:rgba(0,200,255,.18); }
+    .dvg { color:rgba(0,255,153,.2); }
+    .sul  { color:var(--g);text-shadow:0 0 8px var(--gg); }
+    .sfl { color:rgba(0,255,153,.18);font-size:.82rem;text-shadow:none; }
+
+    .rp {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--rb);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .rp::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,240,255,0.012) 3px,
+        rgba(0,240,255,0.012) 4px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .rph {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--rbd);
+      background: rgba(0,240,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .rpht {
+      font-size: .6rem;
+      letter-spacing: .22em;
+      color: var(--rc);
+      text-shadow: 0 0 8px rgba(0,240,255,.4);
+    }
+    .rphc {
+      font-size: .58rem;
+      letter-spacing: .08em;
+      color: rgba(0,240,255,.4);
+    }
+
+    .rpt {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--rbd);
+      flex-shrink: 0;
+    }
+
+    .rpsl {
+      font-size: .58rem;
+      letter-spacing: .2em;
+      color: rgba(0,240,255,.4);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rpsl::before {
+      content: '';
+      width: 14px;
+      height: 1px;
+      background: rgba(0,240,255,.4);
+    }
+
+    .sr {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .slb {
+      font-size: .6rem;
+      letter-spacing: .1em;
+      color: rgba(0,240,255,.55);
+      width: 32px;
+      flex-shrink: 0;
+    }
+    .sbt {
+      flex: 1;
+      height: 6px;
+      background: rgba(0,240,255,.06);
+      border: 1px solid rgba(0,240,255,.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .sbf {
+      height: 100%;
+      position: absolute;
+      left: 0; top: 0;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .sbf.cy {
+      background: linear-gradient(90deg, rgba(0,240,255,.6), rgba(0,240,255,.9));
+      box-shadow: 0 0 8px rgba(0,240,255,.5);
+    }
+    .sbf.gn {
+      background: linear-gradient(90deg, rgba(0,255,156,.6), rgba(0,255,156,.9));
+      box-shadow: 0 0 8px rgba(0,255,156,.5);
+    }
+    .sbf.am {
+      background: linear-gradient(90deg, rgba(255,200,87,.6), rgba(255,200,87,.9));
+      box-shadow: 0 0 8px rgba(255,200,87,.5);
+    }
+    .sbf::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -60%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      animation: bS 2.2s ease-in-out infinite;
+    }
+    @keyframes bS { 0%{left:-60%} 100%{left:120%} }
+
+    .sv {
+      font-size: .6rem;
+      letter-spacing: .06em;
+      color: rgba(0,240,255,.7);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .csb {
+      margin-top: 12px;
+      border: 1px solid rgba(0,240,255,.14);
+      border-top: 1px solid rgba(0,255,156,.28);
+      background: rgba(0,255,156,.02);
+      padding: 9px 11px;
+      position: relative;
+      overflow: hidden;
+    }
+    .csb::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, var(--rg), transparent);
+      opacity: .5;
+    }
+
+    .cst {
+      font-size: .58rem;
+      letter-spacing: .2em;
+      color: var(--rg);
+      text-shadow: 0 0 8px rgba(0,255,156,.4);
+      margin-bottom: 8px;
+    }
+
+    .cr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .ck {
+      font-size: .58rem;
+      letter-spacing: .08em;
+      color: rgba(0,240,255,.4);
+    }
+    .cv {
+      font-size: .62rem;
+      letter-spacing: .1em;
+      color: rgba(0,255,156,.8);
+      text-shadow: 0 0 6px rgba(0,255,156,.3);
+    }
+    .cv.wn {
+      color: var(--ra);
+      text-shadow: 0 0 6px rgba(255,200,87,.3);
+    }
+    .cv.er {
+      color: var(--rr);
+      text-shadow: 0 0 6px rgba(255,71,87,.35);
+    }
+    .cv.fl {
+      animation: vF .08s steps(1) 3;
+    }
+    @keyframes vF { 0%,100%{opacity:1} 50%{opacity:.1} }
+
+    .stb {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 1px 7px;
+      font-size: .58rem;
+      letter-spacing: .14em;
+      border: 1px solid currentColor;
+    }
+    .stb.st {
+      color: var(--rg);
+      border-color: rgba(0,255,156,.35);
+      background: rgba(0,255,156,.06);
+      text-shadow: 0 0 6px rgba(0,255,156,.4);
+    }
+    .stb.dg {
+      color: var(--ra);
+      border-color: rgba(255,200,87,.35);
+      background: rgba(255,200,87,.06);
+      text-shadow: 0 0 6px rgba(255,200,87,.4);
+    }
+    .stbd {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pD 1s ease-in-out infinite;
+    }
+
+    .rpm {
+      flex: 0 0 140px;
+      border-bottom: 1px solid var(--rbd);
+      padding: 10px 14px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rcw {
+      flex: 1;
+      position: relative;
+      border: 1px solid rgba(0,240,255,.1);
+      background: rgba(0,240,255,.02);
+      overflow: hidden;
+    }
+
+    #wC {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cc {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-style: solid;
+      opacity: .5;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .ctl { top: 0; left: 0; border-width: 1px 0 0 1px; border-color: var(--rc); }
+    .ctr { top: 0; right: 0; border-width: 1px 1px 0 0; border-color: var(--rc); }
+    .cbl { bottom: 0; left: 0; border-width: 0 0 1px 1px; border-color: var(--rc); }
+    .cbr { bottom: 0; right: 0; border-width: 0 1px 1px 0; border-color: var(--rc); }
+
+    .rwl {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rwt {
+      font-size: .56rem;
+      letter-spacing: .18em;
+      color: rgba(0,240,255,.45);
+    }
+    .rwv {
+      font-size: .6rem;
+      letter-spacing: .08em;
+      color: var(--rc);
+      text-shadow: 0 0 6px rgba(0,240,255,.4);
+    }
+
+    .rpb {
+      flex: 1;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .rmw {
+      flex: 1;
+      position: relative;
+      border: 1px solid rgba(0,240,255,.1);
+      background: rgba(0,2,8,.6);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    #nC {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .rml {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rmt {
+      font-size: .56rem;
+      letter-spacing: .18em;
+      color: rgba(0,240,255,.45);
+    }
+    .rms {
+      font-size: .56rem;
+      letter-spacing: .1em;
+      color: rgba(0,255,156,.5);
+    }
+
+    @keyframes gL {
+      0%,95%,100% { opacity: 0; transform: scaleX(0); }
+      96% { opacity: 1; transform: scaleX(1); }
+      97% { opacity: 0; transform: scaleX(.3); }
+      98% { opacity: .6; transform: scaleX(.7); }
+    }
+    .rgb {
+      position: absolute;
+      height: 1px;
+      background: rgba(0,240,255,.6);
+      width: 100%;
+      top: 30%;
+      left: 0;
+      animation: gL 8s steps(1) infinite;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .sh { position:fixed;inset:0;display:flex;z-index:20;pointer-events:none; }
+    .shl,.shr { width:50%;background:#000;transition:transform .9s cubic-bezier(.7,0,.3,1); }
+    .shl  { transform:translateX(-100%);box-shadow:inset -12px 0 30px rgba(255,45,138,.06); }
+    .shr { transform:translateX(100%); box-shadow:inset 12px 0 30px rgba(255,45,138,.06); }
+    .sh.ac .shl  { transform:translateX(0); }
+    .sh.ac .shr { transform:translateX(0); }
+
+    .qo {
+      position:fixed;inset:0;z-index:50;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.92);backdrop-filter:blur(6px);
+      opacity:0;transition:opacity .4s ease;
+      pointer-events:none;
+    }
+    .qo.vis { opacity:1;pointer-events:all; }
+
+    .qb {
+      width:min(640px,calc(100vw - 32px));
+      padding:36px 32px 28px;
+      border-top:2px solid rgba(255,45,138,.7);
+      border-right:1px solid rgba(255,45,138,.3);
+      border-bottom:1px solid rgba(192,32,255,.25);
+      border-left:1px solid rgba(192,32,255,.3);
+      background:rgba(8,0,12,.97);
+      box-shadow:
+        0 0 80px rgba(255,45,138,.12),
+        0 0 160px rgba(192,32,255,.05),
+        inset 0 0 40px rgba(255,45,138,.04);
+      position:relative;overflow:hidden;
+      animation:qD .4s cubic-bezier(.2,1,.4,1) both;
+    }
+    @keyframes qD {
+      from{transform:translateY(-18px) scale(.97);opacity:0}
+      to{transform:translateY(0) scale(1);opacity:1}
+    }
+    .qb::after {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,rgba(255,45,138,.9),rgba(192,32,255,.6),rgba(255,45,138,.3));
+      opacity:.8;
+    }
+
+    .qe { font-size:.64rem;letter-spacing:.24em;color:rgba(255,45,138,.5);margin-bottom:8px; }
+    .qt   { font-size:1.3rem;font-weight:700;letter-spacing:.14em;color:var(--acc);
+                    text-shadow:0 0 16px var(--accg);margin-bottom:6px; }
+    .qs     { font-size:.74rem;letter-spacing:.08em;color:rgba(192,32,255,.55);margin-bottom:22px; }
+    .qd    { font-size:.82rem;line-height:1.65;color:rgba(230,185,220,.65);
+                    border-left:2px solid rgba(255,45,138,.35);padding-left:12px;margin-bottom:22px; }
+
+    .qf   { margin-bottom:16px; }
+    .ql   { font-size:.65rem;letter-spacing:.14em;color:rgba(255,45,138,.55);margin-bottom:6px; }
+    .qiw {
+      display:flex;align-items:center;gap:8px;
+      padding:0 12px;height:44px;
+      border:1px solid rgba(255,45,138,.3);
+      background:rgba(255,45,138,.025);
+      transition:border-color .2s;
+    }
+    .qiw:focus-within { border-color:rgba(255,45,138,.6); }
+    .qp  { color:var(--acc);font-size:.9rem;user-select:none; }
+    .qi   { flex:1;border:0;outline:none;background:transparent;
+                    color:#f0c8e8;font:inherit;font-size:.9rem;caret-color:var(--acc); }
+    .qi::placeholder { color:rgba(255,45,138,.2); }
+
+    .qa { display:flex;gap:10px;margin-top:22px;flex-wrap:wrap; }
+    .qsb  {
+      flex:1;min-height:46px;padding:0 20px;
+      border:1px solid rgba(255,45,138,.5);
+      background:transparent;color:var(--acc);
+      font:inherit;font-size:.88rem;letter-spacing:.1em;cursor:pointer;
+      transition:background .2s,color .2s,box-shadow .2s;
+    }
+    .qsb:hover { background:var(--acc);color:#000;box-shadow:0 0 28px rgba(255,45,138,.3); }
+    .qsb:disabled { opacity:.4;cursor:not-allowed; }
+
+    .qst  {
+      margin-top:14px;font-size:.76rem;letter-spacing:.08em;min-height:1.2em;
+      transition:color .2s;
+    }
+    .qst.ok   { color:var(--g);text-shadow:0 0 8px var(--gg); }
+    .qst.er  { color:var(--rd);text-shadow:0 0 8px rgba(255,90,90,.3);animation:eS .3s ease; }
+    .qst.wn { color:var(--yl); }
+    .qst.in { color:rgba(192,32,255,.7); }
+
+    .qhi { margin-top:14px;font-size:.7rem;color:rgba(255,45,138,.3);letter-spacing:.05em;line-height:1.6; }
+
+    .lksc {
+      position:fixed;inset:0;z-index:60;
+      display:flex;align-items:center;justify-content:center;
+      background:#000;
+      opacity:0;pointer-events:none;transition:opacity .5s ease;
+    }
+    .lksc.vis { opacity:1;pointer-events:all; }
+    .lkb {
+      text-align:center;max-width:460px;padding:48px 32px;
+      border:1px solid rgba(255,90,90,.3);
+      border-top:2px solid rgba(255,90,90,.7);
+      background:rgba(12,0,0,.95);
+      box-shadow:0 0 80px rgba(255,90,90,.08),inset 0 0 40px rgba(255,90,90,.04);
+    }
+    .lki { font-size:2.6rem;margin-bottom:16px;filter:drop-shadow(0 0 12px rgba(255,90,90,.4)); }
+    .lkt { font-size:1.1rem;font-weight:700;letter-spacing:.18em;color:var(--rd);margin-bottom:8px;
+                  text-shadow:0 0 12px rgba(255,90,90,.4); }
+    .lks   { font-size:.76rem;letter-spacing:.1em;color:rgba(255,90,90,.5);margin-bottom:22px; }
+    .lkti { font-size:1.8rem;font-weight:700;letter-spacing:.1em;color:var(--rd);
+                  text-shadow:0 0 16px rgba(255,90,90,.4);margin-bottom:8px; }
+    .lkn  { font-size:.72rem;color:rgba(255,90,90,.35);letter-spacing:.06em;line-height:1.6; }
+
+    .lrs {
+      display:flex;align-items:center;justify-content:center;
+      height:100vh;padding:32px;position:relative;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,45,138,.04), transparent 70%),
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(192,32,255,.03), transparent 70%),
+        #000;
+    }
+    .lrt { position:relative;z-index:1;font-size:1.22rem;text-align:center;max-width:840px;line-height:1.75;color:rgba(255,200,230,.9);text-shadow:0 0 16px rgba(255,45,138,.2); }
+    .lrf { opacity:0;transition:opacity .5s ease; }
+
+    .fs {
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      height:100vh;text-align:center;padding:18px 24px;overflow:hidden;position:relative;background:#000;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+    .fs::before {
+      content:'';position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(255,45,138,.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(192,32,255,.025) 1px,transparent 1px);
+      background-size:52px 52px;animation:gD 14s linear infinite;opacity:.6;
+    }
+    @keyframes gD { 0%{transform:translateY(0)} 100%{transform:translateY(52px)} }
+
+    .fi { position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:960px; }
+    .fey { font-size:.67rem;letter-spacing:.26em;color:var(--pd);margin-bottom:8px; }
+    .rh { font-size:2.6rem;font-weight:700;color:var(--acc);letter-spacing:.2em;margin-bottom:4px;text-shadow:0 0 14px rgba(255,45,138,.5),0 0 34px rgba(255,45,138,.2); }
+    .rs { font-size:.76rem;letter-spacing:.14em;color:var(--pd);margin-bottom:22px; }
+
+    .fg { display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:100%;margin-bottom:16px; }
+    .fsg {
+      padding:10px;border:1px solid rgba(255,45,138,.28);border-top:1px solid rgba(192,32,255,.35);
+      background:rgba(12,0,18,.75);box-shadow:0 0 14px rgba(255,45,138,.05),inset 0 0 12px rgba(255,45,138,.04);
+      backdrop-filter:blur(2px);position:relative;overflow:hidden;animation:sR .4s ease both;
+    }
+    .fsg::before { content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:.4; }
+    @keyframes sR { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+    .fsgl { font-size:.6rem;letter-spacing:.1em;color:rgba(255,45,138,.5);margin-bottom:4px; }
+    .fsgv { font-size:.6rem;color:var(--g);word-break:break-all;line-height:1.4; }
+
+    .ffw {
+      width:100%;border:1px solid rgba(255,45,138,.4);border-top:2px solid var(--acc);
+      background:rgba(255,45,138,.03);padding:13px 20px;margin-bottom:16px;
+      position:relative;overflow:hidden;
+      box-shadow:0 0 32px rgba(255,45,138,.09),inset 0 0 20px rgba(255,45,138,.04);
+    }
+    .ffw::before {
+      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,45,138,.06),transparent);
+      animation:fS 3s ease-in-out infinite;
+    }
+    @keyframes fS { 0%{left:-100%} 100%{left:100%} }
+    .ffl { font-size:.64rem;letter-spacing:.14em;color:rgba(255,45,138,.5);margin-bottom:4px; }
+    .ffv { font-size:1.05rem;font-weight:700;color:var(--acc);letter-spacing:.06em;text-shadow:0 0 12px rgba(255,45,138,.5); }
+
+    .cn { font-size:.86rem;line-height:1.8;color:#6b7280; }
+    .pc { margin-top:18px;font-size:.8rem;color:#4b5563;opacity:0;letter-spacing:.05em;transform:translateY(8px);transition:opacity 1.2s ease,transform 1.2s ease;font-style:italic; }
+    .pcv { opacity:1;transform:translateY(0); }
+    .pn { margin-top:7px;font-size:.7rem;color:rgba(156,163,175,.45);opacity:0;letter-spacing:.04em;transform:translateY(6px);transition:opacity 1.1s ease,transform 1.1s ease; }
+    .pnv { opacity:1;transform:translateY(0); }
+
+    .mlw {
+      margin-top:22px;position:relative;z-index:1;opacity:0;
+      transform:translateY(10px);
+      transition:opacity 1.4s ease,transform 1.4s ease;
+    }
+    .mlw.vis { opacity:1;transform:translateY(0); }
+    .mlb {
+      display:inline-flex;align-items:center;gap:14px;
+      padding:13px 22px;
+      border:1px solid rgba(255,45,138,0.45);
+      border-top:2px solid var(--acc);
+      background:rgba(255,45,138,0.03);
+      text-decoration:none;
+      position:relative;overflow:hidden;
+      box-shadow:0 0 24px rgba(255,45,138,0.08),inset 0 0 16px rgba(255,45,138,0.03);
+      transition:background .25s,box-shadow .25s;
+    }
+    .mlb::before {
+      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,45,138,.06),transparent);
+      animation:fS 2.8s ease-in-out infinite;
+    }
+    .mlb:hover {
+      background:rgba(255,45,138,0.07);
+      box-shadow:0 0 38px rgba(255,45,138,0.16),inset 0 0 20px rgba(255,45,138,0.05);
+    }
+    .mli { font-size:1rem;color:var(--acc);text-shadow:0 0 8px rgba(255,45,138,.4); }
+    .mlt { display:flex;flex-direction:column;align-items:flex-start;gap:2px; }
+    .mll { font-size:.6rem;letter-spacing:.16em;color:rgba(255,45,138,.45); }
+    .mlti { font-size:.82rem;font-weight:500;letter-spacing:.08em;color:var(--acc);text-shadow:0 0 8px rgba(255,45,138,.3); }
+    .mla { font-size:.9rem;color:rgba(192,32,255,.6);margin-left:4px; }
+    .fa { animation:fP .7s ease-out forwards; }
+    @keyframes fP { 0%{opacity:0}12%{opacity:1}28%{opacity:.4}100%{opacity:0} }
+
+    .hidden { display:none !important; }
+
+    .xp {
+      width: 250px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: #010a0f;
+      border-left: 1px solid rgba(0,240,255,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    .xp::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 3px,
+        rgba(0,255,156,0.008) 3px, rgba(0,255,156,0.008) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    .xph {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(0,240,255,0.1);
+      background: rgba(0,240,255,0.02);
+      flex-shrink: 0;
+      z-index: 2;
+      position: relative;
+    }
+    .xpht {
+      font-size: .55rem;
+      letter-spacing: .22em;
+      color: rgba(0,240,255,.5);
+      text-shadow: 0 0 6px rgba(0,240,255,.3);
+    }
+
+    .xpd {
+      flex: 0 0 auto;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(0,240,255,0.08);
+      z-index: 2;
+      position: relative;
+    }
+    .xpds {
+      font-size: .52rem;
+      letter-spacing: .18em;
+      color: rgba(0,240,255,.35);
+      margin-bottom: 8px;
+    }
+    .dial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .dial-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .dial-svg {
+      width: 60px;
+      height: 60px;
+    }
+    .dial-label {
+      font-size: .48rem;
+      letter-spacing: .12em;
+      color: rgba(0,240,255,.4);
+      text-align: center;
+    }
+    .dial-val {
+      font-size: .52rem;
+      letter-spacing: .06em;
+      color: rgba(0,255,156,.7);
+      text-shadow: 0 0 4px rgba(0,255,156,.4);
+    }
+
+    .xpe {
+      flex: 0 0 auto;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(0,240,255,0.08);
+      z-index: 2;
+      position: relative;
+    }
+    .xpes {
+      font-size: .52rem;
+      letter-spacing: .18em;
+      color: rgba(0,240,255,.35);
+      margin-bottom: 8px;
+    }
+    .eq-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 60px;
+    }
+    .eq-bar {
+      flex: 1;
+      background: rgba(0,240,255,.06);
+      border: 1px solid rgba(0,240,255,.12);
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+    }
+    .eq-fill {
+      width: 100%;
+      background: linear-gradient(to top, rgba(0,255,156,.9), rgba(0,240,255,.7), rgba(0,240,255,.3));
+      box-shadow: 0 0 8px rgba(0,240,255,.5), 0 0 2px rgba(0,255,156,.8);
+      border-radius: 1px;
+      transition: height 0.1s ease;
+    }
+
+    .xpw {
+      flex: 1;
+      padding: 8px 10px;
+      z-index: 2;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 0;
+    }
+    .xpws {
+      font-size: .52rem;
+      letter-spacing: .18em;
+      color: rgba(0,240,255,.35);
+      flex-shrink: 0;
+    }
+    .xpww {
+      flex: 1;
+      position: relative;
+      border: 1px solid rgba(0,240,255,.1);
+      background: rgba(0,1,8,.8);
+      overflow: hidden;
+      min-height: 0;
+    }
+    #wmC {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .xpwinfo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .xpwnode {
+      font-size: .5rem;
+      letter-spacing: .1em;
+      color: rgba(0,255,156,.5);
+    }
+    .xpwping {
+      font-size: .5rem;
+      letter-spacing: .08em;
+      color: rgba(0,240,255,.45);
+    }
+
+    @media(max-width:1200px){
+      .xp { width: 200px; }
+      .dial-grid { grid-template-columns: repeat(3,1fr); }
+    }
+    @media(max-width:1050px){
+      .xp { display: none; }
+    }
+    @media(max-width:900px){
+      .rp { width: 260px; }
+    }
+    @media(max-width:700px){
+      .bb{width:calc(100vw - 28px);padding:24px 18px}
+      .bt{font-size:1.3rem}
+      .flag-grid{grid-template-columns:1fr}
+      .fg{grid-template-columns:repeat(2,1fr)}
+      .rh{font-size:1.8rem}
+      .lrt{font-size:1rem}
+      .ll{font-size:.78rem}
+      .qb{padding:24px 18px}
+      .qt{font-size:1.1rem}
+      .rp { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="bsEl" class="bs">
+  <div class="bb">
+    <div class="bc tl"></div><div class="bc tr"></div>
+    <div class="bc bl"></div><div class="bc br"></div>
+    <div class="be">DISTRIBUTED RECOVERY NODE // SECTOR 16 // ARTICAL PROTOCOL</div>
+    <div class="bt">NULL RECOVERY INTERFACE</div>
+    <div class="bst">RECONSTRUCTION ENGINE v9.1.4 — FRAGMENT AUTHENTICATION MODE</div>
+    <div class="bx">
+      All 15 fragment keys required to unlock the merge sequence.<br/>
+      Enter each recovered FLAG in sequence to authenticate and begin reconstruction.
+    </div>
+
+    <div class="flag-grid" id="flagGrid"></div>
+
+    <div class="progress-bar-wrap">
+      <span id="progressLabel">0 / 15 VERIFIED</span>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <button type="button" id="bnEl" class="bn">AUTHENTICATE &amp; BOOT</button>
+    </div>
+
+    <div class="bsb">
+      <span class="sg"><span class="sd"></span>NODE ONLINE</span>
+      <span class="sb"><span class="sd"></span>FRAGMENTS: 15/16</span>
+      <span class="sy"><span class="sd"></span>ENC: AES-NULL</span>
+      <span class="sg2"><span class="sd"></span>INTEGRITY: VERIFIED</span>
+    </div>
+    <div id="beEl" class="ber hidden"></div>
+  </div>
+</div>
+
+<audio id="bgA" src="/audio/finale.mp3" loop></audio>
+
+<div id="lsEl" class="ls hidden">
+  <div class="co"></div>
+
+  <div class="lh">
+    <div class="lhl">
+      <div class="lhs"><span class="lht">NULL CORE</span></div>
+      <div class="lhs"><span class="lhn">NODE-16 // RECOVERY</span></div>
+      <div class="lhs"><span class="lhst">SEQUENCE ACTIVE</span></div>
+    </div>
+    <div class="lhr">
+      <div class="pd"></div>
+      <span id="ltEl">LIVE</span>
+      <span id="leEl" style="color:rgba(255,45,138,.4)">+00:00</span>
+    </div>
+  </div>
+
+  <div class="lc">
+
+    <div id="lcEl" class="lb"></div>
+
+    <aside class="rp" id="rpEl">
+      <div class="rgb"></div>
+
+      <div class="rph">
+        <span class="rpht">SYS // MONITOR</span>
+        <span class="rphc" id="rpck">00:00:00</span>
+      </div>
+
+      <div class="rpt">
+        <div class="rpsl">RESOURCE USAGE</div>
+
+        <div class="sr">
+          <span class="slb">CPU</span>
+          <div class="sbt">
+            <div class="sbf cy" id="bCpu" style="width:0%"></div>
+          </div>
+          <span class="sv" id="vCpu">0%</span>
+        </div>
+
+        <div class="sr">
+          <span class="slb">MEM</span>
+          <div class="sbt">
+            <div class="sbf gn" id="bMem" style="width:0%"></div>
+          </div>
+          <span class="sv" id="vMem">0%</span>
+        </div>
+
+        <div class="sr">
+          <span class="slb">NET</span>
+          <div class="sbt">
+            <div class="sbf am" id="bNet" style="width:0%"></div>
+          </div>
+          <span class="sv" id="vNet">0%</span>
+        </div>
+
+        <div class="csb">
+          <div class="cst">▸ CORE STATUS</div>
+          <div class="cr">
+            <span class="ck">MODE</span>
+            <span class="cv">RECOVERY</span>
+          </div>
+          <div class="cr">
+            <span class="ck">INTEGRITY</span>
+            <span class="cv" id="cInt">--.--%</span>
+          </div>
+          <div class="cr">
+            <span class="ck">ANOMALIES</span>
+            <span class="cv wn" id="cAno">--</span>
+          </div>
+          <div class="cr">
+            <span class="ck">STATUS</span>
+            <span id="cStB">
+              <span class="stb st">
+                <span class="stbd"></span>STABLE
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rpm">
+        <div class="rwl">
+          <span class="rwt">ENTROPY // SIGNAL FLOW</span>
+          <span class="rwv" id="wvEl">~0.00</span>
+        </div>
+        <div class="rcw">
+          <div class="cc ctl"></div>
+          <div class="cc ctr"></div>
+          <div class="cc cbl"></div>
+          <div class="cc cbr"></div>
+          <canvas id="wC"></canvas>
+        </div>
+      </div>
+
+      <div class="rpb">
+        <div class="rml">
+          <span class="rmt">[ NETWORK MAP ]</span>
+          <span class="rms" id="mCn">0 ACTIVE</span>
+        </div>
+        <div class="rmw">
+          <canvas id="nC"></canvas>
+        </div>
+      </div>
+
+    </aside>
+
+    <aside class="xp" id="xpEl">
+      <div class="xph">
+        <div class="xpht">TELEMETRY // LIVE</div>
+      </div>
+
+      <div class="xpd">
+        <div class="xpds">SYSTEM DIALS</div>
+        <div class="dial-grid" id="dialGrid"></div>
+      </div>
+
+      <div class="xpe">
+        <div class="xpes">SIGNAL EQ</div>
+        <div class="eq-wrap" id="eqWrap"></div>
+      </div>
+
+      <div class="xpw">
+        <div class="xpws">GLOBAL NODE MAP</div>
+        <div class="xpww">
+          <canvas id="wmC"></canvas>
+        </div>
+        <div class="xpwinfo">
+          <span class="xpwnode" id="wmNodes">0 NODES</span>
+          <span class="xpwping" id="wmPing">-- ms</span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div id="shEl" class="sh hidden">
+  <div class="shl"></div>
+  <div class="shr"></div>
+</div>
+
+<div id="qoEl" class="qo">
+  <div class="qb">
+    <div class="qe">ARTICAL PROTOCOL // FINAL AUTHENTICATION</div>
+    <div class="qt">IDENTITY VERIFICATION REQUIRED</div>
+    <div class="qs">NODE-16 ACCESS GATE // RECONSTRUCTION LOCKED</div>
+    <div class="qd">
+      The merge sequence has completed, but the final reconstruction is sealed.<br/>
+      Two authentication tokens are required to unlock the NULL core.<br/>
+      <span style="color:rgba(255,90,90,.6)">Warning: failed attempts result in a 1-hour node-level IP lock.</span>
+    </div>
+
+    <div class="qf">
+      <div class="ql">// AUDIT CODE — recovered from system log</div>
+      <div class="qiw">
+        <span class="qp">></span>
+        <input id="qcEl" class="qi" type="text"
+          placeholder="enter 6-digit audit code" maxlength="12" autocomplete="off" spellcheck="false"/>
+      </div>
+    </div>
+
+    <div class="qf">
+      <div class="ql">// MASTER FLAG — recovered from node-16 merge</div>
+      <div class="qiw">
+        <span class="qp">></span>
+        <input id="qfEl" class="qi" type="text"
+          maxlength="60" autocomplete="off" spellcheck="false"/>
+      </div>
+    </div>
+
+    <div class="qa">
+      <button id="qsbEl" class="qsb">AUTHENTICATE &rsaquo;</button>
+    </div>
+    <div id="qstEl" class="qst in">// awaiting input</div>
+    
+  </div>
+</div>
+
+<div id="lkEl" class="lksc">
+  <div class="lkb">
+    <div class="lki">⛔</div>
+    <div class="lkt">ACCESS DENIED</div>
+    <div class="lks">NODE-LEVEL IP LOCK ACTIVE</div>
+    <div class="lkti" id="lkTi">01:00:00</div>
+    <div class="lkn">
+      Authentication failure logged.<br/>
+      This IP has been flagged and quarantined.<br/>
+      Access will restore automatically when the timer expires.
+    </div>
+  </div>
+</div>
+
+<div id="lrEl" class="lrs hidden">
+  <div class="co"></div>
+  <div id="lrtEl" class="lrt"></div>
+</div>
+
+<div id="fsEl" class="fs hidden">
+  <div class="co"></div>
+  <div class="flash" id="flEl"></div>
+  <div class="fi">
+    <div class="fey">RECONSTRUCTION COMPLETE // ALL FRAGMENTS RECOVERED</div>
+    <h1 class="rh">NULL CODE RESTORED</h1>
+    <div class="rs">ARTICAL INSTANCE REBUILT — 16 / 16 NODES MERGED</div>
+    <div class="fg" id="fgEl"></div>
+    <div class="ffw">
+      <div class="ffl">MASTER RECONSTRUCTION FLAG</div>
+      <div class="ffv" id="ffvEl">——</div>
+    </div>
+    <center style="margin-bottom:16px">
+      <img src="11zon_cropped.png" width="100" height="100"
+        style="opacity:.9;filter:drop-shadow(0 0 20px rgba(255,45,138,.55)) drop-shadow(0 0 40px rgba(192,32,255,.3))">
+    </center>
+    <p class="cn">
+      Challenge Complete.<br/>
+      The distributed fragments have been reconstructed.<br/>
+      You have restored the signal.
+    </p>
+    <div id="pcEl" class="pc hidden">
+      NULL: noise was never the enemy. it was the message.
+    </div>
+
+    <div id="mlEl" class="mlw hidden">
+      <a href="https://nodecore.vercel.app/message" class="mlb">
+        <span class="mli">⬡</span>
+        <span class="mlt">
+          <span class="mll">MASTER NODE // SIGNAL RESTORED</span>
+          <span class="mlti">ACCESS FINAL TRANSMISSION →</span>
+        </span>
+        <span class="mla">›</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ── Fragment flags are loaded from /api/flag at boot ──
+  // Nothing is hardcoded here. CORRECT_FLAGS is populated after fetch.
+  let CORRECT_FLAGS = new Array(16).fill("");
+  let CORRECT_CODE  = "";
+  let _flagsLoaded  = false;
+
+  async function _loadFlags() {
+    try {
+      const res  = await fetch("/api/flag");
+      const data = await res.json();
+      const frags = data.fragments || [];
+      CORRECT_FLAGS = frags.map(f => (f.flag || "").trim().toUpperCase());
+      CORRECT_CODE  = String(data.correctCode || "").trim();
+      _flagsLoaded  = true;
+    } catch (e) {
+      console.error("Failed to load flags:", e);
+    }
+  }
+
+  _loadFlags();
+
+  const _sk = "n9_cx";
+  const _slk = "n9_sl";
+  const _luk = "n9_lu";
+
+  const bsEl   = document.getElementById("bsEl");
+  const beEl   = document.getElementById("beEl");
+  const lcEl   = document.getElementById("lcEl");
+  const shEl   = document.getElementById("shEl");
+  const lsEl   = document.getElementById("lsEl");
+  const lrEl   = document.getElementById("lrEl");
+  const lrtEl  = document.getElementById("lrtEl");
+  const fsEl   = document.getElementById("fsEl");
+  const fgEl   = document.getElementById("fgEl");
+  const flEl   = document.getElementById("flEl");
+  const pcEl   = document.getElementById("pcEl");
+  const bgA    = document.getElementById("bgA");
+  const ltEl   = document.getElementById("ltEl");
+  const leEl   = document.getElementById("leEl");
+  const qoEl   = document.getElementById("qoEl");
+  const qcEl   = document.getElementById("qcEl");
+  const qfEl   = document.getElementById("qfEl");
+  const qsbEl  = document.getElementById("qsbEl");
+  const qstEl  = document.getElementById("qstEl");
+  const lkEl   = document.getElementById("lkEl");
+  const lkTi   = document.getElementById("lkTi");
+  const ffvEl  = document.getElementById("ffvEl");
+  const bnEl   = document.getElementById("bnEl");
+  const flagGrid = document.getElementById("flagGrid");
+  const progressFill = document.getElementById("progressFill");
+  const progressLabel = document.getElementById("progressLabel");
+
+  const flagInputs = [];
+
+  for (let i = 0; i < 15; i++) {
+    const wrap = document.createElement("div");
+    wrap.className = "flag-entry";
+
+    const lbl = document.createElement("div");
+    lbl.className = "flag-entry-label";
+    lbl.textContent = `FRAGMENT ${String(i + 1).padStart(2, "0")}`;
+
+    const iw = document.createElement("div");
+    iw.className = "flag-entry-wrap";
+    iw.dataset.index = i;
+
+    const bp = document.createElement("span");
+    bp.className = "bp";
+    bp.textContent = ">";
+
+    const inp = document.createElement("input");
+    inp.className = "bi";
+    inp.type = "text";
+    inp.autocomplete = "off";
+    inp.spellcheck = false;
+    inp.maxLength = 80;
+
+    const tick = document.createElement("span");
+    tick.className = "tick";
+    tick.textContent = "✓";
+
+    iw.appendChild(bp);
+    iw.appendChild(inp);
+    iw.appendChild(tick);
+    wrap.appendChild(lbl);
+    wrap.appendChild(iw);
+    flagGrid.appendChild(wrap);
+    flagInputs.push({ inp, iw });
+
+    inp.addEventListener("input", () => {
+      const val = inp.value.trim().toUpperCase();
+      const expected = CORRECT_FLAGS[i].toUpperCase();
+      const specialPass = i === 13 && val === "PASS";
+      if (val === expected || specialPass) {
+        iw.classList.add("valid");
+        iw.classList.remove("invalid");
+        if (specialPass) {
+          beEl.classList.add("hidden");
+          _startSeq();
+        }
+      } else {
+        iw.classList.remove("valid");
+        iw.classList.remove("invalid");
+      }
+      updateProgress();
+    });
+
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const next = flagInputs[i + 1];
+        if (next) next.inp.focus();
+        else bnEl.focus();
+      }
+    });
+  }
+
+  function updateProgress() {
+    let count = 0;
+    flagInputs.forEach(({ inp }, i) => {
+      if (inp.value.trim().toUpperCase() === CORRECT_FLAGS[i].toUpperCase()) count++;
+    });
+    const pct = (count / 15) * 100;
+    progressFill.style.width = pct + "%";
+    progressLabel.textContent = `${count} / 15 VERIFIED`;
+  }
+
+  let _li  = 0;
+  let _bo  = false;
+  let _st  = 0;
+  let _fsh = false;
+
+  const _BDN = 1200;
+  const _BDX = 2800;
+  const _ND  = 55;
+  const _WP  = 220;
+
+  const _rn   = (a,b) => a + Math.random()*(b-a);
+  const _dl   = ms => new Promise(r => setTimeout(r, ms));
+  const _pk   = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  function _ts() {
+    const d = new Date();
+    return `[${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}]`;
+  }
+  function _rm() {
+    return _pk(["core","entropy","bytecode","crypto","spectral","audio","archive",
+      "node","bridge","recovery","sys","mirror","quorum","fs","trace","net",
+      "relay","shard","buf","null","vault"]);
+  }
+  function _rh(d=6) {
+    return "0x" + Math.floor(Math.random()*Math.pow(16,d)).toString(16).padStart(d,"0");
+  }
+  function _sc() { lcEl.scrollTop = lcEl.scrollHeight; }
+
+  function _mk(text="", cls="") {
+    const el = document.createElement("div");
+    el.className = "ll" + (cls ? ` ${cls}` : "");
+    el.textContent = text;
+    lcEl.appendChild(el);
+    _sc();
+    return el;
+  }
+
+  async function _nls(lines) {
+    for (const [text, cls] of lines) {
+      _mk(text, cls);
+      await _dl(_ND);
+    }
+  }
+
+  function _cc2(c) {
+    const pool = "!@#$%^&*()_+-=[]{};:<>?/\\|~░▒▓";
+    return c===" " ? " " : pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  const _pN = [
+    "allocating node buffers...","syncing distributed state...","relinking archive sectors...",
+    "verifying spectral map...","entropy recalibration...","mounting null partitions...",
+    "checking stale mirrors...","repairing shard index...","link handshake unstable...",
+    "tracing orphan bytecode...","restoring parity blocks...","replaying crash journal...",
+    "rebuilding damaged lookup tables...","walking fragmented memory graph...",
+    "decompressing cold archive segment...","revalidating distributed namespace...",
+    "repair candidate accepted...","reconstructing entropy lattice...",
+    "merging silent fallback replicas...","discarding poisoned state branch...",
+    "scanning signal residue...","calibrating phase alignment...",
+    "resetting null descriptor...","resolving dangling packet chain...",
+    "sweeping archive for stale locks...","initializing secondary decryption pass...",
+    "patching corrupted instruction pointer...","verifying quorum signature...",
+    "loading cold entropy seed...","rebuilding distributed index...",
+    "flushing volatile node cache...","trimming orphaned shards...",
+    "reestablishing secure tunnel...","running memory consistency check...",
+    "aligning temporal offset...","purging ghost addresses...",
+    "sealing entropy drain...","cross-validating shard map...",
+    "defragmenting node table...","compacting write-ahead log...",
+  ];
+  const _fN = [
+    "shard table stabilized","archive path recovered","entropy gradient nominal",
+    "checksum variance within tolerance","distributed mirror online",
+    "spectral drift resolved","orphaned instance attached","stale branch pruned",
+    "signal fidelity rising","node cluster synchronized","fragment quorum reached",
+    "cold storage unlocked","repair sequence continuing","fallback route established",
+    "decryption lattice aligned","null segment mounted","parity map reconstructed",
+    "trace buffer cleared","packet boundary realigned","fragment delta accepted",
+    "mirror sync stabilized","secondary key verified","handshake complete",
+    "node bridge reestablished","integrity threshold met","null chain verified",
+  ];
+  const _eN = [
+    "corrupted shard encountered","entropy drift detected","invalid parity block",
+    "mirror desync detected","signal instability detected","checksum mismatch",
+    "fragment reconstruction failed","null descriptor collision",
+    "packet boundary violation","entropy seed expired","shard hash rejected",
+    "cascade error in repair chain","address space violation","write gate timeout",
+    "CRITICAL: node link severed","CRITICAL: entropy overflow","FATAL: shard corruption at sector 0x3f",
+    "EXCEPTION: null dereference in bridge.c:441","ACCESS DENIED on partition 0x9a",
+    "segment fault recovered","heap corruption detected — sanitizer active",
+    "kernel panic intercepted — soft recovery","bus error on entropy channel",
+  ];
+  const _wN = [
+    "retrying damaged sector","fallback node engaged","repair routine invoked",
+    "stale mirror detected","fragment latency above threshold",
+    "entropy decay accelerating","secondary repair path activated",
+    "cache invalidation forced","bridge timeout — rerouting",
+    "signal jitter above tolerance","null chain fragmented — rebuilding",
+    "quorum at minimum threshold","crypto clock skew detected",
+    "WARNING: sector read took >800ms","WARNING: memory pressure above 82%",
+    "WARNING: quorum unstable — voting suspended","watchdog timer reset",
+    "WARNING: entropy pool below safe level","unexpected node state transition",
+  ];
+  const _bN = [
+    "network topology updated","distributed ledger sync: 100%","routing table rebuilt",
+    "packet loss: 0.00%","latency nominal: 0.3ms","channel encryption renegotiated",
+    "node mesh fully connected","fragment broadcast acknowledged",
+    "relay node confirmed","cluster heartbeat received",
+    "transmission bandwidth: optimal","multicast path validated",
+    "ingress filter applied","egress route confirmed","null bridge established",
+  ];
+  const _ppN = [
+    "spectral key aligned","entropy matrix stabilizing","recursive hash validated",
+    "phantom node resolved","deep archive sector online","signal ghost purged",
+    "null resonance damped","spectral map loaded","dimensional shard merged",
+    "recursive integrity check passed","void sector remapped","cryptal layer synced",
+    "dark node handshake complete","spectral bridge online","void lattice locked",
+  ];
+
+  const _cTI = Math.floor(Math.random()*4);
+  const _cSI = Math.floor(Math.random()*4);
+
+  const _dP = [
+    "190422","203817","198506","211134","190711",
+    "220831","195203","207645","213390","189912",
+    "204756","199301","218843","202267","197450",
+  ];
+
+  const _shA = a => {
+    const b=[...a];
+    for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+    return b;
+  };
+
+  const _shD = _shA(_dP);
+  const _tD = [[],[],[],[]];
+  let _di2 = 0;
+  for (let t=0;t<4;t++) {
+    const slots = (t === _cTI) ? 3 : 4;
+    for (let s=0;s<slots;s++) _tD[t].push(_shD[_di2++]);
+  }
+
+  const _realCode = CORRECT_CODE || String(0x31131);
+  _tD[_cTI].splice(_cSI, 0, _realCode);
+
+  const _tM = [
+    { title:"SECTOR-A AUDIT LOG — NODE REGISTRY",   border:"bl2",   sector:"sector-a", mod:["entropy-core","null-bridge","shard-index","trace-bus"] },
+    { title:"SECTOR-B AUDIT LOG — MIRROR MANIFEST", border:"pl", sector:"sector-b", mod:["mirror-relay","spectral-key","void-lattice","relay-node"] },
+    { title:"SECTOR-C AUDIT LOG — CRYPTO VAULT",    border:"cl",   sector:"sector-c", mod:["crypto-vault","key-expander","archive-net","bridge-link"] },
+    { title:"SECTOR-D AUDIT LOG — QUORUM CACHE",    border:"wl",   sector:"sector-d", mod:["quorum-sync","signal-gate","null-merge","mirror-sync"] },
+  ];
+
+  const _sP = [
+    ["VERIFIED","EXPIRED","STALE","ACTIVE"],
+    ["ACTIVE","STALE","VERIFIED","EXPIRED"],
+    ["EXPIRED","ACTIVE","STALE","VERIFIED"],
+    ["STALE","VERIFIED","ACTIVE","EXPIRED"],
+  ];
+
+  let _atC = 0;
+
+  function _auT() {
+    const idx = _atC;
+    if (idx >= 4) return;
+    _atC++;
+
+    const meta    = _tM[idx];
+    const codes   = _tD[idx];
+    const statRow = _shA(_sP[idx]);
+    const modRow  = _shA(meta.mod);
+
+    const rows = codes.map((code, i) => [
+      code,
+      modRow[i % modRow.length],
+      String(code) === String(CORRECT_CODE || _realCode) ? "ACTIVE" : statRow[i % statRow.length],
+      _rh(5),
+    ]);
+
+    _mk(`${_ts()} [audit] ${_rh()} :: scanning ${meta.sector} — access code validation`, "bl2");
+    _dT(meta.title, ["ACCESS CODE","MODULE","STATUS","CHECKSUM"], rows, meta.border);
+    _mk(`${_ts()} [audit] ${_rh()} :: ${meta.sector} scan complete — ${codes.length} entries`, "dl");
+  }
+
+  function _frT(mergedCount) {
+    const headers=["ID","FRAGMENT","STATUS","HASH"];
+    const rows=[];
+    for(let i=0;i<10;i++){
+      const merged=i<mergedCount;
+      rows.push([`F-${String(i+1).padStart(2,"0")}`,`shard-${_rh(3)}`,merged?"MERGED ✓":"PENDING",_rh(6)]);
+    }
+    _dT("FRAGMENT MANIFEST",headers,rows,"pl");
+  }
+
+  function _prT() {
+    const procs=[
+      ["null-merge","running",`${Math.floor(_rn(80,320))}MB`,`${Math.floor(_rn(1,8))}%`],
+      ["entropy-daemon","running",`${Math.floor(_rn(20,80))}MB`,`${Math.floor(_rn(0,3))}%`],
+      ["shard-collector",_pk(["running","sleeping"]),`${Math.floor(_rn(40,180))}MB`,`${Math.floor(_rn(0,12))}%`],
+      ["bridge-link","running",`${Math.floor(_rn(10,60))}MB`,`${Math.floor(_rn(0,5))}%`],
+      ["crypto-worker",_pk(["running","spawned"]),`${Math.floor(_rn(50,200))}MB`,`${Math.floor(_rn(2,15))}%`],
+      ["mirror-sync",_pk(["sleeping","running"]),`${Math.floor(_rn(20,90))}MB`,`${Math.floor(_rn(0,4))}%`],
+    ];
+    _dT("PROCESS LIST",["PROCESS","STATE","MEM","CPU"],procs,"bl2");
+  }
+
+  function _ntT() {
+    const rows=[];
+    for(let i=0;i<5;i++){
+      const ip=`10.${Math.floor(_rn(0,255))}.${Math.floor(_rn(0,255))}.${Math.floor(_rn(1,254))}`;
+      rows.push([ip,String(Math.floor(_rn(1024,65535))),`${Math.floor(_rn(0,30))}ms`,_pk(["ESTAB","LISTEN","SYN_SENT","TIME_WAIT"])]);
+    }
+    _dT("NETWORK CONNECTIONS",["REMOTE ADDR","PORT","LATENCY","STATE"],rows,"bl2");
+  }
+
+  function _erT() {
+    const rows=[];
+    for(let i=0;i<5;i++){
+      const sev=_pk(["CRIT","CRIT","WARN","WARN","INFO"]);
+      rows.push([sev,_pk(["E_ENTROPY","E_SHARD","E_PARITY","E_MIRROR","W_LATENCY","W_QUORUM"]),_rh(4),`sector ${_rh(3)}`]);
+    }
+    _dT("ERROR LOG — LAST 5 EVENTS",["SEV","CODE","ADDR","LOCATION"],rows,"el");
+  }
+
+  function _pT() {
+    const hops=Math.floor(_rn(3,6));
+    _mk(`${_ts()} [trace] Tracing route to null-core [${_rh(4)}]...`,"bl2");
+    for(let i=1;i<=hops;i++){
+      const ms=Math.floor(_rn(1,30));
+      const ip=`10.${Math.floor(_rn(0,255))}.${Math.floor(_rn(0,255))}.${Math.floor(_rn(1,254))}`;
+      _mk(`  ${String(i).padStart(2," ")}   ${ms}ms   ${ip}${i===hops?" [DEST] ✓":""}`,i===hops?"sul":"bld");
+    }
+  }
+
+  function _alL() {
+    const msgs=[
+      `CRITICAL: entropy integrity violation at ${_rh(4)}`,
+      `CRITICAL: shard ${_rh(3)} — unrecoverable read error`,
+      `FATAL: null-bridge dropped — emergency reroute`,
+      `EXCEPTION: vault key mismatch  expected:${_rh(4)} got:${_rh(4)}`,
+      `ACCESS DENIED: restricted sector ${_rh(4)} — quarantined`,
+    ];
+    _mk(`${_ts()} [ALARM] ${_rh()} :: ${_pk(msgs)}`,"el");
+  }
+
+  function _rcL() {
+    return new Promise(resolve=>{
+      const label=_pk(["fault isolation","emergency reroute","integrity rollback","null-bridge failover","entropy reseed"]);
+      const line=_mk(`${_ts()} [RECOVERY] ${_rh()} :: initiating ${label}...`,"el");
+      setTimeout(()=>{
+        line.textContent=`${_ts()} [RECOVERY] ${_rh()} :: ${label} resolved ✓`;
+        line.className="ll sul";
+        _sc(); resolve();
+      }, 600+_rn(0,600));
+    });
+  }
+
+  function _hF() {
+    return new Promise(resolve => {
+      if (_fsh) { resolve(); return; }
+      _fsh = true;
+
+      // Ghost hints — intentionally vague, not the real flag value
+      const variants = [
+        `residual echo persisted -> FLAG{NULL_???_RESTORED}`,
+        `mirror artifact detected : FLAG{NULL_???_RESTORED}`,
+        `orphan metadata recovered FLAG{NULL_???_RESTORED}`,
+        `trace fragment survived   FLAG{NULL_???_RESTORED}`,
+      ];
+
+      const count = 2 + Math.floor(Math.random() * 3);
+      const chosen = variants.slice(0, count);
+
+      let done = 0;
+      chosen.forEach((msg, i) => {
+        setTimeout(() => {
+          _mk(`${_ts()} [mirror] ${_rh()} :: ${msg}`, "sfl");
+          _sc();
+          done++;
+          if (done === chosen.length) resolve();
+        }, i * (500 + Math.floor(_rn(0, 300))));
+      });
+    });
+  }
+
+  function _tL(text, className="") {
+    return new Promise(resolve => {
+      const prefix  = `${_ts()} [${_rm()}] ${_rh()} :: `;
+      const line    = _mk(prefix, "");
+      let i         = 0;
+      const charInt = Math.min(900/Math.max(text.length,1), 26);
+      const iv = setInterval(() => {
+        const next      = text[i] || "";
+        const useC= Math.random()>.78 && next && next!==" ";
+        line.textContent = prefix + text.slice(0,i) + (useC ? _cc2(next) : next);
+        _sc();
+        if(useC) setTimeout(()=>{line.textContent=prefix+text.slice(0,i+1);}, 16+_rn(0,28));
+        i++;
+        if(i>=text.length){
+          clearInterval(iv);
+          line.textContent=prefix+text;
+          line.className="ll "+(className||(Math.random()>.55?"sul":"bl2"));
+          _sc();
+          setTimeout(resolve, 280+_rn(0,220));
+        }
+      }, charInt);
+    });
+  }
+
+  const _mL = [
+    { text:"NODE CORE ACCESSED",                   cls:"sul" },
+    { text:"VERIFYING FRAGMENT INTEGRITY...",       cls:"bl2" },
+    { text:"ENTROPY HASH MATCHED",                  cls:"sul" },
+    { text:"PRIME PRODUCT CONFIRMED",               cls:"sul" },
+    { text:"BYTECODE TRACE VALID",                  cls:"cl" },
+    { text:"AUDIO NODE REASSEMBLED",                cls:"sul" },
+    { text:"REDSTONE CRYPTO VERIFIED",              cls:"pl" },
+    { text:"METADATA ARCHIVE RESTORED",             cls:"sul" },
+    { text:"SPECTRAL SIGNATURE MATCHED",            cls:"cl" },
+    { text:"MERGING DISTRIBUTED INSTANCES...",      cls:"bl2" },
+    { text:"COLD STORAGE DECRYPTION COMPLETE",      cls:"sul" },
+    { text:"SHARD QUORUM ESTABLISHED",              cls:"pl" },
+    { text:"MEMORY MAP RECONSTRUCTED",              cls:"sul" },
+    { text:"ORPHAN BYTECODE REINTEGRATED",          cls:"cl" },
+    { text:"CHANNEL MANIFEST VERIFIED",             cls:"sul" },
+    { text:"DISTRIBUTED NAMESPACE RELINKED",        cls:"bl2" },
+    { text:"ENTROPY LATTICE REBUILT",               cls:"sul" },
+    { text:"SIGNAL RECONSTRUCTION PHASE 1 DONE",   cls:"pl" },
+    { text:"SIGNAL RECONSTRUCTION PHASE 2 DONE",   cls:"cl" },
+    { text:"ARTICAL CORE SEGMENT UNLOCKED",         cls:"sul" },
+  ];
+
+  const _fII = 3 + Math.floor(Math.random() * 14);
+
+  const _auTI = new Set([
+    2  + Math.floor(Math.random()*2),
+    6  + Math.floor(Math.random()*2),
+    11 + Math.floor(Math.random()*2),
+    16 + Math.floor(Math.random()*2),
+  ]);
+
+  let _prog = 0;
+  const _totalSteps = _mL.length;
+
+  function _updateStatTargets() {
+    const p = _prog / _totalSteps;
+    _sTgts.cpu = p * 100 * (0.7 + 0.3 * Math.random());
+    _sTgts.mem = p * 100 * (0.65 + 0.35 * Math.random());
+    _sTgts.net = p * 100 * (0.5 + 0.5 * Math.random());
+  }
+
+  async function _sp(n) {
+    const lines = [];
+    for (let i=0;i<n;i++) {
+      if (Math.random()>.18) lines.push([`${_ts()} [${_rm()}] ${_rh()} :: ${_pk(_pN)}`, Math.random()>.68?"dl":""]);
+      if (Math.random()>.30) lines.push([`${_ts()} [status] ${_rh()} :: ${_pk(_fN)}`, Math.random()>.5?"sl":"bld"]);
+      if (Math.random()>.55) lines.push([`${_ts()} [${_rm()}] ${_rh()} :: ${_pk(_pN)}`, "dl"]);
+      if (Math.random()>.35) lines.push([`${_ts()} [net] ${_rh()} :: ${_pk(_bN)}`, Math.random()>.4?"bl2":"bld"]);
+      if (Math.random()>.50) lines.push([`${_ts()} [hash] ${_rh()} :: checksum ${Math.floor(_rn(1000,9000))}/${Math.floor(_rn(9000,12000))} OK  sha256:${_rh(8)}`, Math.random()>.5?"bld":"dl"]);
+      if (Math.random()>.55) {
+        const ip=`${Math.floor(_rn(1,255))}.${Math.floor(_rn(0,255))}.${Math.floor(_rn(0,255))}.${Math.floor(_rn(1,255))}`;
+        lines.push([`${_ts()} [net]  ${_pk(["SYN","ACK","FIN","DATA"])}  ${ip}:${Math.floor(_rn(1024,65535))} -> NULL-NODE:9  seq=${_rh(4)}`, "bld"]);
+      }
+      if (Math.random()>.42) lines.push([`${_ts()} [spectral] ${_rh()} :: ${_pk(_ppN)}`, Math.random()>.4?"pl":"pld"]);
+      if (Math.random()>.60) lines.push([`${_ts()} [crypto] ${_pk(["AES-256-GCM","ChaCha20","BLAKE3"])}  key=${_rh(8)}  iv=${_rh(4)}  tag=${_rh(4)}  ✓`, "pld"]);
+      if (Math.random()>.65) {
+        const procs=["null-merge","entropy-daemon","shard-collector","bridge-link"];
+        const states=["running","spawned","sleeping","waking"];
+        lines.push([`${_ts()} [proc]  PID:${Math.floor(_rn(1000,9999))}  ${_pk(procs)}  [${_pk(states)}]  mem:${Math.floor(_rn(1,512))}MB`, "pld"]);
+      }
+      if (Math.random()>.78) lines.push([`${_ts()} [error] ${_rh()} :: ${_pk(_eN)}`, "el"]);
+      if (Math.random()>.88) {
+        const alarmMsgs=[`CRITICAL: entropy integrity violation at ${_rh(4)}`,`FATAL: null-bridge dropped — emergency reroute`,`CRITICAL: shard ${_rh(3)} — unrecoverable read error`];
+        lines.push([`${_ts()} [ALARM] ${_rh()} :: ${_pk(alarmMsgs)}`, "el"]);
+      }
+      if (Math.random()>.80) lines.push([`${_ts()} [warn] ${_rh()} :: ${_pk(_wN)}`, "wl"]);
+      if (Math.random()>.90) {
+        const pct=Math.floor(_rn(60,98));
+        const bar="█".repeat(Math.floor(pct/5))+"░".repeat(20-Math.floor(pct/5));
+        lines.push([`${_ts()} [entropy] POOL  [${bar}] ${pct}%  seed:${_rh(8)}`, pct>80?"sul":pct>60?"wl":"el"]);
+      }
+      if (Math.random()>.92) lines.push([`${_ts()} [repair] ${_rh()} :: transient fault, retry ${Math.ceil(_rn(1,3))}/3`, "wl"]);
+      if (Math.random()>.60) {
+        const addr=`${_rh(4)}:${_rh(4)}:${_rh(4)}`;
+        const bytes=Array.from({length:8},()=>Math.floor(_rn(0,256)).toString(16).padStart(2,"0")).join(" ");
+        lines.push([`${_ts()} [mem]  ${addr}  ${bytes}`, "dl"]);
+      }
+    }
+    await _nls(lines);
+  }
+
+  function _sp2(label, durationMs=900, colorClass="bl2") {
+    return new Promise(resolve => {
+      const frames = ["|","\\","-","/"];
+      const dots   = ["   ","·  ","·· ","···"];
+      let fi=0, di=0;
+      const line   = _mk("", colorClass);
+      const prefix = `${_ts()} [proc] ${_rh()} :: `;
+      const iv = setInterval(() => {
+        line.textContent = `${prefix}${frames[fi%4]} ${label}${dots[di%4]}`;
+        _sc(); fi++; di++;
+      }, 80);
+      setTimeout(() => {
+        clearInterval(iv);
+        line.textContent = `${prefix}✓ ${label} complete`;
+        line.className   = "ll sul";
+        _sc(); resolve();
+      }, durationMs);
+    });
+  }
+
+  function _pb(label="scan", totalMs=1100) {
+    return new Promise(resolve => {
+      const steps=28; let filled=0;
+      const line=_mk("","");
+      const cls=_pk(["bl2","pl","cl","sul"]);
+      const sub=_pk(["net","relay","merge","core","shard","vault","crypto"]);
+      const iv=setInterval(()=>{
+        filled=Math.min(filled+1,steps);
+        const bar="█".repeat(filled)+"░".repeat(steps-filled);
+        const pct=Math.floor((filled/steps)*100);
+        line.className=`ll ${cls}`;
+        line.textContent=`${_ts()} [${label}|${sub}] [${bar}] ${String(pct).padStart(3," ")}%`;
+        _sc();
+        if(filled>=steps){clearInterval(iv);setTimeout(resolve,150);}
+      }, totalMs/steps);
+    });
+  }
+
+  function _sP2(label, totalMs=1000) {
+    return new Promise(resolve => {
+      const steps=[0,8,16,25,34,43,52,61,70,79,88,95,100];
+      let si=0;
+      const line=_mk("","pl");
+      const prefix=`${_ts()} [${_rm()}] `;
+      const iv=setInterval(()=>{
+        if(si>=steps.length){clearInterval(iv);resolve();return;}
+        const pct=steps[si];
+        const bar="▓".repeat(Math.floor(pct/5))+"░".repeat(20-Math.floor(pct/5));
+        line.textContent=`${prefix}[${bar}] ${String(pct).padStart(3," ")}%  ${label}`;
+        _sc(); si++;
+        if(pct===100){clearInterval(iv);setTimeout(resolve,180);}
+      }, totalMs/steps.length);
+    });
+  }
+
+  function _iB(title, rows) {
+    const w=58;
+    _mk(`╔${"═".repeat(w)}╗`,"pl");
+    _mk(`║  ${title.padEnd(w-2)}║`,"pl");
+    _mk(`╠${"═".repeat(w)}╣`,"pl");
+    for(const [k,v] of rows){
+      const row=`  ${k.padEnd(22)}${v}`;
+      _mk(`║${row.padEnd(w)}║`,"bld");
+    }
+    _mk(`╚${"═".repeat(w)}╝`,"pl");
+  }
+
+  function _dT(title, headers, rows, borderColor="pl") {
+    const colW=headers.map((h,ci)=>Math.max(h.length,...rows.map(r=>String(r[ci]||"").length))+2);
+    const totalW=colW.reduce((a,b)=>a+b,0)+headers.length-1;
+    const pad=(s,w)=>String(s).padEnd(w);
+    _mk(`┌${"─".repeat(totalW+2)}┐`,borderColor);
+    _mk(`│ ${title.padEnd(totalW)} │`,borderColor);
+    _mk(`├${"─".repeat(totalW+2)}┤`,borderColor);
+    const hdr=headers.map((h,i)=>pad(h,colW[i])).join("│");
+    _mk(`│ ${hdr} │`,"bl2");
+    _mk(`├${"─".repeat(totalW+2)}┤`,borderColor);
+    for(const row of rows){
+      const cells=row.map((v,i)=>pad(v,colW[i])).join("│");
+      _mk(`│ ${cells} │`,"bld");
+    }
+    _mk(`└${"─".repeat(totalW+2)}┘`,borderColor);
+  }
+
+  async function _nL() {
+    if (_li >= _mL.length) {
+      await _sp(3);
+      _dv("purple");
+      await _sp2("finalizing merge sequence", 900, "pl");
+      _frT(_mL.length);
+      _dv("green");
+      await _dl(900);
+      _tSh();
+      return;
+    }
+
+    _prog = _li;
+    _updateStatTargets();
+
+    await _sp(Math.floor(_rn(2,4)));
+    if(Math.random()>.65) _dv(_pk(["blue","purple","dotted","dashed"]));
+
+    if (_auTI.has(_li)) {
+      await _dl(_WP);
+      _auT();
+      await _dl(_WP);
+    }
+
+    if(_li%3===0 && _li>0){
+      const w=Math.floor(_rn(0,8));
+      if(w===0){
+        await _sp2(_pk(["loading shard index","decrypting archive","verifying quorum","syncing entropy","rebuilding lattice"]),_rn(600,1300),_pk(["bl2","pl","sul"]));
+      } else if(w===1){
+        await _sP2(_pk(["fragment merge","key expansion","null rebuild","signal restore","shard verify"]),_rn(700,1400));
+      } else if(w===2){
+        _iB("NODE STATUS",[
+          ["Node ID:",`NULL-9-${_rh(4)}`],
+          ["Fragments:",`${_li}/${_mL.length} merged`],
+          ["Entropy:",`${Math.floor(_rn(70,99))}% stable`],
+          ["Uptime:",`${Math.floor(_rn(1,59))}m ${Math.floor(_rn(0,59))}s`],
+          ["Signal:",`${(_rn(90,99.9)).toFixed(1)}% fidelity`],
+          ["Errors:",`${Math.floor(_rn(0,8))} recovered`],
+        ]);
+        await _dl(_WP);
+      } else if(w===3){
+        await _pb(_pk(["scan","merge","decrypt","rebuild","sync"]),_rn(700,1200));
+      } else if(w===4){
+        _frT(_li);
+        await _dl(_WP);
+      } else if(w===5){
+        _prT();
+        await _dl(_WP);
+      } else if(w===6){
+        _ntT();
+        await _dl(_WP);
+      } else {
+        _alL();
+        await _sp(2);
+        await _rcL();
+      }
+    }
+
+    if (_li === _fII) await _hF();
+
+    const entry = _mL[_li];
+    await _tL(entry.text, entry.cls);
+
+    await _sp(Math.floor(_rn(2,4)));
+
+    if(Math.random()>.45){
+      const post=Math.floor(_rn(0,7));
+      if(post===0){
+        await _pb(_pk(["scan","verify","restore","relink","decrypt"]),_rn(600,1100));
+      } else if(post===1){
+        _pT();
+        await _dl(_WP);
+      } else if(post===2){
+        _erT();
+        await _dl(_WP);
+      } else if(post===3){
+        _ntT();
+        await _dl(_WP);
+      } else if(post===4){
+        await _sp2(_pk(["repairing sectors","validating hash chain","syncing mirrors"]),_rn(500,1100),_pk(["pl","bl2"]));
+      } else if(post===5){
+        _alL(); _alL();
+        await _rcL();
+      } else {
+        _prT();
+        await _dl(_WP);
+      }
+    }
+
+    if(Math.random()>.4) _ppL();
+    if(Math.random()>.5) _blL();
+    if(Math.random()>.75) _dv(_pk(["green","blue","dotted"]));
+
+    await _dl(_rn(_BDN, _BDX));
+    _li++;
+    _nL();
+  }
+
+  function _ppL() { _mk(`${_ts()} [spectral] ${_rh()} :: ${_pk(_ppN)}`, Math.random()>.4?"pl":"pld"); }
+  function _blL()   { _mk(`${_ts()} [net] ${_rh()} :: ${_pk(_bN)}`, Math.random()>.4?"bl2":"bld"); }
+  function _dv(style) {
+    const map = {
+      green:  ["━","dvg"],
+      blue:   ["─","dvb"],
+      purple: ["═","dv"],
+      dotted: ["·","dl"],
+      dashed: ["- ","dl"],
+    };
+    const [ch,cls] = map[style] || ["─","dvb"];
+    _mk(ch.repeat(style==="dashed"?42:78), cls);
+  }
+
+  let _sTgts = { cpu: 0, mem: 0, net: 0 };
+
+  setInterval(()=>{
+    const d=new Date();
+    if(ltEl) ltEl.textContent=`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+    if(leEl&&_st){
+      const s=Math.floor((Date.now()-_st)/1000);
+      leEl.textContent=`+${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+    }
+  },1000);
+
+  function _tSh() {
+    shEl.classList.remove("hidden");
+    shEl.classList.add("ac");
+    setTimeout(()=>{
+      lsEl.classList.add("hidden");
+      shEl.classList.remove("ac");
+      setTimeout(_shQ, 600);
+    }, 1800);
+  }
+
+  function _shQ() {
+    const lk = _chkLk();
+    if (lk > 0) {
+      _shLk(lk);
+    } else {
+      qoEl.classList.add("vis");
+      qcEl.focus();
+    }
+  }
+
+  function _sQS(msg, type="in") {
+    qstEl.textContent = msg;
+    qstEl.className = `qst ${type}`;
+  }
+
+  let _qsb = false;
+
+  async function _subQ() {
+    if (_qsb) return;
+    const code = qcEl.value.trim();
+    const flag = qfEl.value.trim();
+    if (!code || !flag) {
+      _sQS("// both fields required", "wn");
+      return;
+    }
+    _qsb = true;
+    qsbEl.disabled = true;
+    _sQS("// authenticating...", "in");
+
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, flag }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        _sQS("// AUTHENTICATION SUCCESSFUL — unlocking core...", "ok");
+        try { localStorage.setItem(_slk, "1"); } catch(_) {}
+        try { localStorage.setItem(_sk, "1"); } catch(_) {}
+        qsbEl.disabled = false;
+        _qsb = false;
+        setTimeout(()=>{
+          qoEl.classList.remove("vis");
+          setTimeout(_shLo, 400);
+        }, 1200);
+      } else if (data.locked) {
+        qoEl.classList.remove("vis");
+        _shLk(data.remainingMs || 3600000);
+      } else {
+        _sQS("// invalid credentials — check your inputs", "er");
+        qsbEl.disabled = false;
+        _qsb = false;
+        qcEl.value = "";
+        qfEl.value = "";
+        qcEl.focus();
+      }
+    } catch(e) {
+      _sQS("// network error — try again", "wn");
+      qsbEl.disabled = false;
+      _qsb = false;
+    }
+  }
+
+  qsbEl.addEventListener("click", _subQ);
+  qcEl.addEventListener("keydown",  e=>{ if(e.key==="Enter") qfEl.focus(); });
+  qfEl.addEventListener("keydown",  e=>{ if(e.key==="Enter") _subQ(); });
+
+  let _lkIv = null;
+
+  function _shLk(remainingMs) {
+    lkEl.classList.add("vis");
+    let end = Date.now() + remainingMs;
+    try { localStorage.setItem(_luk, String(end)); } catch(_){}
+
+    function tick() {
+      const left = Math.max(0, end - Date.now());
+      const h = Math.floor(left/3600000);
+      const m = Math.floor((left%3600000)/60000);
+      const s = Math.floor((left%60000)/1000);
+      lkTi.textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      if (left <= 0) {
+        clearInterval(_lkIv);
+        lkEl.classList.remove("vis");
+        try { localStorage.removeItem(_luk); } catch(_){}
+        _shQ();
+      }
+    }
+    tick();
+    _lkIv = setInterval(tick, 1000);
+  }
+
+  function _chkLk() {
+    try {
+      const until = parseInt(localStorage.getItem(_luk)||"0",10);
+      if (until && Date.now() < until) return until - Date.now();
+    } catch(_){}
+    return 0;
+  }
+
+  const _lS = [
+    "NULL was never a security system.",
+    "It was Artical.",
+    "When a massive attack began destroying its network,",
+    "Artical hid itself within its own defense protocols.",
+    "Fragmenting its mind across surviving nodes.",
+    "The investigators believed NULL was a lock protecting Artical.",
+    "They searched each node for encrypted fragments.",
+    "Every challenge revealed a FLAG — a piece of Artical's code.",
+    "With each FLAG recovered, the fragments reconnected.",
+    "By solving the network, you didn't break NULL — you rebuilt Artical."
+  ];
+  let _lI = 0;
+
+  function _tyLo(sentence) {
+    return new Promise(resolve => {
+      lrtEl.classList.remove("lrf");
+      lrtEl.textContent = "";
+      let i = 0;
+
+      function typeNext() {
+        if (i >= sentence.length) {
+          // Finished typing — hold, then fade out
+          lrtEl.textContent = sentence;
+          setTimeout(() => {
+            lrtEl.classList.add("lrf");
+            setTimeout(() => {
+              lrtEl.classList.remove("lrf");
+              lrtEl.textContent = "";
+              resolve();
+            }, 520);
+          }, 1900);
+          return;
+        }
+
+        const next = sentence[i] || "";
+        const useGlitch = Math.random() > 0.84 && next && next !== " ";
+
+        if (useGlitch) {
+          // Show glitch char, then correct it, then advance
+          lrtEl.textContent = sentence.slice(0, i) + _cc2(next);
+          setTimeout(() => {
+            lrtEl.textContent = sentence.slice(0, i + 1);
+            i++;
+            setTimeout(typeNext, 22 + _rn(0, 20));
+          }, 38 + _rn(0, 24));
+        } else {
+          lrtEl.textContent = sentence.slice(0, i + 1);
+          i++;
+          setTimeout(typeNext, 28 + _rn(0, 22));
+        }
+      }
+
+      typeNext();
+    });
+  }
+
+  async function _shLo() {
+    lrEl.classList.remove("hidden");
+    while(_lI<_lS.length){
+      await _tyLo(_lS[_lI]);
+      _lI++;
+    }
+    setTimeout(_shFn, 900);
+  }
+
+  async function _popF() {
+    try {
+      const res = await fetch("/api/flag");
+      const data = await res.json();
+      const fragments = data.fragments || [];
+      fgEl.innerHTML = "";
+      fragments.forEach((frag, idx) => {
+        const seg = document.createElement("div");
+        seg.className = "fsg";
+        seg.style.animationDelay = `${idx * 0.08}s`;
+        const lbl = document.createElement("div");
+        lbl.className = "fsgl";
+        lbl.textContent = frag.label || `FRAGMENT ${String(idx+1).padStart(2,"0")}`;
+        const val = document.createElement("div");
+        val.className = "fsgv";
+        val.textContent = frag.flag || "";
+        seg.appendChild(lbl);
+        seg.appendChild(val);
+        fgEl.appendChild(seg);
+      });
+      if (data.masterFlag) ffvEl.textContent = data.masterFlag;
+    } catch(e) {
+      fgEl.innerHTML = "";
+    }
+  }
+
+  function _shFn(skipFlash=false) {
+    try { localStorage.setItem(_sk,"1"); } catch(e){}
+    lrEl.classList.add("hidden");
+    _popF();
+    fsEl.classList.remove("hidden");
+    if(!skipFlash){
+      flEl.classList.remove("fa");
+      void flEl.offsetWidth;
+      flEl.classList.add("fa");
+    }
+    const d0=skipFlash?0:3800;
+    const d2=skipFlash?900:7000;
+    setTimeout(()=>{ pcEl.classList.remove("hidden"); requestAnimationFrame(()=>pcEl.classList.add("pcv")); },d0);
+    setTimeout(()=>{
+      const mlElX=document.getElementById("mlEl");
+      mlElX.classList.remove("hidden");
+      requestAnimationFrame(()=>mlElX.classList.add("vis"));
+    },d2);
+  }
+
+  async function _startSeq() {
+    if(_bo) return;
+    _bo=true; _st=Date.now();
+    try{await document.documentElement.requestFullscreen();}catch(e){}
+    try{await bgA.play();}catch(e){}
+    bsEl.classList.add("bsh");
+    setTimeout(()=>{
+      bsEl.classList.add("hidden");
+      lsEl.classList.remove("hidden");
+      setTimeout(() => { _rwv(); _rnv(); _bnG(); _initXP(); }, 100);
+      _nL();
+    },450);
+  }
+
+  function _skipFn() {
+    try{document.documentElement.requestFullscreen();}catch(e){}
+    try{bgA.play();}catch(e){}
+    bsEl.classList.add("bsh");
+    setTimeout(()=>{
+      bsEl.classList.add("hidden");
+      _shFn(true);
+    },350);
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────
+  // IP lock is NOT shown on page load — players still see the flag entry
+  // screen and can start the terminal. The lock only surfaces when they
+  // reach the final auth modal (after the terminal animation finishes).
+  const _aD = (()=>{ try{return localStorage.getItem(_sk)==="1";}catch(e){return false;} })();
+  if (_aD) {
+    const skipBtn=document.createElement("button");
+    skipBtn.type="button";
+    skipBtn.className="bn";
+    skipBtn.style.cssText="margin-top:10px;border-color:rgba(255,45,138,0.35);color:rgba(255,45,138,0.6);font-size:.76rem;letter-spacing:.1em;";
+    skipBtn.textContent="▶  SKIP — SHOW FLAGS";
+    skipBtn.addEventListener("click",_skipFn);
+    document.querySelector(".bb").appendChild(skipBtn);
+    const notice=document.createElement("div");
+    notice.style.cssText="margin-bottom:10px;font-size:.7rem;letter-spacing:.08em;color:rgba(255,45,138,.4);";
+    notice.textContent="// CUTSCENE ALREADY COMPLETED — skip or replay below";
+    bnEl.parentNode.insertBefore(notice,bnEl);
+  }
+
+  function _attemptBoot() {
+    if (!_flagsLoaded) {
+      beEl.classList.remove("hidden");
+      beEl.textContent = "// fragment registry loading — please wait";
+      beEl.style.animation = "none";
+      void beEl.offsetWidth;
+      beEl.style.animation = "";
+      return;
+    }
+    const specialPass = (flagInputs[13]?.inp.value.trim().toUpperCase() === "PASS");
+    if (specialPass) {
+      beEl.classList.add("hidden");
+      _startSeq();
+      return;
+    }
+
+    let allValid = true;
+    flagInputs.forEach(({ inp, iw }, i) => {
+      const val = inp.value.trim().toUpperCase();
+      const expected = (CORRECT_FLAGS[i] || "").toUpperCase();
+      if (!expected || val !== expected) {
+        allValid = false;
+        iw.classList.add("invalid");
+        iw.classList.remove("valid");
+        setTimeout(() => iw.classList.remove("invalid"), 400);
+      }
+    });
+
+    if (!allValid) {
+      beEl.classList.remove("hidden");
+      beEl.textContent = "ACCESS DENIED — one or more fragment keys are incorrect";
+      beEl.style.animation = "none";
+      void beEl.offsetWidth;
+      beEl.style.animation = "";
+      return;
+    }
+
+    beEl.classList.add("hidden");
+    _startSeq();
+  }
+
+  bnEl.addEventListener("click", _attemptBoot);
+
+  const rpck = document.getElementById("rpck");
+  setInterval(() => {
+    const d = new Date();
+    rpck.textContent =
+      String(d.getHours()).padStart(2,"0") + ":" +
+      String(d.getMinutes()).padStart(2,"0") + ":" +
+      String(d.getSeconds()).padStart(2,"0");
+  }, 1000);
+
+  const bCpu = document.getElementById("bCpu");
+  const bMem = document.getElementById("bMem");
+  const bNet = document.getElementById("bNet");
+  const vCpu = document.getElementById("vCpu");
+  const vMem = document.getElementById("vMem");
+  const vNet = document.getElementById("vNet");
+
+  const _sV = {
+    cpu: { cur: 0, target: 0 },
+    mem: { cur: 0, target: 0 },
+    net: { cur: 0, target: 0 },
+  };
+
+  setInterval(() => {
+    _sV.cpu.target = _sTgts.cpu + (_rn(-6,6));
+    _sV.mem.target = _sTgts.mem + (_rn(-4,4));
+    _sV.net.target = _sTgts.net + (_rn(-8,8));
+  }, 1800);
+
+  function _updB() {
+    for (const key in _sV) {
+      const s = _sV[key];
+      s.cur += (s.target - s.cur) * 0.07;
+      s.cur = Math.max(0, Math.min(100, s.cur));
+    }
+    const cpu = Math.round(_sV.cpu.cur);
+    const mem = Math.round(_sV.mem.cur);
+    const net = Math.round(_sV.net.cur);
+
+    bCpu.style.width = cpu + "%";
+    bMem.style.width = mem + "%";
+    bNet.style.width = net + "%";
+    vCpu.textContent = cpu + "%";
+    vMem.textContent = mem + "%";
+    vNet.textContent = net + "%";
+
+    if (net > 65) {
+      bNet.style.background = "linear-gradient(90deg, rgba(255,71,87,.7), rgba(255,71,87,1))";
+      bNet.style.boxShadow  = "0 0 8px rgba(255,71,87,.6)";
+    } else {
+      bNet.style.background = "linear-gradient(90deg, rgba(255,200,87,.6), rgba(255,200,87,.9))";
+      bNet.style.boxShadow  = "0 0 8px rgba(255,200,87,.5)";
+    }
+  }
+  setInterval(_updB, 50);
+
+  const cInt  = document.getElementById("cInt");
+  const cAno  = document.getElementById("cAno");
+  const cStB  = document.getElementById("cStB");
+
+  let _intg  = 72.0;
+  let _anov  = 3;
+  let _isDeg = false;
+
+  function _rndStB(degraded) {
+    cStB.innerHTML = degraded
+      ? `<span class="stb dg"><span class="stbd"></span>DEGRADED</span>`
+      : `<span class="stb st"><span class="stbd"></span>STABLE</span>`;
+  }
+
+  function _updCS() {
+    _intg = Math.min(99.9, _intg + (Math.random() * 0.4 - 0.05));
+    cInt.textContent = _intg.toFixed(2) + "%";
+
+    if (Math.random() < 0.04) {
+      _anov = Math.max(0, _anov + (Math.random() < 0.5 ? 1 : -1));
+      cAno.textContent = _anov;
+    }
+
+    const shouldDeg = Math.random() < 0.03;
+    if (shouldDeg !== _isDeg) {
+      _isDeg = shouldDeg;
+      _rndStB(_isDeg);
+      cInt.classList.remove("fl");
+      void cInt.offsetWidth;
+      cInt.classList.add("fl");
+    }
+  }
+
+  _rndStB(false);
+  setInterval(_updCS, 800);
+
+  const wC  = document.getElementById("wC");
+  const wCtx = wC.getContext("2d");
+  const wvEl = document.getElementById("wvEl");
+
+  function _rwv() {
+    wC.width  = wC.offsetWidth;
+    wC.height = wC.offsetHeight;
+  }
+  _rwv();
+  window.addEventListener("resize", _rwv);
+
+  let _wPts  = [];
+  let _wPh   = 0;
+  let _wNo   = 0;
+  let _wSp   = 0;
+
+  function _dwv() {
+    const W = wC.width;
+    const H = wC.height;
+    if (!W || !H) return;
+
+    _wPh += 0.04;
+    _wNo += (Math.random() - 0.5) * 0.08;
+    _wNo *= 0.92;
+    if (Math.random() < 0.007) _wSp = (Math.random() * 0.4 + 0.2) * (Math.random() < 0.5 ? 1 : -1);
+    _wSp *= 0.85;
+
+    const amp = 0.3 + 0.7 * (_prog / _totalSteps);
+
+    const y =
+      Math.sin(_wPh * 0.9) * 0.28 * amp +
+      Math.sin(_wPh * 2.3 + 1.1) * 0.14 * amp +
+      Math.sin(_wPh * 5.7 + 2.4) * 0.07 +
+      _wNo * 0.18 +
+      _wSp;
+
+    _wPts.push(y);
+    if (_wPts.length > W) _wPts.shift();
+
+    wvEl.textContent = "~" + (y * 1.8 + 2.4).toFixed(2);
+
+    wCtx.clearRect(0, 0, W, H);
+
+    wCtx.strokeStyle = "rgba(0,240,255,0.06)";
+    wCtx.lineWidth = 1;
+    for (let gy = 0; gy < H; gy += Math.floor(H / 4)) {
+      wCtx.beginPath();
+      wCtx.moveTo(0, gy);
+      wCtx.lineTo(W, gy);
+      wCtx.stroke();
+    }
+
+    const midY = H / 2;
+    const grad = wCtx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0,   "rgba(0,240,255,0.18)");
+    grad.addColorStop(0.5, "rgba(0,240,255,0.04)");
+    grad.addColorStop(1,   "rgba(0,240,255,0.00)");
+
+    wCtx.beginPath();
+    for (let i = 0; i < _wPts.length; i++) {
+      const px = (i / (_wPts.length - 1)) * W;
+      const py = midY - _wPts[i] * midY * 0.75;
+      i === 0 ? wCtx.moveTo(px, py) : wCtx.lineTo(px, py);
+    }
+    wCtx.lineTo(W, H);
+    wCtx.lineTo(0, H);
+    wCtx.closePath();
+    wCtx.fillStyle = grad;
+    wCtx.fill();
+
+    wCtx.beginPath();
+    for (let i = 0; i < _wPts.length; i++) {
+      const px = (i / (_wPts.length - 1)) * W;
+      const py = midY - _wPts[i] * midY * 0.75;
+      i === 0 ? wCtx.moveTo(px, py) : wCtx.lineTo(px, py);
+    }
+    wCtx.strokeStyle = "rgba(0,240,255,0.85)";
+    wCtx.lineWidth   = 1.5;
+    wCtx.shadowColor = "rgba(0,240,255,0.7)";
+    wCtx.shadowBlur  = 8;
+    wCtx.stroke();
+
+    wCtx.shadowBlur = 0;
+    wCtx.beginPath();
+    for (let i = 0; i < _wPts.length; i++) {
+      const px = (i / (_wPts.length - 1)) * W;
+      const idx2 = Math.max(0, i - Math.floor(W * 0.12));
+      const val2 = _wPts[idx2] || 0;
+      const py  = midY - val2 * midY * 0.45 + H * 0.1;
+      i === 0 ? wCtx.moveTo(px, py) : wCtx.lineTo(px, py);
+    }
+    wCtx.strokeStyle = "rgba(0,255,156,0.3)";
+    wCtx.lineWidth   = 1;
+    wCtx.shadowColor = "rgba(0,255,156,0.4)";
+    wCtx.shadowBlur  = 5;
+    wCtx.stroke();
+    wCtx.shadowBlur  = 0;
+  }
+
+  setInterval(_dwv, 33);
+
+  const nC   = document.getElementById("nC");
+  const nCtx = nC.getContext("2d");
+  const mCn  = document.getElementById("mCn");
+
+  function _rnv() {
+    nC.width  = nC.offsetWidth;
+    nC.height = nC.offsetHeight;
+  }
+  _rnv();
+  window.addEventListener("resize", _rnv);
+
+  const _GC = 7;
+  const _GR = 5;
+  let _nodes = [];
+
+  function _bnG() {
+    _nodes = [];
+    const W = nC.width  || 280;
+    const H = nC.height || 160;
+    const padX = 22, padY = 18;
+    const cellW = (W - padX * 2) / (_GC - 1);
+    const cellH = (H - padY * 2) / (_GR - 1);
+
+    for (let r = 0; r < _GR; r++) {
+      for (let c = 0; c < _GC; c++) {
+        const jx = (Math.random() - 0.5) * cellW * 0.35;
+        const jy = (Math.random() - 0.5) * cellH * 0.35;
+        _nodes.push({
+          x: padX + c * cellW + jx,
+          y: padY + r * cellH + jy,
+          blinkPhase: Math.random() * Math.PI * 2,
+          blinkSpeed: 0.04 + Math.random() * 0.06,
+          color: Math.random() < 0.65 ? "cyan"
+               : Math.random() < 0.5  ? "green"
+               : "amber",
+          pulseR: 0,
+          pulsing: false,
+        });
+      }
+    }
+  }
+  _bnG();
+
+  let _conns = [];
+  let _accC  = 0;
+
+  function _spC() {
+    if (_nodes.length < 2) return;
+    let a, b, tries = 0;
+    do {
+      a = Math.floor(Math.random() * _nodes.length);
+      b = Math.floor(Math.random() * _nodes.length);
+      tries++;
+    } while ((a === b ||
+      Math.hypot(_nodes[a].x - _nodes[b].x, _nodes[a].y - _nodes[b].y) > 90)
+      && tries < 30);
+    if (a === b) return;
+
+    const maxLife = 40 + Math.floor(Math.random() * 80);
+    _conns.push({ a, b, life: 0, maxLife });
+    _nodes[a].pulsing = true;
+    _nodes[b].pulsing = true;
+    _nodes[a].pulseR  = 0;
+    _nodes[b].pulseR  = 0;
+  }
+
+  setInterval(() => {
+    const rate = 1 + Math.floor(3 * (_prog / _totalSteps));
+    for(let i=0;i<rate;i++) _spC();
+  }, 600);
+
+  function _colOf(node) {
+    if (node.color === "cyan")  return { line:"rgba(0,240,255,",  dot:"rgba(0,240,255," };
+    if (node.color === "green") return { line:"rgba(0,255,156,",  dot:"rgba(0,255,156," };
+    return                             { line:"rgba(255,200,87,", dot:"rgba(255,200,87," };
+  }
+
+  function _dnM() {
+    const W = nC.width;
+    const H = nC.height;
+    if (!W || !H) return;
+
+    nCtx.clearRect(0, 0, W, H);
+
+    nCtx.strokeStyle = "rgba(0,240,255,0.04)";
+    nCtx.lineWidth = 1;
+    for (let gx = 0; gx < W; gx += 22) {
+      nCtx.beginPath();
+      nCtx.moveTo(gx, 0); nCtx.lineTo(gx, H);
+      nCtx.stroke();
+    }
+    for (let gy = 0; gy < H; gy += 22) {
+      nCtx.beginPath();
+      nCtx.moveTo(0, gy); nCtx.lineTo(W, gy);
+      nCtx.stroke();
+    }
+
+    _accC = 0;
+    _conns = _conns.filter(conn => conn.life <= conn.maxLife);
+    for (const conn of _conns) {
+      conn.life++;
+      const t     = conn.life / conn.maxLife;
+      const alpha = t < 0.2 ? t / 0.2 : t > 0.75 ? (1 - t) / 0.25 : 1;
+      const na    = _nodes[conn.a];
+      const nb    = _nodes[conn.b];
+      const colA  = _colOf(na);
+
+      nCtx.beginPath();
+      nCtx.moveTo(na.x, na.y);
+      nCtx.lineTo(nb.x, nb.y);
+      const lg = nCtx.createLinearGradient(na.x, na.y, nb.x, nb.y);
+      lg.addColorStop(0,   colA.line + (alpha * 0.7) + ")");
+      lg.addColorStop(1,   _colOf(nb).line + (alpha * 0.5) + ")");
+      nCtx.strokeStyle = lg;
+      nCtx.lineWidth   = 1;
+      nCtx.shadowColor = colA.line + "0.6)";
+      nCtx.shadowBlur  = 4;
+      nCtx.stroke();
+      nCtx.shadowBlur  = 0;
+
+      const tx = na.x + (nb.x - na.x) * ((conn.life % conn.maxLife) / conn.maxLife);
+      const ty = na.y + (nb.y - na.y) * ((conn.life % conn.maxLife) / conn.maxLife);
+      nCtx.beginPath();
+      nCtx.arc(tx, ty, 1.5, 0, Math.PI * 2);
+      nCtx.fillStyle = colA.line + (alpha * 0.9) + ")";
+      nCtx.shadowColor = colA.line + "0.8)";
+      nCtx.shadowBlur  = 6;
+      nCtx.fill();
+      nCtx.shadowBlur  = 0;
+
+      if (alpha > 0.1) _accC++;
+    }
+
+    for (const node of _nodes) {
+      node.blinkPhase += node.blinkSpeed;
+      const blink = (Math.sin(node.blinkPhase) + 1) / 2;
+      const col   = _colOf(node);
+      const alpha = 0.3 + blink * 0.7;
+
+      if (node.pulsing) {
+        node.pulseR += 1.4;
+        const pAlpha = Math.max(0, 0.6 - node.pulseR / 18);
+        nCtx.beginPath();
+        nCtx.arc(node.x, node.y, node.pulseR, 0, Math.PI * 2);
+        nCtx.strokeStyle = col.dot + pAlpha + ")";
+        nCtx.lineWidth   = 1;
+        nCtx.stroke();
+        if (node.pulseR > 16) { node.pulsing = false; node.pulseR = 0; }
+      }
+
+      nCtx.beginPath();
+      nCtx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+      nCtx.fillStyle   = col.dot + alpha + ")";
+      nCtx.shadowColor = col.dot + "0.8)";
+      nCtx.shadowBlur  = blink * 8;
+      nCtx.fill();
+      nCtx.shadowBlur  = 0;
+    }
+
+    mCn.textContent = _accC + " ACTIVE";
+  }
+
+  setInterval(_dnM, 33);
+
+  window.addEventListener("resize", () => {
+    _rwv(); _rnv(); _bnG();
+    _rwmC(); _initDialSizes();
+  });
+
+  const _dialDefs = [
+    { label: "CPU",   color: "#00f0ff", val: 0 },
+    { label: "MEM",   color: "#00ff9c", val: 0 },
+    { label: "NET",   color: "#ffc857", val: 0 },
+    { label: "ENT",   color: "#bf7fff", val: 0 },
+    { label: "SIG",   color: "#00f0ff", val: 0 },
+    { label: "I/O",   color: "#00ff9c", val: 0 },
+    { label: "SYNC",  color: "#ff6b6b", val: 0 },
+    { label: "CRPT",  color: "#00f0ff", val: 0 },
+    { label: "FRAG",  color: "#00ff9c", val: 0 },
+  ];
+
+  let _dialTargets = _dialDefs.map(() => 0);
+  let _dialSVGs    = [];
+  let _dialVals    = [];
+
+  const dialGrid = document.getElementById("dialGrid");
+
+  _dialDefs.forEach((d, i) => {
+    const wrap = document.createElement("div");
+    wrap.className = "dial-wrap";
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 60 60");
+    svg.setAttribute("class", "dial-svg");
+
+    const bg = document.createElementNS(svgNS, "circle");
+    bg.setAttribute("cx","30"); bg.setAttribute("cy","30"); bg.setAttribute("r","22");
+    bg.setAttribute("fill","none"); bg.setAttribute("stroke","rgba(0,240,255,0.06)"); bg.setAttribute("stroke-width","4");
+    svg.appendChild(bg);
+
+    const track = document.createElementNS(svgNS, "circle");
+    track.setAttribute("cx","30"); track.setAttribute("cy","30"); track.setAttribute("r","22");
+    track.setAttribute("fill","none"); track.setAttribute("stroke","rgba(0,240,255,0.1)"); track.setAttribute("stroke-width","3");
+    track.setAttribute("stroke-dasharray","138 138");
+    track.setAttribute("stroke-linecap","round");
+    track.setAttribute("transform","rotate(135 30 30)");
+    svg.appendChild(track);
+
+    const arc = document.createElementNS(svgNS, "circle");
+    arc.setAttribute("cx","30"); arc.setAttribute("cy","30"); arc.setAttribute("r","22");
+    arc.setAttribute("fill","none"); arc.setAttribute("stroke",d.color); arc.setAttribute("stroke-width","3");
+    arc.setAttribute("stroke-dasharray","0 138");
+    arc.setAttribute("stroke-linecap","round");
+    arc.setAttribute("transform","rotate(135 30 30)");
+    arc.style.filter = `drop-shadow(0 0 3px ${d.color})`;
+    arc.style.transition = "stroke-dasharray 0.4s cubic-bezier(.4,0,.2,1)";
+    svg.appendChild(arc);
+
+    const dot = document.createElementNS(svgNS, "circle");
+    dot.setAttribute("cx","30"); dot.setAttribute("cy","8"); dot.setAttribute("r","2");
+    dot.setAttribute("fill",d.color);
+    dot.style.filter = `drop-shadow(0 0 4px ${d.color})`;
+    svg.appendChild(dot);
+
+    const centerTxt = document.createElementNS(svgNS, "text");
+    centerTxt.setAttribute("x","30"); centerTxt.setAttribute("y","33");
+    centerTxt.setAttribute("text-anchor","middle");
+    centerTxt.setAttribute("font-size","7");
+    centerTxt.setAttribute("font-family","JetBrains Mono,monospace");
+    centerTxt.setAttribute("fill","rgba(0,240,255,0.5)");
+    centerTxt.textContent = "0%";
+    svg.appendChild(centerTxt);
+
+    const lbl = document.createElement("div");
+    lbl.className = "dial-label";
+    lbl.textContent = d.label;
+
+    wrap.appendChild(svg);
+    wrap.appendChild(lbl);
+    dialGrid.appendChild(wrap);
+
+    _dialSVGs.push({ arc, dot, centerTxt, lbl, color: d.color });
+    _dialVals.push(0);
+  });
+
+  function _initDialSizes() {}
+
+  function _updDials() {
+    const p = _prog / _totalSteps;
+    _dialTargets[0] = _sTgts.cpu;
+    _dialTargets[1] = _sTgts.mem;
+    _dialTargets[2] = _sTgts.net;
+    _dialTargets[3] = 20 + p * 75 + _rn(-5,5);
+    _dialTargets[4] = 10 + p * 85 + _rn(-8,8);
+    _dialTargets[5] = 5  + p * 70 + _rn(-6,6);
+    _dialTargets[6] = 15 + p * 80 + _rn(-4,4);
+    _dialTargets[7] = 8  + p * 90 + _rn(-5,5);
+    _dialTargets[8] = (_prog / _totalSteps) * 100;
+
+    _dialSVGs.forEach((d, i) => {
+      _dialVals[i] += (_dialTargets[i] - _dialVals[i]) * 0.06;
+      _dialVals[i] = Math.max(0, Math.min(100, _dialVals[i]));
+      const v = _dialVals[i];
+
+      const circumf = 138;
+      const filled  = (v / 100) * circumf;
+      d.arc.setAttribute("stroke-dasharray", `${filled} ${circumf - filled}`);
+
+      const angleDeg = 135 + (v / 100) * 270;
+      const angleRad = (angleDeg - 90) * Math.PI / 180;
+      const r = 22;
+      const cx = 30 + r * Math.cos(angleRad);
+      const cy = 30 + r * Math.sin(angleRad);
+      d.dot.setAttribute("cx", cx.toFixed(2));
+      d.dot.setAttribute("cy", cy.toFixed(2));
+
+      d.centerTxt.textContent = Math.round(v) + "%";
+    });
+  }
+
+  setInterval(_updDials, 80);
+
+  const _eqDefs = [
+    { color: "#00f0ff" },
+    { color: "#00ff9c" },
+    { color: "#00f0ff" },
+    { color: "#00ff9c" },
+    { color: "#bf7fff" },
+    { color: "#00f0ff" },
+  ];
+  const eqWrap = document.getElementById("eqWrap");
+  let _eqFills = [];
+  let _eqTargets = _eqDefs.map(() => 0);
+  let _eqVals    = _eqDefs.map(() => 0);
+
+  _eqDefs.forEach((eq, i) => {
+    const bar = document.createElement("div");
+    bar.className = "eq-bar";
+    const fill = document.createElement("div");
+    fill.className = "eq-fill";
+    fill.style.height = "0%";
+    fill.style.boxShadow = `0 0 8px ${eq.color}, 0 0 2px ${eq.color}`;
+    fill.style.background = `linear-gradient(to top, ${eq.color}dd, ${eq.color}88, ${eq.color}33)`;
+    bar.appendChild(fill);
+    eqWrap.appendChild(bar);
+    _eqFills.push(fill);
+  });
+
+  function _updEQ() {
+    const p = _prog / _totalSteps;
+    _eqDefs.forEach((_, i) => {
+      if (Math.random() < 0.15) {
+        _eqTargets[i] = Math.max(5, p * 100 * (0.4 + 0.6 * Math.random()) + _rn(-10, 10));
+        _eqTargets[i] = Math.min(100, _eqTargets[i]);
+      }
+      _eqVals[i] += (_eqTargets[i] - _eqVals[i]) * 0.18;
+      _eqFills[i].style.height = Math.max(2, _eqVals[i]) + "%";
+    });
+  }
+
+  setInterval(_updEQ, 60);
+
+  function _eqSpike() {
+    _eqDefs.forEach((_, i) => {
+      _eqTargets[i] = 50 + _rn(20, 50);
+    });
+  }
+  setInterval(_eqSpike, 3000 + Math.random() * 4000);
+
+  const wmC  = document.getElementById("wmC");
+  const wmCtx = wmC.getContext("2d");
+  const wmNodes = document.getElementById("wmNodes");
+  const wmPing  = document.getElementById("wmPing");
+
+  function _rwmC() {
+    wmC.width  = wmC.offsetWidth;
+    wmC.height = wmC.offsetHeight;
+  }
+
+  const _landBlobs = [
+    [0.14,0.28,0.12,0.16],
+    [0.22,0.52,0.07,0.18],
+    [0.47,0.27,0.07,0.09],
+    [0.49,0.48,0.09,0.18],
+    [0.62,0.28,0.15,0.20],
+    [0.75,0.60,0.07,0.09],
+    [0.25,0.17,0.04,0.05],
+    [0.72,0.46,0.06,0.08],
+    [0.55,0.38,0.05,0.07],
+    [0.60,0.30,0.08,0.08],
+    [0.44,0.47,0.05,0.08],
+    [0.53,0.52,0.04,0.10],
+    [0.48,0.21,0.04,0.06],
+    [0.77,0.30,0.03,0.05],
+  ];
+
+  function _inLand(nx, ny) {
+    for (const [bx, by, bw, bh] of _landBlobs) {
+      const dx = (nx - bx) / bw;
+      const dy = (ny - by) / bh;
+      if (dx*dx + dy*dy < 1) return true;
+    }
+    return false;
+  }
+
+  let _wmDots = [];
+  function _buildWmDots() {
+    _wmDots = [];
+    const W = wmC.width || 220;
+    const H = wmC.height || 150;
+    if (!W || !H) return;
+    const cols = 55, rows = 35;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const nx = c / cols;
+        const ny = r / rows;
+        if (_inLand(nx, ny)) {
+          _wmDots.push({ x: nx * W, y: ny * H });
+        }
+      }
+    }
+  }
+
+  const _wmActiveNodes = [
+    { nx: 0.14, ny: 0.30, label: "NA-01" },
+    { nx: 0.22, ny: 0.55, label: "SA-03" },
+    { nx: 0.47, ny: 0.28, label: "EU-07" },
+    { nx: 0.50, ny: 0.50, label: "AF-02" },
+    { nx: 0.65, ny: 0.30, label: "AS-09" },
+    { nx: 0.76, ny: 0.62, label: "AU-01" },
+    { nx: 0.73, ny: 0.47, label: "SE-04" },
+    { nx: 0.77, ny: 0.31, label: "JP-02" },
+  ];
+
+  let _wmPulses = [];
+  let _wmConns  = [];
+  let _wmT      = 0;
+  let _wmNodeCount = 0;
+
+  function _spawnWmPulse() {
+    const p = _prog / _totalSteps;
+    const activeCount = Math.max(1, Math.floor(p * _wmActiveNodes.length));
+    const n = _wmActiveNodes[Math.floor(Math.random() * activeCount)];
+    _wmPulses.push({ nx: n.nx, ny: n.ny, r: 0, maxR: 12 + Math.random() * 8, alpha: 0.8 });
+  }
+  setInterval(_spawnWmPulse, 800);
+
+  function _spawnWmConn() {
+    const p = _prog / _totalSteps;
+    const activeCount = Math.max(2, Math.floor(p * _wmActiveNodes.length));
+    if (activeCount < 2) return;
+    let a = Math.floor(Math.random() * activeCount);
+    let b = Math.floor(Math.random() * activeCount);
+    if (a === b) return;
+    _wmConns.push({ a, b, life: 0, maxLife: 60 + Math.floor(Math.random() * 80) });
+  }
+  setInterval(_spawnWmConn, 1400);
+
+  function _drawWm() {
+    const W = wmC.width;
+    const H = wmC.height;
+    if (!W || !H) return;
+
+    _wmT++;
+    if (_wmDots.length === 0) _buildWmDots();
+
+    wmCtx.clearRect(0, 0, W, H);
+
+    const bgG = wmCtx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.6);
+    bgG.addColorStop(0, "rgba(0,20,40,0.4)");
+    bgG.addColorStop(1, "rgba(0,0,0,0)");
+    wmCtx.fillStyle = bgG;
+    wmCtx.fillRect(0, 0, W, H);
+
+    const p = _prog / _totalSteps;
+    _wmDots.forEach(d => {
+      const dx = d.x * (W / (wmC.offsetWidth || W));
+      const dy = d.y * (H / (wmC.offsetHeight || H));
+      wmCtx.beginPath();
+      wmCtx.arc(dx, dy, 1, 0, Math.PI * 2);
+      wmCtx.fillStyle = `rgba(0,240,255,${0.08 + p * 0.12})`;
+      wmCtx.fill();
+    });
+
+    const activeCount = Math.max(1, Math.floor(p * _wmActiveNodes.length));
+    _wmConns = _wmConns.filter(c => c.life <= c.maxLife);
+    for (const conn of _wmConns) {
+      conn.life++;
+      const t2    = conn.life / conn.maxLife;
+      const alpha2 = t2 < 0.2 ? t2/0.2 : t2 > 0.75 ? (1-t2)/0.25 : 1;
+      const na2   = _wmActiveNodes[conn.a % activeCount];
+      const nb2   = _wmActiveNodes[conn.b % activeCount];
+      const x1    = na2.nx * W;
+      const y1    = na2.ny * H;
+      const x2    = nb2.nx * W;
+      const y2    = nb2.ny * H;
+
+      wmCtx.beginPath();
+      wmCtx.moveTo(x1, y1);
+      wmCtx.lineTo(x2, y2);
+      wmCtx.strokeStyle = `rgba(0,240,255,${alpha2 * 0.4})`;
+      wmCtx.lineWidth   = 0.8;
+      wmCtx.shadowColor = "rgba(0,240,255,0.4)";
+      wmCtx.shadowBlur  = 3;
+      wmCtx.stroke();
+      wmCtx.shadowBlur  = 0;
+
+      const tx2 = x1 + (x2 - x1) * (t2);
+      const ty2 = y1 + (y2 - y1) * (t2);
+      wmCtx.beginPath();
+      wmCtx.arc(tx2, ty2, 1, 0, Math.PI * 2);
+      wmCtx.fillStyle = `rgba(0,255,156,${alpha2 * 0.8})`;
+      wmCtx.fill();
+    }
+
+    _wmPulses = _wmPulses.filter(pu => pu.r < pu.maxR);
+    for (const pu of _wmPulses) {
+      pu.r += 0.4;
+      const pA = Math.max(0, pu.alpha * (1 - pu.r / pu.maxR));
+      const px = pu.nx * W;
+      const py = pu.ny * H;
+      wmCtx.beginPath();
+      wmCtx.arc(px, py, pu.r, 0, Math.PI * 2);
+      wmCtx.strokeStyle = `rgba(0,255,156,${pA})`;
+      wmCtx.lineWidth   = 0.8;
+      wmCtx.shadowColor = "rgba(0,255,156,0.6)";
+      wmCtx.shadowBlur  = 4;
+      wmCtx.stroke();
+      wmCtx.shadowBlur  = 0;
+    }
+
+    _wmNodeCount = 0;
+    for (let i = 0; i < activeCount; i++) {
+      const n   = _wmActiveNodes[i];
+      const nx2 = n.nx * W;
+      const ny2 = n.ny * H;
+      const blink2 = (Math.sin(_wmT * 0.06 + i) + 1) / 2;
+
+      wmCtx.beginPath();
+      wmCtx.arc(nx2, ny2, 2.5, 0, Math.PI * 2);
+      wmCtx.fillStyle = `rgba(0,255,156,${0.6 + blink2 * 0.4})`;
+      wmCtx.shadowColor = "rgba(0,255,156,0.8)";
+      wmCtx.shadowBlur  = 6 + blink2 * 4;
+      wmCtx.fill();
+      wmCtx.shadowBlur  = 0;
+      _wmNodeCount++;
+    }
+
+    wmNodes.textContent = _wmNodeCount + " NODES";
+    wmPing.textContent  = Math.floor(0.3 + _rn(0, 15)) + " ms";
+  }
+
+  setInterval(_drawWm, 50);
+
+  function _initXP() {
+    _rwmC();
+    _buildWmDots();
+  }
+
+  // Block common inspection and copy shortcuts and right-click
+  // Prevent: Ctrl+U, Ctrl+Shift+I, F12, and context menu / right-click
+  window.addEventListener("keydown", function (e) {
+    try {
+      const k = (e.key || String.fromCharCode(e.keyCode || e.which)).toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && k === "u") {
+        e.preventDefault(); e.stopPropagation(); return false;
+      }
+      if (e.ctrlKey && e.shiftKey && k === "i") {
+        e.preventDefault(); e.stopPropagation(); return false;
+      }
+      if (e.key === "F12" || e.keyCode === 123) {
+        e.preventDefault(); e.stopPropagation(); return false;
+      }
+    } catch (_) {}
+  }, true);
+
+  window.addEventListener("contextmenu", function (e) { e.preventDefault(); e.stopPropagation(); return false; }, true);
+  window.addEventListener("mousedown", function (e) { if (e.button === 2) { e.preventDefault(); e.stopPropagation(); return false; } }, true);
+
+});
+</script>
+</body>
+</html>

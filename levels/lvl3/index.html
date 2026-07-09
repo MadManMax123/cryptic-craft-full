@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+
+  <style>
+    /* ================= GLITCH ================= */
+
+    .corrupted-flicker {
+      color: red;
+      display: inline;
+      position: relative;
+    }
+
+    @keyframes glitch-shift {
+      0%   { clip-path: inset(0 0 95% 0); transform: translate(-3px, 0); opacity: 1; }
+      10%  { clip-path: inset(30% 0 50% 0); transform: translate(3px, 0); opacity: 0.8; }
+      20%  { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 0); opacity: 1; }
+      30%  { clip-path: inset(10% 0 70% 0); transform: translate(4px, 0); opacity: 0.6; }
+      40%  { clip-path: inset(80% 0 5% 0);  transform: translate(-4px, 0); opacity: 1; }
+      50%  { clip-path: inset(40% 0 40% 0); transform: translate(2px, 0); opacity: 0.9; }
+      60%  { clip-path: inset(5% 0 85% 0);  transform: translate(-3px, 0); opacity: 0.7; }
+      70%  { clip-path: inset(70% 0 15% 0); transform: translate(3px, 0); opacity: 1; }
+      80%  { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 0); opacity: 0.8; }
+      90%  { clip-path: inset(50% 0 30% 0); transform: translate(4px, 0); opacity: 1; }
+      100% { clip-path: inset(0 0 95% 0);   transform: translate(0, 0); opacity: 1; }
+    }
+
+    @keyframes glitch-color {
+      0%   { color: red; text-shadow: none; }
+      15%  { color: #ff003c; text-shadow: 2px 0 0 #00fff9, -2px 0 0 #ff00ff; }
+      30%  { color: #ff6a00; text-shadow: -3px 0 0 #00fff9; }
+      45%  { color: red; text-shadow: 3px 0 0 #ff00ff; }
+      60%  { color: #ff003c; text-shadow: -2px 0 0 #00fff9, 2px 0 0 #ff00ff; }
+      75%  { color: #ff6a00; text-shadow: none; }
+      100% { color: red; text-shadow: none; }
+    }
+
+    .corrupted-flicker::before,
+    .corrupted-flicker::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .corrupted-flicker.is-glitching {
+      animation: glitch-color 0.12s steps(1) infinite;
+    }
+
+    .corrupted-flicker.is-glitching::before {
+      color: #00fff9;
+      animation: glitch-shift 0.1s steps(1) infinite;
+      mix-blend-mode: screen;
+    }
+
+    .corrupted-flicker.is-glitching::after {
+      color: #ff00ff;
+      animation: glitch-shift 0.13s steps(1) reverse infinite;
+      mix-blend-mode: screen;
+    }
+
+    /* ================= CINEMATIC INTRO ================= */
+
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at center, #05060a 0%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    #intro-text {
+      font-family: monospace;
+      color: rgba(200,220,255,.9);
+      max-width: 72ch;
+      text-align: center;
+      line-height: 1.9;
+      letter-spacing: 0.06em;
+      font-size: 0.95rem;
+      transition: opacity .4s ease;
+    }
+
+    #skip-btn {
+      margin-top: 34px;
+      background: transparent;
+      border: 1px solid rgba(120,160,255,.25);
+      color: rgba(120,160,255,.75);
+      padding: 8px 14px;
+      cursor: pointer;
+      letter-spacing: .12em;
+      font-family: monospace;
+      transition: .25s;
+      position: absolute; bottom: 28px; right: 32px;
+      z-index: 3;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95,240,255,.6);
+      color: rgba(95,240,255,.95);
+      box-shadow: 0 0 18px rgba(95,240,255,.12);
+    }
+
+    .fade-out {
+      animation: fadeOut 1.2s forwards;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    /* ================= LORE BOX ================= */
+
+    #lore-box {
+      display: none;
+      margin-top: 22px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(120,160,255,.14);
+      background: linear-gradient(180deg, rgba(10,14,24,.78), rgba(8,10,18,.88));
+      font-family: monospace;
+      font-size: 0.86rem;
+      color: #d7e2f2;
+      line-height: 1.7;
+    }
+
+    .lore-line {
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(2px);
+      transition: .35s ease;
+      margin-bottom: 6px;
+    }
+
+    .lore-line.show {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  </style>
+</head>
+
+<body class="level3">
+
+<!-- CINEMATIC INTRO -->
+<div id="cinematic-intro">
+  <div id="intro-text"></div>
+  <button id="skip-btn">skip →</button>
+</div>
+
+<audio
+  id="bg-audio"
+  src="/audio/machine.mp3"
+  preload="auto"
+  autoplay
+  loop
+></audio>
+
+<div class="noise-overlay"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<main class="l3-wrapper">
+
+  <div class="l3-header">
+    <div class="l3-tag">NODE 04 // Physical Energy Layer</div>
+    <h1>ENTROPY CHANNEL</h1>
+    <p class="l3-sub">
+      the relay left two fragments in this frame. both are required to access the archive.
+    </p>
+  </div>
+
+  <div class="stego-frame">
+    <img class="stego-img" src="image.png" alt="relay capture" />
+  </div>
+
+  <!-- LORE BOX -->
+  <div id="lore-box"></div>
+
+  <section class="l3-clue">
+
+<pre><code>NODE = 14.00 + 7.50 + 1.33 + 1.25 = 24.08
+
+CORE = 3.00 + 7.50 + 6.00 + 1.25 = 17.75
+
+NULL = ?
+</code></pre>
+
+    <p class="l3-footnote">this relay was recovered from tracebacks.</p>
+
+<pre><code>SHA256(message + <span class="corrupted-flicker" id="corrupted-label" data-text="[CORRUPTED]">[CORRUPTED]</span>)
+
+message = "entropy"
+</code></pre>
+
+    <p class="l3-footnote">
+      Use what you discover here to unlock the archive hidden inside the
+      image. But you can't see the archive unless you know who built The Machine...
+    </p>
+
+  </section>
+
+  <button id="mute-toggle" class="mute-toggle" type="button">
+    mute audio
+  </button>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* ================= AUDIO ================= */
+
+  const audio = document.getElementById("bg-audio");
+  const muteBtn = document.getElementById("mute-toggle");
+
+  function startAudio() {
+    audio.play().catch(() => {
+      const resume = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener("click", resume);
+        document.removeEventListener("keydown", resume);
+      };
+      document.addEventListener("click", resume, { once: true });
+      document.addEventListener("keydown", resume, { once: true });
+    });
+  }
+
+  startAudio();
+
+  muteBtn.addEventListener("click", () => {
+    audio.muted = !audio.muted;
+    muteBtn.textContent = audio.muted ? "unmute audio" : "mute audio";
+  });
+
+  /* ================= CONSOLE HINTS ================= */
+
+  console.log("%c[trace] residue detected", "color:#64748b");
+  window.salt = "school";
+  console.log("entropy is unstable. Needs transformation.");
+  console.log();
+  console.log("Not everything should be used in [CORRUPTED]");
+  console.log("1 is useless.");
+  console.log("Not every step belongs.");
+  console.log("Indices point at numbers we can't ########...");
+  console.warn("🪟");
+  window.inspect = function(str) {
+    console.log("length:", str.length);
+    console.log("uppercase:", (str.match(/[A-Z]/g)||[]).length);
+    console.log("lowercase:", (str.match(/[a-z]/g)||[]).length);
+  };
+
+  /* ================= INTRO ================= */
+
+  const intro = document.getElementById("cinematic-intro");
+  const text  = document.getElementById("intro-text");
+  const skip  = document.getElementById("skip-btn");
+  const loreBox = document.getElementById("lore-box");
+
+  const LINES = [
+    "This used to be NULL's physical energy layer.",
+    "A relay system buried beneath global wireless stations.",
+    "Signals were never meant to be decoded directly.",
+    "Investigators reported unstable entropy patterns.",
+    "This may have been one of NULL's hardest encryptions."
+  ];
+
+  let skipped = false;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function runIntro() {
+    for (let line of LINES) {
+      if (skipped) return;
+
+      text.textContent = "";
+
+      for (let ch of line) {
+        if (skipped) return;
+        text.textContent += ch;
+        await sleep(30);
+      }
+
+      await sleep(1500);
+      text.style.opacity = 0.4;
+      await sleep(250);
+      text.style.opacity = 1;
+    }
+
+    endIntro();
+  }
+
+  function endIntro() {
+    if (intro.classList.contains("fade-out")) return;
+
+    intro.classList.add("fade-out");
+
+    setTimeout(() => {
+      intro.remove();
+      showLore();
+    }, 1100);
+  }
+
+  skip.onclick = () => {
+    skipped = true;
+    endIntro();
+  };
+
+  runIntro();
+
+  /* ================= LORE ================= */
+
+  function showLore() {
+    loreBox.style.display = "block";
+
+    const LORE = [
+      "This used to be NULL's physical energy layer.",
+      "A hidden relay mesh spanning global wireless stations.",
+      "Each node stored partial entropy fragments.",
+      "According to investigator reports, this was the hardest encryption in NULL..."
+    ];
+
+    loreBox.innerHTML = "";
+
+    const total = 1000;
+    const step  = total / LORE.length;
+
+    LORE.forEach((t, i) => {
+      const el = document.createElement("div");
+      el.className = "lore-line";
+      el.textContent = t;
+      loreBox.appendChild(el);
+
+      setTimeout(() => el.classList.add("show"), i * step);
+    });
+  }
+
+  /* ================= GLITCH ================= */
+
+  const label = document.getElementById("corrupted-label");
+  const GLITCH_BUILDUP_MS = 400;
+  const SALT_VISIBLE_MS   = 130;
+
+  function runFlicker() {
+    // Phase 1: glitch buildup — label stays [CORRUPTED] but shakes
+    label.dataset.text = "[CORRUPTED]";
+    label.classList.add("is-glitching");
+
+    setTimeout(() => {
+      // Phase 2: snap to 🧂
+      label.textContent = "🧂";
+      label.dataset.text = "🧂";
+      label.classList.remove("is-glitching");
+
+      setTimeout(() => {
+        // Phase 3: glitch back out then restore
+        label.dataset.text = "🧂";
+        label.classList.add("is-glitching");
+
+        setTimeout(() => {
+          label.textContent = "[CORRUPTED]";
+          label.dataset.text = "[CORRUPTED]";
+          label.classList.remove("is-glitching");
+
+          // Schedule next cycle
+          setTimeout(runFlicker, 1800 + Math.random() * 2400);
+        }, GLITCH_BUILDUP_MS);
+
+      }, SALT_VISIBLE_MS);
+    }, GLITCH_BUILDUP_MS);
+  }
+
+  setTimeout(runFlicker, 2000 + Math.random() * 1500);
+
+});
+</script>
+
+</body>
+</html>

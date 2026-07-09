@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 07</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="/11zon_cropped.png" />
+
+  <style>
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes introFadeOut { to { opacity: 0; } }
+
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,.12) 2px, rgba(0,0,0,.12) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.7) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* breach overlay */
+    #breach-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .5s ease;
+      background: radial-gradient(ellipse at center,
+        rgba(255,18,18,.18) 0%,
+        rgba(140,0,0,.09) 55%,
+        transparent 100%);
+    }
+
+    #breach-overlay.active {
+      opacity: 1;
+      animation: breachPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes breachPulse {
+      0%,100% { opacity: .6; }
+      50%      { opacity: 1; }
+    }
+
+    #cinematic-intro.breach-mode {
+      animation: borderFlash 1.2s ease-in-out infinite;
+    }
+
+    @keyframes borderFlash {
+      0%,100% { box-shadow: inset 0 0 0 2px rgba(255,30,30,.15); }
+      50%      { box-shadow: inset 0 0 0 2px rgba(255,40,40,.6), 0 0 60px rgba(180,0,0,.2); }
+    }
+
+    /* warning triangle */
+    #warn-triangle {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease;
+    }
+
+    #warn-triangle.visible {
+      opacity: 1;
+      animation: triPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes triPulse {
+      0%,100% { opacity: .4; transform: translate(-50%,-50%) scale(1); }
+      50%      { opacity: .9; transform: translate(-50%,-50%) scale(1.06); }
+    }
+
+    #warn-triangle svg {
+      width: clamp(90px, 15vw, 150px);
+      filter: drop-shadow(0 0 28px rgba(255,40,20,.9));
+    }
+
+    /* terminal */
+    #terminal-panel {
+      position: relative;
+      z-index: 4;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px 36px 30px;
+      overflow: hidden;
+    }
+
+    #terminal {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      max-height: 100%;
+      scrollbar-width: none;
+    }
+
+    #terminal::-webkit-scrollbar { display: none; }
+
+    .t-line {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.7rem, 1.25vw, .84rem);
+      line-height: 1.95;
+      letter-spacing: .03em;
+      white-space: pre-wrap;
+      word-break: break-word;
+      opacity: 0;
+      animation: lineIn .2s ease forwards;
+    }
+
+    @keyframes lineIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .t-normal { color: rgba(175,205,255,.78); }
+    .t-dim    { color: rgba(85,115,165,.55); }
+    .t-breach { color: #ff3d3d; text-shadow: 0 0 9px rgba(255,40,20,.6); }
+    .t-warn   { color: #ffaa38; text-shadow: 0 0 7px rgba(255,148,20,.38); }
+    .t-good   { color: #55f0a0; text-shadow: 0 0 9px rgba(50,230,130,.38); }
+    .t-empty  { color: transparent; user-select: none; line-height: 1; }
+
+    /* lore panel */
+    #lore-panel {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 44px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .9s ease;
+    }
+
+    #lore-panel.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #lore-display {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(185,215,255,.82);
+      text-align: center;
+      max-width: 62ch;
+      line-height: 1.85;
+      letter-spacing: .045em;
+      transition: opacity .8s ease;
+    }
+
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95,240,255,.75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0; }
+    }
+
+    /* skip */
+    #skip-btn {
+      position: absolute;
+      bottom: 26px;
+      right: 30px;
+      z-index: 10;
+      background: transparent;
+      border: 1px solid rgba(120,160,255,.18);
+      border-radius: 8px;
+      color: rgba(120,160,255,.38);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .64rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 6px 13px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95,240,255,.5);
+      color: rgba(95,240,255,.8);
+    }
+  </style>
+</head>
+<body class="level5">
+
+  <div id="cinematic-intro">
+    <div id="breach-overlay"></div>
+    <div id="warn-triangle">
+      <svg viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 6L95 84H5L50 6Z" stroke="#ff3322" stroke-width="3.5"
+              fill="rgba(255,20,10,.07)"/>
+        <text x="50" y="70" text-anchor="middle"
+              font-family="monospace" font-size="40"
+              font-weight="bold" fill="#ff4433">!</text>
+      </svg>
+    </div>
+    <div id="terminal-panel">
+      <div id="terminal"></div>
+    </div>
+    <div id="lore-panel">
+      <div id="lore-display"></div>
+    </div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <div class="noise-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <main class="l5-wrapper" id="main-site"
+        style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+    <div class="l5-header">
+      <div class="l5-tag">NODE 07 // Facility Layer</div>
+      <h1>REDSTONE CRYPTOGRAPHY</h1>
+      <p class="l5-sub">Facility Node 7 Access Portal</p>
+    </div>
+
+    <section class="l5-section lore-box">
+      <div class="section-label">briefing</div>
+      <p>
+        Investigators have located Node 7 of the NULL network deep within an
+        abandoned facility. Beneath the structure, a redstone-driven encryption
+        system protects the next fragment of the algorithm. Recover the flag and
+        extract the data.
+      </p>
+    </section>
+
+    <section class="l5-section">
+      <div class="section-label">objective</div>
+      <ul class="l5-list">
+        <li>Decode the redstone encryption to crack FLAG 6.</li>
+        <li>Navigate the underground facility.</li>
+        <li>Avoid triggering containment systems.</li>
+        <li>Retrieve the Level 7 flag.</li>
+      </ul>
+    </section>
+
+    <section class="l5-section info-grid">
+      <div class="info-card">
+        <div class="section-label">server information</div>
+        <div class="info-row">
+          <span class="info-key">Server Address</span>
+          <span class="info-value">in6n.xitenodes.com:25564</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Minecraft Java Version</span>
+          <span class="info-value">Release 1.21.11 (Vanilla)</span>
+          <span class="info-note" style="color: #ff4444;">Forge or Fabric is not supported.</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Maximum Players</span>
+          <span class="info-value">15 + 2 admins</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Client Type</span>
+          <span class="info-value">Minecraft Java (TLauncher supported)</span>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="section-label">how to join</div>
+        <ol class="l5-list ordered">
+          <li>Open Minecraft Java Edition.</li>
+          <li>Go to Multiplayer.</li>
+          <li>Click Add Server.</li>
+          <li>Enter the server address.</li>
+          <li>Join the challenge.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="l5-section">
+      <div class="section-label">rules</div>
+      <ul class="l5-list">
+        <li>Do not break blocks.</li>
+        <li>Do not place blocks.</li>
+        <li>Do not exploit glitches.</li>
+        <li>No external mods that give unfair advantages.</li>
+        <li>Follow admin instructions.</li>
+        <li>Admins may remove players who disrupt the challenge.</li>
+        <li> <span style="color: #ff4444;">X-raying in the server is prohibited. YOUR SCHOOL WILL BE DISQUALIFIED IF YOU ARE CAUGHT.</span></li>
+      </ul>
+    </section>
+
+    <section class="l5-section tip-box">
+      <div class="section-label">field note</div>
+      <p>Observation is often more important than speed.</p>
+    </section>
+
+    <section class="l5-section submission-box">
+      <div class="section-label">flag format</div>
+      <div class="flag-format">NULL{...}</div>
+      <p>Submit the flag to the challenge platform once recovered.</p>
+    </section>
+
+    <section class="l5-section admin-box">
+      <div class="section-label">support</div>
+      <p>
+        If you experience technical issues during the challenge, contact the
+        event administrators.
+      </p>
+    </section>
+
+    <div class="l5-actions">
+      <button id="copy-server" class="l5-btn secondary-btn" type="button">
+        copy server address
+      </button>
+      <a href="minecraft://?addExternalServer=Node5|in6n.xitenodes.com:25564"
+         class="l5-btn primary-btn">enter server</a>
+    </div>
+    <div id="copy-feedback" class="copy-feedback" aria-live="polite"></div>
+  </main>
+
+  <script>
+    // ── copy button ───────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      const copyBtn  = document.getElementById("copy-server");
+      const feedback = document.getElementById("copy-feedback");
+      if (!copyBtn) return;
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText("in6n.xitenodes.com:25584");
+          feedback.textContent = "server address copied.";
+          feedback.className   = "copy-feedback ok";
+        } catch {
+          feedback.textContent = "copy failed. server: in6n.xitenodes.com:25564";
+          feedback.className   = "copy-feedback error";
+        }
+      });
+    });
+
+    // ── cinematic intro ───────────────────────────────────────────
+    (async () => {
+      const introEl    = document.getElementById('cinematic-intro');
+      const termEl     = document.getElementById('terminal');
+      const breachEl   = document.getElementById('breach-overlay');
+      const triangleEl = document.getElementById('warn-triangle');
+      const termPanel  = document.getElementById('terminal-panel');
+      const lorePanel  = document.getElementById('lore-panel');
+      const loreDisp   = document.getElementById('lore-display');
+      const skipBtn    = document.getElementById('skip-btn');
+      const mainSite   = document.getElementById('main-site');
+
+      let skipTriggered = false;
+      let audioCtx      = null;
+      let sirenOsc1     = null;
+      let sirenOsc2     = null;
+      let sirenGain     = null;
+      let sirenLfo      = null;
+
+      // ── helpers ──────────────────────────────────────────────────
+
+      const wait   = ms => new Promise(r => setTimeout(r, ms));
+      const jitter = (min, max) => wait(min + Math.random() * (max - min));
+
+      function revealSite() {
+        skipTriggered = true;
+        stopSiren();
+        introEl.classList.add('fade-out');
+        setTimeout(() => {
+          introEl.style.display     = 'none';
+          mainSite.style.visibility = 'visible';
+          mainSite.style.opacity    = '1';
+        }, 1200);
+      }
+
+      skipBtn.addEventListener('click', revealSite);
+
+      function scrollTerm() {
+        termEl.scrollTop = termEl.scrollHeight;
+      }
+
+      function addLine(text, cls = 't-normal') {
+        const el = document.createElement('div');
+        el.className = `t-line ${cls}`;
+        el.textContent = text;
+        termEl.appendChild(el);
+        scrollTerm();
+        return el;
+      }
+
+      function addEmpty() {
+        const el = document.createElement('div');
+        el.className = 't-line t-empty';
+        el.textContent = '.';
+        termEl.appendChild(el);
+        scrollTerm();
+      }
+
+      // ── droning siren ─────────────────────────────────────────────
+      function startSiren() {
+        try {
+          audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+
+          // master gain — fade in slowly
+          sirenGain = audioCtx.createGain();
+          sirenGain.gain.setValueAtTime(0, audioCtx.currentTime);
+          sirenGain.gain.linearRampToValueAtTime(0.14, audioCtx.currentTime + 2.5);
+          sirenGain.connect(audioCtx.destination);
+
+          // LFO to modulate pitch — slow, menacing sweep
+          sirenLfo = audioCtx.createOscillator();
+          sirenLfo.type = 'sine';
+          sirenLfo.frequency.value = 0.18; // very slow sweep
+          const lfoGain = audioCtx.createGain();
+          lfoGain.gain.value = 120; // pitch depth
+          sirenLfo.connect(lfoGain);
+          sirenLfo.start();
+
+          // osc 1 — base drone
+          sirenOsc1 = audioCtx.createOscillator();
+          sirenOsc1.type = 'sawtooth';
+          sirenOsc1.frequency.value = 220;
+          lfoGain.connect(sirenOsc1.frequency);
+          const filter1 = audioCtx.createBiquadFilter();
+          filter1.type = 'lowpass';
+          filter1.frequency.value = 900;
+          filter1.Q.value = 2.2;
+          sirenOsc1.connect(filter1);
+          filter1.connect(sirenGain);
+          sirenOsc1.start();
+
+          // osc 2 — slight detune for thickness
+          sirenOsc2 = audioCtx.createOscillator();
+          sirenOsc2.type = 'sawtooth';
+          sirenOsc2.frequency.value = 221.8;
+          lfoGain.connect(sirenOsc2.frequency);
+          const filter2 = audioCtx.createBiquadFilter();
+          filter2.type = 'lowpass';
+          filter2.frequency.value = 700;
+          filter2.Q.value = 1.8;
+          sirenOsc2.connect(filter2);
+          filter2.connect(sirenGain);
+          sirenOsc2.start();
+
+        } catch(e) { /* audio unavailable */ }
+      }
+
+      function stopSiren() {
+        try {
+          if (!audioCtx) return;
+          const now = audioCtx.currentTime;
+          sirenGain.gain.linearRampToValueAtTime(0, now + 1.2);
+          setTimeout(() => {
+            try {
+              sirenOsc1 && sirenOsc1.stop();
+              sirenOsc2 && sirenOsc2.stop();
+              sirenLfo  && sirenLfo.stop();
+              audioCtx  && audioCtx.close();
+            } catch(e) {}
+            audioCtx = null;
+          }, 1300);
+        } catch(e) {}
+      }
+
+      // ── PHASE 1: BOOT (~6s) ──────────────────────────────────────
+      await jitter(300, 500);
+      if (skipTriggered) return;
+
+      addLine('> NULL facility access terminal v4.1.0', 't-dim');
+      await jitter(400, 700);
+      addLine('> initializing secure handshake with NODE_05...', 't-dim');
+      await jitter(600, 900);
+      addLine('  >> establishing encrypted tunnel...', 't-dim');
+      await jitter(500, 800);
+      addLine('  >> RSA-4096 key exchange: OK', 't-normal');
+      await jitter(300, 550);
+      addLine('  >> session token issued: [7f3a-c91b-e204]', 't-dim');
+      await jitter(400, 650);
+      addLine('> NODE_05 :: handshake confirmed — latency: 22ms', 't-normal');
+      await jitter(350, 600);
+      addLine('> mounting redstone encryption layer...', 't-dim');
+      await jitter(700, 1050);
+      addLine('  >> layer checksum: VALID', 't-normal');
+      await jitter(300, 500);
+      addLine('  >> cipher mode: AES-256-GCM / redstone-mapped', 't-dim');
+      await jitter(400, 650);
+      addLine('> opening access tunnel...', 't-dim');
+      await jitter(500, 800);
+      addLine('> access tunnel: OPEN', 't-normal');
+      await jitter(300, 500);
+      addLine('> scanning facility sectors...', 't-dim');
+      await jitter(600, 900);
+      addLine('  >> sector A: CLEAR', 't-normal');
+      await jitter(200, 380);
+      addLine('  >> sector B: CLEAR', 't-normal');
+      await jitter(200, 360);
+      addLine('  >> sector C: CLEAR', 't-normal');
+      await jitter(350, 580);
+      addLine('> all systems nominal. ready for entry.', 't-normal');
+      await jitter(700, 1000);
+      if (skipTriggered) return;
+
+      // ── PHASE 2: BREACH (~18s) ────────────────────────────────────
+      addEmpty();
+      addLine('⚠  NULL SECURITY BREACH DETECTED', 't-breach');
+      breachEl.classList.add('active');
+      introEl.classList.add('breach-mode');
+      triangleEl.classList.add('visible');
+      startSiren();
+
+      await jitter(200, 350);
+      addLine('   INTRUSION TYPE: EXTERNAL FORCED ENTRY', 't-breach');
+      await jitter(150, 280);
+      addLine('   VECTOR: UNCLASSIFIED  //  ORIGIN: MASKED', 't-breach');
+      await jitter(250, 420);
+      addLine('   AFFECTED SECTORS: C, D, TUNNEL GATEWAY', 't-breach');
+      await jitter(300, 500);
+      addLine('> INITIATING TIER-3 DEFENSE PROTOCOLS...', 't-warn');
+      await jitter(400, 650);
+      addLine('  >> activating firewall layer 1...         [OK]', 't-warn');
+      await jitter(300, 520);
+      addLine('  >> activating firewall layer 2...         [OK]', 't-warn');
+      await jitter(350, 580);
+      addLine('  >> activating firewall layer 3...         [PARTIAL]', 't-warn');
+      await jitter(250, 420);
+      addLine('     layer 3 override — unknown bypass key detected', 't-breach');
+      await jitter(300, 500);
+      addLine('> isolating affected gateway nodes...', 't-warn');
+      await jitter(500, 780);
+      addLine('  >> gateway C sealed', 't-warn');
+      await jitter(250, 420);
+      addLine('  >> gateway D sealed', 't-warn');
+      await jitter(300, 500);
+      addLine('  >> tunnel gateway: RESISTANT — secondary path still open', 't-breach');
+      await jitter(350, 580);
+      addLine('> deploying counter-intrusion mesh...', 't-warn');
+      await jitter(600, 900);
+      addLine('  >> mesh coverage: 94%  —  6% exposure remains', 't-warn');
+      await jitter(300, 500);
+      addLine('> attempting attacker source trace...', 't-warn');
+      await jitter(800, 1200);
+      addLine('  >> hop 1: 192.168.xx.xx — null route', 't-dim');
+      await jitter(400, 650);
+      addLine('  >> hop 2: TOR exit node — untraceable', 't-dim');
+      await jitter(400, 620);
+      addLine('  >> hop 3: DEAD END — route fully encrypted', 't-breach');
+      await jitter(350, 580);
+      addLine('> TRACE FAILED — source identity unresolvable', 't-breach');
+      await jitter(300, 500);
+      addLine('> cross-referencing NULL breach archive...', 't-dim');
+      await jitter(900, 1300);
+      addLine('  >> scanning 4,891 historical breach records...', 't-dim');
+      await jitter(700, 1000);
+      addLine('  >> partial signature match found', 't-warn');
+      addLine('     confidence: 87.4%  //  ref: ARCHIVE-7 [CLASSIFIED]', 't-warn');
+      await jitter(300, 500);
+      addLine('  >> this attack pattern has been seen before', 't-dim');
+      await jitter(250, 420);
+      addLine('  >> last recorded occurrence: [DATE REDACTED]', 't-dim');
+      await jitter(400, 650);
+      addLine('> sealing exposed memory register banks...    [OK]', 't-warn');
+      await jitter(300, 520);
+      addLine('> invalidating injected session tokens...     [OK]', 't-warn');
+      await jitter(350, 580);
+      addLine('> purging rogue process tree...', 't-warn');
+      await jitter(600, 900);
+      addLine('  >> 14 rogue processes terminated', 't-warn');
+      await jitter(300, 500);
+      addLine('> re-encrypting compromised data sectors...', 't-warn');
+      await jitter(800, 1100);
+      addLine('  >> sectors re-keyed: C, D, TUNNEL-GATEWAY', 't-warn');
+      await jitter(300, 500);
+      addLine('> running full perimeter integrity check...', 't-warn');
+      await jitter(900, 1300);
+      addLine('  >> all critical sectors: INTACT', 't-good');
+      await jitter(250, 420);
+      addLine('  >> no persistent backdoors detected', 't-good');
+      await jitter(300, 500);
+      addLine('  >> data exfiltration volume: ZERO', 't-good');
+      await jitter(400, 650);
+      if (skipTriggered) return;
+
+      // ── PHASE 3: RESOLVED (~5s) ───────────────────────────────────
+      stopSiren();
+      breachEl.classList.remove('active');
+      introEl.classList.remove('breach-mode');
+      triangleEl.classList.remove('visible');
+
+      await jitter(300, 500);
+      addEmpty();
+      addLine('> INTRUSION SUCCESSFULLY NEUTRALISED', 't-good');
+      await jitter(250, 420);
+      addLine('> PERIMETER INTEGRITY: FULLY RESTORED', 't-good');
+      await jitter(300, 500);
+      addLine('> threat classification: PERSISTENT EXTERNAL ENTITY', 't-dim');
+      await jitter(250, 420);
+      addLine('  >> behaviour consistent with long-dormant actor', 't-dim');
+      await jitter(300, 520);
+      addLine('  >> flagged for inter-node intelligence review', 't-dim');
+      await jitter(400, 650);
+      addLine('> resuming facility access sequence...', 't-dim');
+      await jitter(500, 780);
+      addLine('> UNLOCKING NODE_05...', 't-good');
+      await jitter(400, 650);
+      addLine('> entry granted.', 't-good');
+      await jitter(800, 1100);
+      if (skipTriggered) return;
+
+      // ── TERMINAL FADES TO BLACK ───────────────────────────────────
+      termPanel.style.transition = 'opacity .8s ease';
+      termPanel.style.opacity    = '0';
+      await wait(900);
+      if (skipTriggered) return;
+
+      // ── LORE SEQUENCE ─────────────────────────────────────────────
+      const CHAR_DELAY = 34;
+      const HOLD_MS    = 2200;
+      const FADE_MS    = 800;
+
+      lorePanel.classList.add('visible');
+
+      const loreLines = [
+        'It was the same attacker that appeared many years ago.',
+        'The signal pattern — identical. Dormant for years. Then suddenly active.',
+        'Maybe it noticed a recovering signal from Artical...?',
+      ];
+
+      for (let i = 0; i < loreLines.length; i++) {
+        if (skipTriggered) break;
+
+        loreDisp.textContent  = '';
+        loreDisp.style.opacity    = '1';
+        loreDisp.style.transition = 'none';
+
+        await new Promise(resolve => {
+          let idx = 0;
+          const text = loreLines[i];
+          function tick() {
+            if (skipTriggered) { loreDisp.textContent = text; resolve(); return; }
+            loreDisp.textContent = text.slice(0, idx);
+            if (idx <= text.length) { idx++; setTimeout(tick, CHAR_DELAY); }
+            else resolve();
+          }
+          tick();
+        });
+
+        if (skipTriggered) break;
+        await wait(HOLD_MS);
+        if (skipTriggered) break;
+
+        if (i < loreLines.length - 1) {
+          loreDisp.style.transition = `opacity ${FADE_MS}ms ease`;
+          loreDisp.style.opacity    = '0';
+          await wait(FADE_MS + 80);
+          loreDisp.textContent = '';
+        }
+      }
+
+      if (!skipTriggered) {
+        await wait(600);
+        revealSite();
+      }
+    })();
+  </script>
+</body>
+</html>

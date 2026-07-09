@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL // Node 10</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    /* ── CINEMATIC INTRO ── */
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes introFadeOut {
+      to { opacity: 0; }
+    }
+
+    #lore-display {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(180, 210, 255, 0.82);
+      text-align: center;
+      max-width: 64ch;
+      line-height: 1.8;
+      letter-spacing: .045em;
+      min-height: 1.8em;
+
+      opacity: 1;
+      transition: opacity .42s ease;
+    }
+
+    #lore-display.fade-line-out {
+      opacity: 0;
+      transition: opacity .42s ease;
+    }
+
+    /* blinking cursor */
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95, 240, 255, .75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* scanline texture on intro */
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.18) 2px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #lore-display {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* skip button */
+    #skip-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 32px;
+      z-index: 3;
+
+      background: transparent;
+      border: 1px solid rgba(120, 160, 255, .2);
+      border-radius: 8px;
+
+      color: rgba(120, 160, 255, .45);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .66rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #skip-btn:hover {
+      border-color: rgba(95, 240, 255, .5);
+      color: rgba(95, 240, 255, .8);
+      box-shadow: 0 0 10px rgba(95, 240, 255, .12);
+    }
+
+    /* subtle vignette on intro bg */
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body class="level7">
+
+  <!-- CINEMATIC INTRO -->
+  <div id="cinematic-intro">
+    <div id="lore-display"></div>
+    <button id="skip-btn">skip ›</button>
+  </div>
+
+  <!-- MAIN SITE -->
+  <main class="l7-wrapper" id="main-site" style="visibility:hidden;opacity:0;transition:opacity .9s ease;">
+    <div class="l7-header">
+      <div class="l7-tag">NODE 10 // Translation Layer</div>
+      <h1>AUDIO NODAL INTERFACE</h1>
+      <p class="l7-sub">
+        this layer archives what earlier nodes could not preserve in plain form.
+      </p>
+    </div>
+    <div id="lore-block" class="l7-lore"></div>
+    <section id="integral-block" class="l7-integral hidden">
+      <p class="integral-intro">
+        the relay requires a stable numerical key before full trace reconstruction.
+      </p>
+      <p class="integral-text">
+        Evaluate the following integral:
+        <br>
+        <sub>Enter the answer when it is rounded off to 4 decimal places...</sub>
+      </p>
+      <div class="integral-math">
+        $$\int_{0}^{2} \frac{\tan^{-1}(x)}{1 + (1 + x)^2} \, dx$$
+      </div>
+      <div class="integral-input-row">
+       <h3>0.</h3> <input
+          id="answer-input"
+          type="text"
+          maxlength="4"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="####"
+          inputmode="numeric"
+        />
+        <button id="answer-submit" type="button">unlock audio</button>
+      </div>
+      <div id="integral-feedback" class="integral-feedback"></div>
+    </section>
+    <section id="audio-block" class="l7-audio hidden">
+      <div class="audio-status">trace reconstruction complete</div>
+      <p class="audio-text">
+        node stabilized. the full static trace has been released.
+        <br />
+        <span class="flag-inline"></span>
+      </p>
+      <audio id="static-audio" controls preload="none">
+        <source src="/2564.wav" type="audio/wav" />
+        Your browser does not support the audio element.
+      </audio>
+      <p class="audio-link-note">
+        Download the full trace:
+        <a id="download-link" href="/2564.wav" class="audio-link">
+          audionodal.vercel.app/2564.wav
+        </a>
+      </p>
+      <p class="audio-footnote">
+        raw captures often preserve more than the interface is willing to render.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    (async () => {
+      const introEl   = document.getElementById('cinematic-intro');
+      const displayEl = document.getElementById('lore-display');
+      const skipBtn   = document.getElementById('skip-btn');
+      const mainSite  = document.getElementById('main-site');
+
+      // ── config ──────────────────────────────
+      const CHAR_DELAY   = 38;   // ms per character typed
+      const HOLD_MS      = 1100; // pause after line fully typed
+      const FADE_MS      = 1000;  // CSS fade-out duration (must match CSS)
+      const INTER_MS     = 80;   // gap between fade-out and next line
+      // ────────────────────────────────────────
+
+      let skipTriggered = false;
+
+      function revealSite() {
+        skipTriggered = true;
+        introEl.classList.add('fade-out');
+        setTimeout(() => {
+          introEl.style.display = 'none';
+          mainSite.style.visibility = 'visible';
+          mainSite.style.opacity    = '1';
+        }, 1200);
+      }
+
+      skipBtn.addEventListener('click', revealSite);
+
+      // ── fetch lore ───────────────────────────
+      let lines = [];
+      try {
+        const res  = await fetch('/data.json');
+        const data = await res.json();
+        lines = Array.isArray(data)
+          ? data
+          : (data.lore || data.lines || Object.values(data)[0] || []);
+        lines = lines.map(l => typeof l === 'string' ? l : JSON.stringify(l));
+      } catch {
+        revealSite();
+        return;
+      }
+
+      if (!lines.length) { revealSite(); return; }
+
+      // ── type a single line character by character ──
+      function typeLine(text) {
+        return new Promise(resolve => {
+          let i = 0;
+          displayEl.textContent = '';
+
+          function tick() {
+            if (skipTriggered) { resolve(); return; }
+            if (i <= text.length) {
+              displayEl.textContent = text.slice(0, i);
+              i++;
+              setTimeout(tick, CHAR_DELAY);
+            } else {
+              resolve();
+            }
+          }
+
+          tick();
+        });
+      }
+
+      // ── wait helper ──────────────────────────
+      function wait(ms) {
+        return new Promise(r => setTimeout(r, ms));
+      }
+
+      // ── run sequence ─────────────────────────
+      for (let idx = 0; idx < lines.length; idx++) {
+        if (skipTriggered) break;
+
+        // type in
+        await typeLine(lines[idx]);
+        if (skipTriggered) break;
+
+        // hold
+        await wait(HOLD_MS);
+        if (skipTriggered) break;
+
+        // fade out (skip on last line — let introFadeOut handle it)
+        if (idx < lines.length - 1) {
+          displayEl.classList.add('fade-line-out');
+          await wait(FADE_MS);
+          displayEl.classList.remove('fade-line-out');
+          displayEl.textContent = '';
+          await wait(INTER_MS);
+        }
+      }
+
+      if (!skipTriggered) {
+        await wait(600);
+        revealSite();
+      }
+    })();
+  </script>
+
+  <script src="/script.js"></script>
+</body>
+</html>

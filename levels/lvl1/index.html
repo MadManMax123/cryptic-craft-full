@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NULL OVERRIDE — Node 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="11zon_cropped.png">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── CINEMATIC INTRO ─────────────────────────────────── */
+    #cinematic-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    #cinematic-intro.fade-out {
+      animation: introFadeOut 1.2s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes introFadeOut { to { opacity: 0; } }
+
+    #lore-display {
+      position: relative;
+      z-index: 2;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: clamp(.78rem, 1.5vw, .95rem);
+      color: rgba(180, 210, 255, 0.82);
+      text-align: center;
+      max-width: 64ch;
+      line-height: 1.8;
+      letter-spacing: .045em;
+      min-height: 1.8em;
+      opacity: 1;
+      transition: opacity .8s ease;
+    }
+    #lore-display.fade-line-out {
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+    #lore-display::after {
+      content: '';
+      display: inline-block;
+      width: .5em;
+      height: 1em;
+      background: rgba(95, 240, 255, .75);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink .65s step-end infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+    #cinematic-intro::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.18) 2px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    #cinematic-intro::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    #skip-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 32px;
+      z-index: 3;
+      background: transparent;
+      border: 1px solid rgba(120, 160, 255, .2);
+      border-radius: 8px;
+      color: rgba(120, 160, 255, .45);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .66rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: .2s;
+    }
+    #skip-btn:hover {
+      border-color: rgba(95, 240, 255, .5);
+      color: rgba(95, 240, 255, .8);
+      box-shadow: 0 0 10px rgba(95, 240, 255, .12);
+    }
+
+    /* ── LORE BLOCK ──────────────────────────────────────── */
+    #lore-block {
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      right: 28px;
+      z-index: 2000;
+      max-width: 600px;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(120, 160, 255, .12);
+      background: rgba(10, 14, 24, .85);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease;
+    }
+    #lore-block.visible { opacity: 1; }
+    .lore-line {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .85rem;
+      color: #dbe4ee;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .lore-line.shown { opacity: 1; transform: translateY(0); }
+    .lore-line.shudder { animation: shudderLine .5s ease-in-out forwards; }
+    .lore-line.flicker { animation: flickerLine .4s ease-in-out forwards; }
+    .lore-timer-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(120, 160, 255, .1);
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+    .lore-timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5ff0ff, #98b8ff);
+      border-radius: 2px;
+      width: 100%;
+      animation: loreTimerDeplete 10s linear forwards;
+    }
+    @keyframes loreTimerDeplete {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    @keyframes shudderLine {
+      0% { opacity: 0; transform: translateY(6px); }
+      10% { transform: translateX(-2px); }
+      20% { transform: translateX(2px); }
+      30% { transform: translateX(-2px); }
+      40% { transform: translateX(2px); }
+      50% { transform: translateX(0); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flickerLine {
+      0% { opacity: 0; transform: translateY(6px) scale(0.95); }
+      25% { opacity: 0.6; }
+      50% { opacity: 1; }
+      75% { opacity: 0.7; }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body class="level1">
+  <!-- ── CINEMATIC INTRO ── -->
+  <div id="cinematic-intro">
+    <div id="lore-display"></div>
+    <button id="skip-btn">skip →</button>
+  </div>
+
+  <!-- ── LORE BLOCK (appears after intro) ── -->
+  <div id="lore-block">
+    <div class="lore-timer-track"><div class="lore-timer-fill"></div></div>
+  </div>
+
+  <canvas id="ghostCanvas"></canvas>
+  <div class="answer-box">
+    <label for="answer-input" class="answer-label">
+      Enter the decrypted message
+    </label>
+    <div class="answer-row">
+      <input
+        id="answer-input"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="type here..."
+        oninput="this.value = this.value.toLowerCase()"
+      />
+      <button id="submit-answer" type="button">Submit</button>
+    </div>
+    <div id="answer-feedback" class="answer-feedback"></div>
+  </div>
+  <div id="bottom-hint"></div>
+
+  <script>
+    // ── Session guard ──────────────────────────────────────────────────────────
+    // Probe the hints API; a 401 means the session is missing/expired → login.
+    (async () => {
+      try {
+        const r = await fetch("/api/get-level1-hints", { credentials: "same-origin" });
+        if (r.status === 401) {
+          window.location.replace("/login.html");
+        }
+      } catch {
+        // Network error — let the page load; individual API calls will 401 gracefully.
+      }
+    })();
+  </script>
+
+<script>
+  // ── LORE LINES ─────────────────────────────────────────
+  const INTRO_LINES = [
+    "Welcome operator...",
+    "This is NULL's entry node that will allow you to access the further nodes.",
+    "Each node will have a flag... which will allow you to break NULL and access Artical.",
+    "Override the security of this node and you will be able to pass into the main nodes.",
+    "Remember, things are not always what they seem....",
+    "The investigators have left their legacy to you...",
+    "Good luck."
+  ];
+
+  const LORE_LINES_BODY = [...INTRO_LINES];
+
+  const DRAMATIC_LINES = [1, 3, 4, 5, 6];
+
+  // ── DOM REFS ────────────────────────────────────────────
+  const introEl  = document.getElementById('cinematic-intro');
+  const loreDisp = document.getElementById('lore-display');
+  const skipBtn  = document.getElementById('skip-btn');
+  const loreBlock = document.getElementById('lore-block');
+  const answerBox = document.querySelector('.answer-box');
+
+  // ── CINEMATIC INTRO ─────────────────────────────────────
+  async function runIntro() {
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+
+    const typeText = async (text) => {
+      loreDisp.textContent = '';
+      for (const ch of text) {
+        loreDisp.textContent += ch;
+        await delay(28);
+      }
+    };
+
+    const fadeOut = async () => {
+      loreDisp.classList.add('fade-line-out');
+      await delay(850);
+      loreDisp.classList.remove('fade-line-out');
+    };
+
+    for (let i = 0; i < INTRO_LINES.length; i++) {
+      await typeText(INTRO_LINES[i]);
+      await delay(1100);
+      if (i < INTRO_LINES.length - 1) await fadeOut();
+    }
+
+    await delay(700);
+    endIntro();
+  }
+
+  function endIntro() {
+    introEl.classList.add('fade-out');
+
+    setTimeout(() => {
+      introEl.style.display = 'none';
+
+      // 👇 ONLY NOW reveal lore
+      revealLore();
+
+      if (answerBox) answerBox.focus();
+    }, 1200);
+  }
+
+  skipBtn.addEventListener('click', endIntro);
+
+  // ── LORE BLOCK REVEAL ───────────────────────────────────
+  function revealLore() {
+    loreBlock.classList.add('visible');
+
+    const lines = [];
+
+    LORE_LINES_BODY.forEach((line, i) => {
+      const p = document.createElement('p');
+      p.className = 'lore-line';
+      p.textContent = '> ' + line;
+      loreBlock.appendChild(p);
+      lines.push(p);
+
+      const delay = 200 + i * 180;
+
+      setTimeout(() => {
+        p.classList.add('shown');
+
+        if (DRAMATIC_LINES.includes(i)) {
+          p.classList.add(i % 2 === 0 ? 'shudder' : 'flicker');
+        }
+
+        // 👇 when LAST line appears → start timer
+        if (i === LORE_LINES_BODY.length - 1) {
+          startLoreTimer();
+        }
+
+      }, delay);
+    });
+  }
+
+  // ── TIMER CONTROL (starts AFTER lines finish) ────────────
+  function startLoreTimer() {
+    const timerTrack = document.querySelector('.lore-timer-track');
+
+    // recreate timer fill so animation starts fresh
+    timerTrack.innerHTML = '<div class="lore-timer-fill"></div>';
+    const timerFill = timerTrack.querySelector('.lore-timer-fill');
+
+    timerFill.addEventListener('animationend', () => {
+      dismissLore();
+    });
+  }
+
+  // ── LORE DISMISS ─────────────────────────────────────────
+  function dismissLore() {
+    loreBlock.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    loreBlock.style.opacity = '0';
+    loreBlock.style.transform = 'translateY(-10px)';
+
+    setTimeout(() => {
+      loreBlock.style.pointerEvents = 'none';
+      loreBlock.style.display = 'none';
+    }, 600);
+  }
+
+  // ── INIT ────────────────────────────────────────────────
+  runIntro();
+</script>
+
+  <script src="./script.js"></script>
+</body>
+</html>

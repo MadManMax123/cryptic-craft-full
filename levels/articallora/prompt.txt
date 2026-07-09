@@ -1,0 +1,380 @@
+refer to attached files for styling
+
+
+---
+
+# 🧠 PROMPT START
+
+You are building a complete cryptography + RF simulation CTF web application.
+
+The system consists of:
+
+* Frontend terminal UI (HTML/CSS/JS)
+* Backend API layer (Node.js / Next.js / Vercel serverless functions)
+* Google Sheets used as database (via service account)
+* Environment variables (.env)
+* Crypto + packet simulation logic in frontend only
+
+NO business logic is allowed in Google Sheets. Sheets only store data.
+
+---
+
+# 🌐 SYSTEM OVERVIEW
+
+## Player Flow:
+
+### 1. LOGIN SCREEN (NEW REQUIRED FLOW)
+
+(index.html which is the login page)
+
+* Users enter:
+
+  * team_id
+  * password
+
+### 2. AUTH FLOW
+
+* backend checks:
+
+  * team_id exists in Google Sheets
+  * password matches stored SHA256(password)
+  * lockout logic
+
+### 3. SESSION CREATION
+
+* if valid:
+
+  * generate session cookie
+  * sign with HMAC server secret
+  * allow entry to main.html.
+  * main.html verifies login
+
+---
+
+
+
+### 4. MAIN TERMINAL SCREEN
+
+* terminal boot animation (black minimal UI)
+* hidden logs briefly show SHA1(AUTH) (from env, subtle)
+* briefly show "archivepull();" in terminal. this command can be used by users in the devtools to download doc.pdf from a popup
+* lore text appears
+
+---
+
+### 5. FREQUENCY INPUT
+
+* user enters frequency (MHz)
+
+
+---
+
+### 6. PACKET GENERATION
+
+* system generates exactly 3 packets:
+
+  * DATA (Base32, Europe only coords)
+  * AUTH
+  * SIG
+  * FREQ included
+* city field appears
+
+---
+
+### 7. DECODING PHASE
+
+* user identifies correct packet
+* verifies:
+
+
+---
+
+### 8. CITY SUBMISSION
+
+* user submits city
+
+---
+
+### 9. RESULT
+
+* correct → FLAG
+* incorrect → attempt++
+
+---
+
+# 📡 CORE CONSTANTS (ENV ONLY)
+
+* TRUE_FREQ = 868.5
+* TRUE_AUTH = A86TFG
+* TRUE_SIG = HSGYS7N
+* TRUE_COORDS = 50.082553, 14.428998
+* TRUE_CITY = Prague
+* TRUE_SHA1_AUTH = cdb0c745bdc0e33d37619fae4b8cee43094168b7
+* TRUE_H2 = 9e9784a5a9e3b3ec5a6d3dc5cc6d4eee37317c15fdb08f1c3f27c3de8aef8c4a
+
+---
+
+# 📦 PACKET GENERATION RULE
+
+For every frequency input:
+
+Generate exactly 3 packets:
+
+```
+DATA: base32(lat,lon) (EUROPE ONLY)
+AUTH: string
+SIG: string
+FREQ: user input
+```
+
+---
+
+# 🔐 AUTH RULE
+
+AUTH is TRUE_AUTH ONLY IF:
+
+harmonic_mean(user_freq, TRUE_FREQ) is divisible by 3
+
+Else:
+AUTH = random alphanumeric
+
+---
+
+# 📦 PACKET RULES
+
+## If frequency is WRONG:
+
+* all packets random
+* coords strictly within Europe:
+  lat: 35–71
+  lon: -10–40
+* SIG random
+* AUTH random
+
+---
+
+## If frequency is CORRECT:
+
+* ONLY ONE packet contains:
+
+  * AUTH = TRUE_AUTH
+  * SIG = TRUE_SIG
+  * DATA = base32(TRUE_COORDS)
+* other 2 packets are decoys
+
+---
+
+
+# 📂 TERMINAL UI REQUIREMENTS
+
+* black background minimal terminal
+* typewriter animation
+* flicker noise logs
+* RF scanning animation
+* hidden command prompt
+
+---
+
+# 📡 TERMINAL FEATURES
+
+1. SHA1(AUTH) shown briefly in logs (NOT labeled, from env)
+2. hidden command EXACTLY: "archivepull();"
+
+
+* when executed in devtools console:
+
+  * generates `doc.pdf`
+
+---
+
+# 🧾 LOGIN SYSTEM (NEW CORE REQUIREMENT)
+
+## Backend authentication:
+
+User submits:
+
+* team_id
+* password
+
+### Backend checks:
+
+1. Fetch user row from Google Sheets via service account (key in env vars)
+2. Validate:
+
+   * team_id exists
+   * SHA256(password) matches stored hash
+3. Check lockout:
+
+   * if current_time < lockout_until → block login
+
+---
+
+## LOCKOUT RULE
+
+* if attempts >= 3:
+
+  * set lockout_until = now + 6 hours
+  * reset attempts = 0
+
+---
+
+## SUCCESS LOGIN
+
+* generate session cookie
+* sign using HMAC(secret, session_data)
+* store session server-side or verify via signature
+
+---
+
+# 🔐 SESSION SECURITY MODEL
+
+* session cookie required for all API calls
+* HMAC verification prevents:
+
+  * env var access abuse
+  * unauthorized packet generation
+  * direct API spoofing
+
+---
+
+# 📦 CITY SUBMISSION RULE
+
+Backend receives city:
+
+* if city == "Prague":
+
+  * return FLAG
+
+* else:
+
+  * increment attempts in Google Sheets
+
+---
+
+## LOCKOUT TRIGGER
+
+If attempts == 3:
+
+* set lockout timestamp
+* deny login until expired
+
+---
+
+# 🟡 GOOGLE SHEETS STRUCTURE
+
+Columns:
+
+```
+team_id | password_sha256 | attempts | lockout
+```
+sheet name: users
+
+---
+
+# 🌐 SERVERLESS API LAYER
+
+Create:
+
+* /api/login
+* /api/session
+* /api/frequency
+* /api/submitCity
+* /api/getEnv (HMAC protected, session required)
+
+---
+
+## API RESPONSIBILITIES:
+
+* authenticate session via HMAC
+* fetch env vars securely
+* generate packets
+* perform SHA1 / H2 checks
+* communicate with Google Sheets API
+
+---
+
+# 🔐 SECURITY MODEL
+
+* env vars NEVER exposed directly
+* all API calls require valid session cookie
+* HMAC prevents token tampering
+* Sheets never exposed to frontend
+
+---
+
+# 📦 FILE STRUCTURE REQUIRED
+
+## FRONTEND
+
+* index.html (login)
+* style.css
+* script.js
+* main.html (main page)
+
+## BACKEND
+
+* /api/login.js
+* /api/session.js
+* /api/submitCity.js
+* /api/getEnv.js
+
+## CONFIG
+
+* .env
+* package.json
+* vercel.json (or equivalent)
+
+---
+
+# 🎨 UI STYLE
+
+* black terminal aesthetic
+* monospace font
+* glitch flicker effects
+* RF scan visualization
+* typewriter lore intro
+
+---
+
+# 📜 LORE
+
+Again...
+
+The same error... maybe an attack?
+
+(stop longer)
+
+Operator, you have reached the transmission layer.
+
+NULL is using its many long-range RF nodes to send you a message.
+
+But many have been spoofed and are dangerous to access.
+
+Listen over many frequencies and receive the RF packages.
+
+But to actually identify the true package, you must verify its digital signature and AUTH code.
+
+Your clue has already been given...
+
+---
+
+# 🏁 FINAL OUTPUT FLAG
+
+```
+FLAG{ARTICAL_LORAWAN_PKG_RCVD}
+```
+
+---
+
+# 🧠 IMPLEMENTATION NOTES
+
+* Europe coordinate generator must be strict
+* Only ONE valid packet per correct frequency
+* harmonic mean rule must be deterministic
+* Base32 encoding must be reversible
+* archive command must be session-protected
+* NO extra text after frequency packet output (strict output mode)
+
+---
+
+## END PROMPT
